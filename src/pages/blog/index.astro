@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import PostCard from '../../components/PostCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const allPosts = await getCollection('blog');
+const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const postLabel = `${posts.length} ${posts.length === 1 ? 'entry' : 'entries'}`;
+---
+
+<BaseLayout title="Blog" description="Notes on software engineering, AI-native product work, and the systems behind them.">
+  <div class="page-stack fade-sequence">
+    <section class="page-intro page-intro--wide">
+      <p class="eyebrow">Journal</p>
+      <h1 class="page-intro__title">Writing in public about software, product, and systems.</h1>
+      <p class="page-intro__lede">
+        A running set of notes on the decisions, tradeoffs, and tools behind the work. Newest
+        entries land first.
+      </p>
+      <ul class="meta-pill-list">
+        <li class="meta-pill">{postLabel}</li>
+        <li class="meta-pill">RSS available</li>
+      </ul>
+    </section>
+
+    <section class="content-grid">
+      {posts.map((post) => <PostCard post={post} />)}
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-intro--wide {
+    max-width: 48rem;
+    display: grid;
+    gap: var(--space-5);
+  }
+</style>

@@ -1,17 +1,155 @@
 ---
+import { getCollection } from "astro:content";
+import ProjectCard from "../components/ProjectCard.astro";
+import PostCard from "../components/PostCard.astro";
+import { SITE, SOCIAL_LINKS } from "../consts";
+import BaseLayout from "../layouts/BaseLayout.astro";
 
+const allPosts = await getCollection("blog");
+const recentPosts = allPosts
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 4);
+
+const allProjects = await getCollection("projects");
+const featuredProjects = allProjects
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 4);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title={SITE.author}>
+  <div class="page-stack fade-sequence">
+    <section class="home-hero">
+      <div class="home-hero__copy">
+        <h1>Building AI-native products with a clear point of view.</h1>
+        <p class="lede">
+          I am Thiago Moura. I design and ship software that turns complex
+          systems into useful, steady experiences, from product surfaces to the
+          architecture behind them.
+        </p>
+
+        <div class="button-row">
+          <a class="button" href="/projects">Browse selected work</a>
+          <a class="button--ghost" href="/blog">Read the journal</a>
+        </div>
+      </div>
+
+      <div class="home-hero__aside">
+        <div class="home-note">
+          <p class="home-note__label">Currently exploring</p>
+          <ul class="meta-pill-list">
+            <li class="meta-pill">AI Agents</li>
+            <li class="meta-pill">Observability</li>
+          </ul>
+        </div>
+
+        <div class="home-note">
+          <p class="home-note__label">This site</p>
+          <p>
+            A compact portfolio for selected work, notes, and experiments.
+          </p>
+        </div>
+
+        <div class="home-note">
+          <p class="home-note__label">Elsewhere</p>
+          <div class="button-row">
+            {
+              SOCIAL_LINKS.map((link) => {
+                const isExternal = link.href.startsWith("http");
+
+                return (
+                  <a
+                    class="button--ghost"
+                    href={link.href}
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
+                  >
+                    {link.label}
+                  </a>
+                );
+              })
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .home-hero {
+    display: grid;
+    gap: var(--space-8);
+    padding: clamp(1rem, 2vw, 1.5rem) 0;
+    grid-template-columns: minmax(0, 1.7fr) minmax(18rem, 1fr);
+  }
+
+  .home-hero__copy {
+    display: grid;
+    gap: var(--space-6);
+    align-content: center;
+    max-width: 42rem;
+  }
+
+  .home-hero__aside {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .home-note {
+    display: grid;
+    gap: var(--space-4);
+    padding: 1rem 0;
+  }
+
+  .home-note__label {
+    color: var(--text);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .home-principles,
+  .home-section {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .section-heading--inline {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-5);
+    max-width: none;
+  }
+
+  .principle-grid {
+    display: grid;
+    gap: var(--space-5);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .principle-card {
+    display: grid;
+    gap: var(--space-4);
+    padding: 1rem 0;
+  }
+
+  .principle-card p {
+    line-height: 1.72;
+  }
+
+  @media (max-width: 64rem) {
+    .home-hero,
+    .principle-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 42rem) {
+    .section-heading--inline {
+      align-items: start;
+      flex-direction: column;
+    }
+  }
+</style>

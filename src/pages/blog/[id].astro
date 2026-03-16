@@ -1,0 +1,69 @@
+---
+import { getCollection, render } from 'astro:content';
+import { formatDate } from '../../lib/format-date';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+
+<BaseLayout title={post.data.title} description={post.data.description}>
+  <article class="page-stack fade-sequence">
+    <header class="post-header">
+      <a class="section-link" href="/blog">Back to the journal</a>
+      <div class="post-header__meta">
+        <span>Published {formatDate(post.data.pubDate)}</span>
+        {post.data.updatedDate && <span>Updated {formatDate(post.data.updatedDate)}</span>}
+      </div>
+      <h1>{post.data.title}</h1>
+      <p class="post-header__lede">{post.data.description}</p>
+      {post.data.tags && post.data.tags.length > 0 && (
+        <ul class="tag-list">
+          {post.data.tags.map((tag) => <li class="tag">{tag}</li>)}
+        </ul>
+      )}
+    </header>
+
+    <div class="surface surface--strong post-body">
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post-header {
+    display: grid;
+    gap: var(--space-4);
+    max-width: 46rem;
+  }
+
+  .post-header__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    color: var(--text-soft);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .post-header__lede {
+    max-width: 42rem;
+    font-size: 1.18rem;
+    line-height: 1.74;
+  }
+
+  .post-body {
+    padding: clamp(1.4rem, 3vw, 2.2rem);
+  }
+</style>

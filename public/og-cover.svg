@@ -1,0 +1,17 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#F6F2EB"/>
+  <circle cx="1022" cy="110" r="190" fill="#D9EFE7"/>
+  <circle cx="176" cy="528" r="140" fill="#EBD8B6"/>
+  <rect x="56" y="56" width="1088" height="518" rx="32" fill="#FFFDF8" stroke="#D7D2C8" stroke-width="2"/>
+  <rect x="90" y="92" width="120" height="120" rx="60" fill="#0D766D"/>
+  <path d="M132.352 163V126.636H117.608V113.568H163.672V126.636H148.928V163H132.352ZM170.14 163V113.568H186.716V131.772H202.668V113.568H219.244V163H202.668V145.084H186.716V163H170.14Z" fill="#FFFDF8"/>
+  <text x="90" y="308" fill="#182326" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" letter-spacing="-2.4">
+    nthings.dev
+  </text>
+  <text x="90" y="374" fill="#556367" font-family="Arial, sans-serif" font-size="30">
+    Portfolio, writing, and selected work by Thiago Moura.
+  </text>
+  <text x="90" y="430" fill="#0D766D" font-family="Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="3.2">
+    AI SYSTEMS   ·   CALM INTERFACES   ·   DURABLE SOFTWARE
+  </text>
+</svg>

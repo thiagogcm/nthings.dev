@@ -1,0 +1,53 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+
+const { project } = Astro.props;
+---
+
+<article class="content-card">
+  <div class="card-meta">
+    <span>Selected work</span>
+    {project.data.website && (
+      <a href={project.data.website} target="_blank" rel="noopener noreferrer" class="card-link">
+        Live site
+      </a>
+    )}
+  </div>
+
+  <div>
+    <h3>
+      {project.data.website ? (
+        <a href={project.data.website} target="_blank" rel="noopener noreferrer" class="card-link">
+          {project.data.title}
+        </a>
+      ) : (
+        project.data.title
+      )}
+    </h3>
+  </div>
+
+  <p>{project.data.description}</p>
+
+  {project.data.tags && project.data.tags.length > 0 && (
+    <ul class="tag-list">
+      {project.data.tags.map((tag) => <li class="tag">{tag}</li>)}
+    </ul>
+  )}
+
+  <div class="card-actions">
+    {project.data.website && (
+      <a href={project.data.website} target="_blank" rel="noopener noreferrer" class="button">
+        Visit site
+      </a>
+    )}
+    {project.data.repository && (
+      <a href={project.data.repository} target="_blank" rel="noopener noreferrer" class="button--ghost">
+        Source code
+      </a>
+    )}
+  </div>
+</article>

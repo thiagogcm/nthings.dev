@@ -1,0 +1,35 @@
+---
+import { NAV_LINKS } from '../consts';
+
+const pathname = Astro.url.pathname;
+const isActive = (href: string) =>
+  pathname === href || (href !== '/' && pathname.startsWith(`${href}/`));
+---
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="brand" href="/">
+      <span class="brand__mark">TM</span>
+      <span class="brand__text">
+        <span class="brand__name">Thiago Moura</span>
+        <span class="brand__meta">nthings.dev</span>
+      </span>
+    </a>
+
+    <nav aria-label="Primary">
+      <ul class="site-nav">
+        {NAV_LINKS.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              aria-current={isActive(link.href) ? 'page' : undefined}
+              class:list={['site-nav__link', isActive(link.href) && 'is-active']}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>

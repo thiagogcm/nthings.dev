@@ -1,0 +1,65 @@
+---
+import '../styles/global.css';
+import { Font } from 'astro:assets';
+import Header from '../components/Header.astro';
+import { SITE } from '../consts';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+}
+
+const { title, description = SITE.description, image = SITE.ogImage } = Astro.props;
+const siteUrl = Astro.site ?? new URL(SITE.url);
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
+const socialImage = new URL(image, siteUrl);
+const pageTitle = title ? (title === SITE.title ? title : `${title} | ${SITE.title}`) : SITE.title;
+const isArticle = Astro.url.pathname.startsWith('/blog/');
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f6f2eb" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="canonical" href={canonicalUrl.toString()} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${SITE.title} RSS Feed`}
+      href={new URL('/rss.xml', siteUrl).toString()}
+    />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta property="og:type" content={isArticle ? 'article' : 'website'} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl.toString()} />
+    <meta property="og:image" content={socialImage.toString()} />
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content={pageTitle} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={socialImage.toString()} />
+    <title>{pageTitle}</title>
+    <Font cssVariable="--font-body" preload={[{ weight: 400 }, { weight: 600 }]} />
+    <Font cssVariable="--font-display" preload={[{ weight: 600 }]} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <div class="site-shell">
+      <Header />
+      <div class="site-content">
+        <main id="main-content" class="site-main">
+          <div class="shell">
+            <slot />
+          </div>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

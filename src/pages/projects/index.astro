@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import ProjectCard from '../../components/ProjectCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const allProjects = await getCollection('projects');
+const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
+const projectLabel = `${projects.length} ${projects.length === 1 ? 'project' : 'projects'}`;
+---
+
+<BaseLayout title="Projects" description="Selected projects, experiments, and product explorations by Thiago Moura.">
+  <div class="page-stack fade-sequence">
+    <section class="page-intro page-intro--wide">
+      <p class="eyebrow">Projects</p>
+      <h1 class="page-intro__title">A curated set of experiments, product ideas, and working builds.</h1>
+      <p class="page-intro__lede">
+        Some of these are polished, some are exploratory, all of them reflect how I think about
+        product, tooling, and practical engineering.
+      </p>
+      <ul class="meta-pill-list">
+        <li class="meta-pill">{projectLabel}</li>
+        <li class="meta-pill">Selected work only</li>
+      </ul>
+    </section>
+
+    <section class="content-grid">
+      {projects.map((project) => <ProjectCard project={project} />)}
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-intro--wide {
+    max-width: 48rem;
+    display: grid;
+    gap: var(--space-5);
+  }
+</style>

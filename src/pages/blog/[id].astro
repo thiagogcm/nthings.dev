@@ -13,10 +13,10 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
 ---
 
-<BaseLayout title={post.data.title} description={post.data.description}>
+<BaseLayout title={post.data.title} description={post.data.description} headings={headings}>
   <article class="page-stack fade-sequence">
     <header class="post-header">
       <a class="section-link" href="/blog">Back to the journal</a>

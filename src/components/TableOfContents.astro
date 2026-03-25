@@ -1,0 +1,81 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const toc = headings.filter((h) => h.depth > 1 && h.depth < 4);
+---
+
+{toc.length > 0 && (
+  <aside class="site-toc">
+    <div class="site-toc__inner">
+      <h2 class="site-toc__title">On this page</h2>
+      <ul class="site-toc__list">
+        {toc.map((heading) => (
+          <li class={`site-toc__item depth-${heading.depth}`}>
+            <a href={`#${heading.slug}`} class="site-toc__link">
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </aside>
+)}
+
+<style>
+  .site-toc {
+    display: none;
+  }
+
+  /* Only show TOC on large screens */
+  @media (min-width: 75rem) {
+    .site-toc {
+      display: block;
+      width: 16rem;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 2.5rem 1.5rem 2.5rem 0;
+      overflow-y: auto;
+    }
+  }
+
+  .site-toc__title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: var(--space-4);
+    font-family: var(--font-sans);
+  }
+
+  .site-toc__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .site-toc__link {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    transition: color var(--transition-fast);
+    display: inline-block;
+    line-height: 1.4;
+  }
+
+  .site-toc__link:hover,
+  .site-toc__link:focus-visible {
+    color: var(--text);
+  }
+
+  .depth-3 {
+    padding-left: 0.8rem;
+  }
+</style>

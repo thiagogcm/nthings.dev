@@ -1,0 +1,71 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate } from '../../lib/format-date';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+
+  return projects.map((project) => ({
+    params: { id: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content, headings } = await render(project);
+---
+
+<BaseLayout title={project.data.title} description={project.data.description} headings={headings}>
+  <article class="page-stack fade-sequence">
+    <header class="post-header">
+      <a class="section-link" href="/projects">Back to projects</a>
+      <h1>{project.data.title}</h1>
+      <p class="post-header__lede">{project.data.description}</p>
+      
+      <div class="card-actions" style="margin-top: 1rem;">
+        {project.data.website && (
+          <a href={project.data.website} target="_blank" rel="noopener noreferrer" class="button">
+            Visit site
+          </a>
+        )}
+        {project.data.repository && (
+          <a href={project.data.repository} target="_blank" rel="noopener noreferrer" class="button--ghost">
+            Source code
+          </a>
+        )}
+      </div>
+
+      {project.data.tags && project.data.tags.length > 0 && (
+        <ul class="tag-list" style="margin-top: 1rem;">
+          {project.data.tags.map((tag) => <li class="tag">{tag}</li>)}
+        </ul>
+      )}
+    </header>
+
+    <div class="surface surface--strong post-body">
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post-header {
+    display: grid;
+    gap: var(--space-4);
+    max-width: 48rem;
+  }
+
+  .post-header__lede {
+    max-width: 42rem;
+    font-size: 1.18rem;
+    line-height: 1.74;
+  }
+
+  .post-body {
+    padding: clamp(1.4rem, 3vw, 2.2rem);
+    border: none !important;
+  }
+</style>

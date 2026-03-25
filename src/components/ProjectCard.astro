@@ -12,21 +12,17 @@ const { project } = Astro.props;
   <div class="card-meta">
     <span>Selected work</span>
     {project.data.website && (
-      <a href={project.data.website} target="_blank" rel="noopener noreferrer" class="card-link">
-        Live site
+      <a href={project.data.website} target="_blank" rel="noopener noreferrer" class="card-link" style="color: var(--text-soft);">
+        Live site ↗
       </a>
     )}
   </div>
 
   <div>
     <h3>
-      {project.data.website ? (
-        <a href={project.data.website} target="_blank" rel="noopener noreferrer" class="card-link">
-          {project.data.title}
-        </a>
-      ) : (
-        project.data.title
-      )}
+      <a href={`/projects/${project.id}`} class="card-link" style="color: var(--text); font-weight: 700;">
+        {project.data.title}
+      </a>
     </h3>
   </div>
 
@@ -39,14 +35,12 @@ const { project } = Astro.props;
   )}
 
   <div class="card-actions">
-    {project.data.website && (
-      <a href={project.data.website} target="_blank" rel="noopener noreferrer" class="button">
-        Visit site
-      </a>
-    )}
+    <a href={`/projects/${project.id}`} class="button">
+      View details
+    </a>
     {project.data.repository && (
       <a href={project.data.repository} target="_blank" rel="noopener noreferrer" class="button--ghost">
-        Source code
+        Source
       </a>
     )}
   </div>

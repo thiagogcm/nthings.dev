@@ -2,15 +2,18 @@
 import '../styles/global.css';
 import { Font } from 'astro:assets';
 import Header from '../components/Header.astro';
+import TableOfContents from '../components/TableOfContents.astro';
 import { SITE } from '../consts';
+import type { MarkdownHeading } from 'astro';
 
 interface Props {
   title?: string;
   description?: string;
   image?: string;
+  headings?: MarkdownHeading[];
 }
 
-const { title, description = SITE.description, image = SITE.ogImage } = Astro.props;
+const { title, description = SITE.description, image = SITE.ogImage, headings = [] } = Astro.props;
 const siteUrl = Astro.site ?? new URL(SITE.url);
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
 const socialImage = new URL(image, siteUrl);
@@ -59,7 +62,16 @@ const isArticle = Astro.url.pathname.startsWith('/blog/');
             <slot />
           </div>
         </main>
+        {headings && headings.length > 0 && <TableOfContents headings={headings} />}
       </div>
     </div>
   </body>
 </html>
+
+<style>
+  @media (min-width: 75rem) {
+    .site-content {
+      flex-direction: row;
+    }
+  }
+</style>

@@ -3,6 +3,18 @@
 	"compatibility_flags": ["global_fetch_strictly_public"],
 	"name": "nthings-dev",
 	"main": "@astrojs/cloudflare/entrypoints/server",
+	"routes": [
+		{
+			"pattern": "nthings.dev",
+			"zone_name": "nthings.dev",
+			"custom_domain": true
+		},
+		{
+			"pattern": "www.nthings.dev",
+			"zone_name": "nthings.dev",
+			"custom_domain": true
+		}
+	],
 	"assets": {
 		"directory": "./dist",
 		"binding": "ASSETS"

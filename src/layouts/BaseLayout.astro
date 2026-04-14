@@ -1,35 +1,35 @@
 ---
 import '../styles/global.css';
 import { Font } from 'astro:assets';
+import { ClientRouter, slide } from 'astro:transitions';
 import Header from '../components/Header.astro';
-import TableOfContents from '../components/TableOfContents.astro';
-import { SITE } from '../consts';
-import type { MarkdownHeading } from 'astro';
+import Icon from '../components/Icon.astro';
+import { SITE, SOCIAL_LINKS } from '../consts';
 
 interface Props {
   title?: string;
   description?: string;
   image?: string;
-  headings?: MarkdownHeading[];
 }
 
-const { title, description = SITE.description, image = SITE.ogImage, headings = [] } = Astro.props;
+const { title, description = SITE.description, image = SITE.ogImage } = Astro.props;
 const siteUrl = Astro.site ?? new URL(SITE.url);
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
 const socialImage = new URL(image, siteUrl);
 const pageTitle = title ? (title === SITE.title ? title : `${title} | ${SITE.title}`) : SITE.title;
 const isArticle = Astro.url.pathname.startsWith('/blog/');
+const currentYear = new Date().getUTCFullYear();
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" transition:name="root" transition:animate="none">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f6f2eb" />
+    <meta name="theme-color" content="#f7f7f5" />
     <meta name="color-scheme" content="light dark" />
     <link rel="canonical" href={canonicalUrl.toString()} />
     <link
@@ -51,27 +51,51 @@ const isArticle = Astro.url.pathname.startsWith('/blog/');
     <title>{pageTitle}</title>
     <Font cssVariable="--font-body" preload={[{ weight: 400 }, { weight: 600 }]} />
     <Font cssVariable="--font-display" preload={[{ weight: 600 }]} />
+    <ClientRouter />
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
     <div class="site-shell">
       <Header />
-      <div class="site-content">
-        <main id="main-content" class="site-main">
-          <div class="shell">
-            <slot />
+
+      <main
+        id="main-content"
+        class="site-main"
+        transition:name="page-shell"
+        transition:animate={slide({ duration: '0.32s' })}
+      >
+        <div class="shell">
+          <slot />
+        </div>
+      </main>
+
+      <footer class="site-footer">
+        <div class="shell site-footer__inner">
+          <div class="site-footer__copy">
+            <span>© {currentYear} {SITE.author}</span>
+            <span>·</span>
+            <span>{SITE.location}</span>
           </div>
-        </main>
-        {headings && headings.length > 0 && <TableOfContents headings={headings} />}
-      </div>
+
+          <div class="site-footer__links">
+            {SOCIAL_LINKS.map((link) => {
+              const isExternal = link.href.startsWith('http');
+
+              return (
+                <a
+                  class="site-footer__link"
+                  href={link.href}
+                  target={isExternal ? '_blank' : undefined}
+                  rel={isExternal ? 'noopener noreferrer' : undefined}
+                >
+                  <Icon name={link.icon} aria-hidden="true" />
+                  <span>{link.label}</span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      </footer>
     </div>
   </body>
 </html>
-
-<style>
-  @media (min-width: 75rem) {
-    .site-content {
-      flex-direction: row;
-    }
-  }
-</style>

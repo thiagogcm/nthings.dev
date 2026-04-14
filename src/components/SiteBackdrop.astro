@@ -1,0 +1,84 @@
+<div class="site-backdrop" transition:persist="site-backdrop" aria-hidden="true">
+  <div class="site-backdrop__mesh"></div>
+  <div class="site-backdrop__orb site-backdrop__orb--one"></div>
+  <div class="site-backdrop__orb site-backdrop__orb--two"></div>
+  <div class="site-backdrop__orb site-backdrop__orb--three"></div>
+</div>
+
+<style>
+  .site-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .site-backdrop__mesh,
+  .site-backdrop__orb {
+    position: absolute;
+    inset: auto;
+  }
+
+  .site-backdrop__mesh {
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(17, 24, 28, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(17, 24, 28, 0.045) 1px, transparent 1px);
+    background-size: clamp(2.5rem, 5vw, 4rem) clamp(2.5rem, 5vw, 4rem);
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.42), transparent 78%);
+    opacity: 0.45;
+  }
+
+  .site-backdrop__orb {
+    border-radius: 999px;
+    filter: blur(60px);
+    opacity: 0.7;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .site-backdrop__orb--one {
+    top: -8rem;
+    right: min(14vw, 9rem);
+    width: clamp(16rem, 30vw, 28rem);
+    height: clamp(16rem, 30vw, 28rem);
+    background: rgba(12, 122, 100, 0.18);
+  }
+
+  .site-backdrop__orb--two {
+    top: 28rem;
+    left: -7rem;
+    width: clamp(14rem, 24vw, 22rem);
+    height: clamp(14rem, 24vw, 22rem);
+    background: rgba(196, 103, 50, 0.15);
+  }
+
+  .site-backdrop__orb--three {
+    right: -6rem;
+    bottom: -4rem;
+    width: clamp(14rem, 24vw, 24rem);
+    height: clamp(14rem, 24vw, 24rem);
+    background: rgba(232, 187, 102, 0.18);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .site-backdrop__mesh {
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      opacity: 0.35;
+    }
+
+    .site-backdrop__orb--one {
+      background: rgba(64, 185, 161, 0.16);
+    }
+
+    .site-backdrop__orb--two {
+      background: rgba(211, 118, 72, 0.14);
+    }
+
+    .site-backdrop__orb--three {
+      background: rgba(227, 187, 111, 0.12);
+    }
+  }
+</style>

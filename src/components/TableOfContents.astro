@@ -10,72 +10,69 @@ const toc = headings.filter((h) => h.depth > 1 && h.depth < 4);
 ---
 
 {toc.length > 0 && (
-  <aside class="site-toc">
-    <div class="site-toc__inner">
-      <h2 class="site-toc__title">On this page</h2>
-      <ul class="site-toc__list">
-        {toc.map((heading) => (
-          <li class={`site-toc__item depth-${heading.depth}`}>
-            <a href={`#${heading.slug}`} class="site-toc__link">
-              {heading.text}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
+  <aside class="site-toc" aria-label="On this page">
+    <p class="site-toc__heading">On this page</p>
+    <ul class="site-toc__list">
+      {toc.map((heading) => (
+        <li class={`site-toc__item depth-${heading.depth}`}>
+          <a href={`#${heading.slug}`} class="site-toc__link">
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ul>
   </aside>
 )}
 
 <style>
   .site-toc {
-    display: none;
+    position: sticky;
+    top: calc(var(--header-height) + 1.25rem);
+    align-self: start;
+    max-height: calc(100vh - var(--header-height) - 2rem);
+    overflow-y: auto;
+    padding-left: 1rem;
+    border-left: 1px solid var(--border);
   }
 
-  /* Only show TOC on large screens */
-  @media (min-width: 75rem) {
-    .site-toc {
-      display: block;
-      width: 16rem;
-      flex-shrink: 0;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      padding: 2.5rem 1.5rem 2.5rem 0;
-      overflow-y: auto;
-    }
-  }
-
-  .site-toc__title {
-    font-size: 0.85rem;
+  .site-toc__heading {
+    margin: 0 0 0.75rem;
+    color: var(--text-soft);
+    font-size: 0.7rem;
     font-weight: 700;
-    color: var(--text);
-    margin-bottom: var(--space-4);
-    font-family: var(--font-sans);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
   }
 
   .site-toc__list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   .site-toc__link {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    transition: color var(--transition-fast);
     display: inline-block;
+    color: var(--text-muted);
+    font-size: 0.85rem;
     line-height: 1.4;
+    transition: color var(--transition-fast);
   }
 
   .site-toc__link:hover,
   .site-toc__link:focus-visible {
-    color: var(--text);
+    color: var(--accent);
   }
 
   .depth-3 {
     padding-left: 0.8rem;
+  }
+
+  @media (max-width: 75rem) {
+    .site-toc {
+      display: none;
+    }
   }
 </style>

@@ -1,0 +1,34 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import DocsSidebar from '../components/DocsSidebar.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  headings?: MarkdownHeading[];
+  showToc?: boolean;
+}
+
+const { title, description, image, headings = [], showToc = false } = Astro.props;
+const withToc = showToc && headings.length > 0;
+---
+
+<BaseLayout title={title} description={description} image={image}>
+  <div class:list={['docs-grid', { 'docs-grid--with-toc': withToc }]}>
+    <details class="docs-sidebar__drawer">
+      <summary>Sections</summary>
+      <DocsSidebar />
+    </details>
+
+    <DocsSidebar />
+
+    <div class="docs-main">
+      <slot />
+    </div>
+
+    {withToc && <TableOfContents headings={headings} />}
+  </div>
+</BaseLayout>

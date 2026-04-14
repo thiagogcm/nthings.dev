@@ -1,155 +1,207 @@
 ---
-import { getCollection } from "astro:content";
-import ProjectCard from "../components/ProjectCard.astro";
-import PostCard from "../components/PostCard.astro";
-import { SITE, SOCIAL_LINKS } from "../consts";
-import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from 'astro:content';
+import PostCard from '../components/PostCard.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import Icon from '../components/Icon.astro';
+import { CURRENT_FOCUS, SITE, SOCIAL_LINKS } from '../consts';
+import BaseLayout from '../layouts/BaseLayout.astro';
 
-const allPosts = await getCollection("blog");
+const allPosts = await getCollection('blog');
 const recentPosts = allPosts
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 4);
+  .slice(0, 6);
+const latestPost = recentPosts[0];
 
-const allProjects = await getCollection("projects");
-const featuredProjects = allProjects
-  .sort((a, b) => a.data.order - b.data.order)
-  .slice(0, 4);
+const allProjects = await getCollection('projects');
+const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
+const latestProject = projects[0];
 ---
 
 <BaseLayout title={SITE.author}>
-  <div class="page-stack fade-sequence">
-    <section class="home-hero">
-      <div class="home-hero__copy">
-        <h1>Building AI-native products with a clear point of view.</h1>
-        <p class="lede">
-          I am Thiago Moura. I design and ship software that turns complex
-          systems into useful, steady experiences, from product surfaces to the
-          architecture behind them.
-        </p>
+  <div class="page-stack home-page fade-sequence">
+    <section id="about" class="home-about">
+      <p class="eyebrow" transition:name="page-kicker">About</p>
+      <h1 transition:name="page-heading">
+        Hi, I'm {SITE.author}. I build AI-native products that stay understandable.
+      </h1>
+      <p class="lede">
+        {SITE.role} based in {SITE.location}. I design and ship software that turns complex
+        systems — product surfaces, internal tools, and the architecture behind them — into
+        useful, steady experiences.
+      </p>
 
-        <div class="button-row">
-          <a class="button" href="/projects">Browse selected work</a>
-          <a class="button--ghost" href="/blog">Read the journal</a>
-        </div>
+      <ul class="home-about__pills meta-pill-list" aria-label="Current focus">
+        {CURRENT_FOCUS.map((item) => (
+          <li class="meta-pill">{item}</li>
+        ))}
+      </ul>
+
+      <div class="home-about__shortcuts">
+        {latestPost && (
+          <a class="home-about__shortcut" href={`/blog/${latestPost.id}`}>
+            <span class="home-about__shortcut-label">Latest post</span>
+            <span class="home-about__shortcut-title">{latestPost.data.title}</span>
+            <Icon name="lucide:arrow-right" aria-hidden="true" />
+          </a>
+        )}
+        {latestProject && (
+          <a class="home-about__shortcut" href={`/projects/${latestProject.id}`}>
+            <span class="home-about__shortcut-label">Latest project</span>
+            <span class="home-about__shortcut-title">{latestProject.data.title}</span>
+            <Icon name="lucide:arrow-right" aria-hidden="true" />
+          </a>
+        )}
       </div>
 
-      <div class="home-hero__aside">
-        <div class="content-card home-note">
-          <p class="home-note__label">Currently exploring</p>
-          <ul class="meta-pill-list">
-            <li class="meta-pill">AI Agents</li>
-            <li class="meta-pill">Observability</li>
-          </ul>
-        </div>
+      <ul class="home-about__social" aria-label="Contact">
+        {SOCIAL_LINKS.map((link) => {
+          const isExternal = link.href.startsWith('http');
+          return (
+            <li>
+              <a
+                class="button--ghost"
+                href={link.href}
+                target={isExternal ? '_blank' : undefined}
+                rel={isExternal ? 'noopener noreferrer' : undefined}
+              >
+                <Icon name={link.icon} aria-hidden="true" />
+                <span>{link.label}</span>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
 
-        <div class="content-card home-note">
-          <p class="home-note__label">This site</p>
-          <p>
-            A compact portfolio for selected work, notes, and experiments.
+    <section id="projects" class="home-section">
+      <div class="section-heading section-heading--inline">
+        <div class="section-heading">
+          <p class="eyebrow">Projects</p>
+          <h2 class="section-heading__title">Selected builds and experiments.</h2>
+          <p class="section-heading__copy">
+            A tighter set of product work, tooling, and systems included because each one says
+            something useful about how I approach delivery under real constraints.
           </p>
         </div>
 
-        <div class="content-card home-note">
-          <p class="home-note__label">Elsewhere</p>
-          <div class="button-row">
-            {
-              SOCIAL_LINKS.map((link) => {
-                const isExternal = link.href.startsWith("http");
+        <a class="section-link" href="/projects">
+          <span>All projects</span>
+          <Icon name="lucide:arrow-right" aria-hidden="true" />
+        </a>
+      </div>
 
-                return (
-                  <a
-                    class="button--ghost"
-                    href={link.href}
-                    target={isExternal ? "_blank" : undefined}
-                    rel={isExternal ? "noopener noreferrer" : undefined}
-                  >
-                    {link.label}
-                  </a>
-                );
-              })
-            }
-          </div>
+      <div class="content-grid">
+        {projects.map((project) => <ProjectCard project={project} />)}
+      </div>
+    </section>
+
+    <section id="blog" class="home-section">
+      <div class="section-heading section-heading--inline">
+        <div class="section-heading">
+          <p class="eyebrow">Blog</p>
+          <h2 class="section-heading__title">Writing in public.</h2>
+          <p class="section-heading__copy">
+            Short notes, decisions, and implementation details from the work itself — product,
+            software, and system design.
+          </p>
         </div>
+
+        <a class="section-link" href="/blog">
+          <span>Read the journal</span>
+          <Icon name="lucide:arrow-right" aria-hidden="true" />
+        </a>
+      </div>
+
+      <div class="content-grid">
+        {recentPosts.map((post) => <PostCard post={post} />)}
       </div>
     </section>
   </div>
 </BaseLayout>
 
 <style>
-  .home-hero {
+  .home-about {
     display: grid;
-    gap: var(--space-8);
-    padding: clamp(1rem, 2vw, 1.5rem) 0;
-    grid-template-columns: minmax(0, 1.7fr) minmax(18rem, 1fr);
+    gap: 1.25rem;
+    max-width: 48rem;
+    padding-block: clamp(1rem, 2vw, 2rem);
   }
 
-  .home-hero__copy {
-    display: grid;
-    gap: var(--space-6);
-    align-content: center;
-    max-width: 42rem;
+  .home-about h1 {
+    max-width: 22ch;
   }
 
-  .home-hero__aside {
-    display: grid;
-    gap: var(--space-4);
+  .home-about__pills {
+    margin-top: 0.25rem;
   }
 
-  .home-note {
+  .home-about__shortcuts {
     display: grid;
-    gap: var(--space-4);
-    padding: 1rem 0;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
   }
 
-  .home-note__label {
+  .home-about__shortcut {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-elevated);
     color: var(--text);
-    font-size: 0.82rem;
+    transition:
+      border-color var(--transition-fast),
+      background-color var(--transition-fast);
+  }
+
+  .home-about__shortcut:hover,
+  .home-about__shortcut:focus-visible {
+    border-color: var(--accent);
+    background: var(--surface-strong);
+  }
+
+  .home-about__shortcut-label {
+    color: var(--text-soft);
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
-  .home-principles,
+  .home-about__shortcut-title {
+    color: var(--text);
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .home-about__shortcut :global(svg) {
+    color: var(--accent);
+  }
+
+  .home-about__social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
   .home-section {
     display: grid;
-    gap: var(--space-6);
-  }
-
-  .section-heading--inline {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    gap: var(--space-5);
-    max-width: none;
-  }
-
-  .principle-grid {
-    display: grid;
-    gap: var(--space-5);
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .principle-card {
-    display: grid;
-    gap: var(--space-4);
-    padding: 1rem 0;
-  }
-
-  .principle-card p {
-    line-height: 1.72;
-  }
-
-  @media (max-width: 64rem) {
-    .home-hero,
-    .principle-grid {
-      grid-template-columns: 1fr;
-    }
+    gap: 1rem;
   }
 
   @media (max-width: 42rem) {
-    .section-heading--inline {
-      align-items: start;
-      flex-direction: column;
+    .home-about__shortcut {
+      grid-template-columns: 1fr auto;
+    }
+
+    .home-about__shortcut-label {
+      grid-column: 1 / -1;
     }
   }
 </style>

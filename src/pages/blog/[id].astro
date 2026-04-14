@@ -1,7 +1,8 @@
 ---
+import Icon from '../../components/Icon.astro';
 import { getCollection, render } from 'astro:content';
 import { formatDate } from '../../lib/format-date';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import DocsLayout from '../../layouts/DocsLayout.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog');
@@ -16,16 +17,33 @@ const { post } = Astro.props;
 const { Content, headings } = await render(post);
 ---
 
-<BaseLayout title={post.data.title} description={post.data.description} headings={headings}>
-  <article class="page-stack fade-sequence">
-    <header class="post-header">
-      <a class="section-link" href="/blog">Back to the journal</a>
-      <div class="post-header__meta">
+<DocsLayout
+  title={post.data.title}
+  description={post.data.description}
+  headings={headings}
+  showToc={true}
+>
+  <article class="post fade-sequence">
+    <header class="post__header">
+      <a class="section-link post__back" href="/blog">
+        <Icon name="lucide:arrow-right" aria-hidden="true" />
+        <span>Back to the blog</span>
+      </a>
+
+      <p class="eyebrow">Blog</p>
+      <h1 transition:name={`post-title-${post.id}`}>{post.data.title}</h1>
+      <p class="lede">{post.data.description}</p>
+
+      <div class="post__meta">
         <span>Published {formatDate(post.data.pubDate)}</span>
-        {post.data.updatedDate && <span>Updated {formatDate(post.data.updatedDate)}</span>}
+        {post.data.updatedDate && (
+          <>
+            <span>·</span>
+            <span>Updated {formatDate(post.data.updatedDate)}</span>
+          </>
+        )}
       </div>
-      <h1>{post.data.title}</h1>
-      <p class="post-header__lede">{post.data.description}</p>
+
       {post.data.tags && post.data.tags.length > 0 && (
         <ul class="tag-list">
           {post.data.tags.map((tag) => <li class="tag">{tag}</li>)}
@@ -33,37 +51,44 @@ const { Content, headings } = await render(post);
       )}
     </header>
 
-    <div class="surface surface--strong post-body">
-      <div class="prose">
-        <Content />
-      </div>
+    <div class="prose">
+      <Content />
     </div>
   </article>
-</BaseLayout>
+</DocsLayout>
 
 <style>
-  .post-header {
+  .post {
     display: grid;
-    gap: var(--space-4);
-    max-width: 46rem;
+    gap: 2rem;
   }
 
-  .post-header__meta {
+  .post__header {
+    display: grid;
+    gap: 0.75rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post__back {
+    width: fit-content;
+    color: var(--text-soft);
+  }
+
+  .post__back :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  .post__back:hover,
+  .post__back:focus-visible {
+    color: var(--accent);
+  }
+
+  .post__meta {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-4);
+    gap: 0.5rem;
     color: var(--text-soft);
-    font-size: 0.95rem;
-    font-weight: 600;
-  }
-
-  .post-header__lede {
-    max-width: 42rem;
-    font-size: 1.18rem;
-    line-height: 1.74;
-  }
-
-  .post-body {
-    padding: clamp(1.4rem, 3vw, 2.2rem);
+    font-size: 0.88rem;
   }
 </style>

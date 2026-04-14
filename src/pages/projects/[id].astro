@@ -1,7 +1,7 @@
 ---
+import Icon from '../../components/Icon.astro';
 import { getCollection, render } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { formatDate } from '../../lib/format-date';
+import DocsLayout from '../../layouts/DocsLayout.astro';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -16,56 +16,87 @@ const { project } = Astro.props;
 const { Content, headings } = await render(project);
 ---
 
-<BaseLayout title={project.data.title} description={project.data.description} headings={headings}>
-  <article class="page-stack fade-sequence">
-    <header class="post-header">
-      <a class="section-link" href="/projects">Back to projects</a>
-      <h1>{project.data.title}</h1>
-      <p class="post-header__lede">{project.data.description}</p>
-      
-      <div class="card-actions" style="margin-top: 1rem;">
+<DocsLayout
+  title={project.data.title}
+  description={project.data.description}
+  headings={headings}
+  showToc={true}
+>
+  <article class="project fade-sequence">
+    <header class="project__header">
+      <a class="section-link project__back" href="/projects">
+        <Icon name="lucide:arrow-right" aria-hidden="true" />
+        <span>Back to projects</span>
+      </a>
+
+      <p class="eyebrow">Project</p>
+      <h1 transition:name={`project-title-${project.id}`}>{project.data.title}</h1>
+      <p class="lede">{project.data.description}</p>
+
+      <div class="project__actions">
         {project.data.website && (
           <a href={project.data.website} target="_blank" rel="noopener noreferrer" class="button">
-            Visit site
+            <span>Visit site</span>
+            <Icon name="lucide:arrow-up-right" aria-hidden="true" />
           </a>
         )}
         {project.data.repository && (
-          <a href={project.data.repository} target="_blank" rel="noopener noreferrer" class="button--ghost">
-            Source code
+          <a
+            href={project.data.repository}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="button--ghost"
+          >
+            <span>Source code</span>
+            <Icon name="lucide:arrow-up-right" aria-hidden="true" />
           </a>
         )}
       </div>
 
       {project.data.tags && project.data.tags.length > 0 && (
-        <ul class="tag-list" style="margin-top: 1rem;">
+        <ul class="tag-list">
           {project.data.tags.map((tag) => <li class="tag">{tag}</li>)}
         </ul>
       )}
     </header>
 
-    <div class="surface surface--strong post-body">
-      <div class="prose">
-        <Content />
-      </div>
+    <div class="prose">
+      <Content />
     </div>
   </article>
-</BaseLayout>
+</DocsLayout>
 
 <style>
-  .post-header {
+  .project {
     display: grid;
-    gap: var(--space-4);
-    max-width: 48rem;
+    gap: 2rem;
   }
 
-  .post-header__lede {
-    max-width: 42rem;
-    font-size: 1.18rem;
-    line-height: 1.74;
+  .project__header {
+    display: grid;
+    gap: 0.75rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
   }
 
-  .post-body {
-    padding: clamp(1.4rem, 3vw, 2.2rem);
-    border: none !important;
+  .project__back {
+    width: fit-content;
+    color: var(--text-soft);
+  }
+
+  .project__back :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  .project__back:hover,
+  .project__back:focus-visible {
+    color: var(--accent);
+  }
+
+  .project__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
   }
 </style>

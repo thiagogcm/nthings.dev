@@ -1,0 +1,93 @@
+---
+import { getCollection } from 'astro:content';
+import Icon from './Icon.astro';
+
+const [allPosts, allProjects] = await Promise.all([
+  getCollection('blog'),
+  getCollection('projects'),
+]);
+
+const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
+
+const pathname = Astro.url.pathname;
+const projectsActive = pathname === '/projects' || pathname.startsWith('/projects/');
+const blogActive = pathname === '/blog' || pathname.startsWith('/blog/');
+const isItemActive = (href: string) => pathname === href || pathname === `${href}/`;
+---
+
+<aside class="docs-sidebar" aria-label="Section navigation">
+  <p class="docs-sidebar__heading">Portfolio</p>
+
+  <ul class="docs-sidebar__group">
+    <li>
+      <a href="/#about" class="docs-sidebar__top-link">About</a>
+    </li>
+  </ul>
+
+  <ul class="docs-sidebar__group">
+    <li>
+      <details open={projectsActive}>
+        <summary>
+          <span class="docs-sidebar__chevron" aria-hidden="true">
+            <Icon name="lucide:chevron-right" size={14} />
+          </span>
+          <a
+            href="/projects"
+            class:list={['docs-sidebar__summary-link', { 'is-active': pathname === '/projects' }]}
+          >
+            Projects
+          </a>
+        </summary>
+        <ul class="docs-sidebar__items">
+          {projects.map((project) => {
+            const href = `/projects/${project.id}`;
+            return (
+              <li>
+                <a
+                  href={href}
+                  class:list={['docs-sidebar__link', { 'is-active': isItemActive(href) }]}
+                >
+                  {project.data.title}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </details>
+    </li>
+  </ul>
+
+  <ul class="docs-sidebar__group">
+    <li>
+      <details open={blogActive}>
+        <summary>
+          <span class="docs-sidebar__chevron" aria-hidden="true">
+            <Icon name="lucide:chevron-right" size={14} />
+          </span>
+          <a
+            href="/blog"
+            class:list={['docs-sidebar__summary-link', { 'is-active': pathname === '/blog' }]}
+          >
+            Blog
+          </a>
+        </summary>
+        <ul class="docs-sidebar__items">
+          {posts.map((post) => {
+            const href = `/blog/${post.id}`;
+            return (
+              <li>
+                <a
+                  href={href}
+                  class:list={['docs-sidebar__link', { 'is-active': isItemActive(href) }]}
+                >
+                  {post.data.title}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </details>
+    </li>
+  </ul>
+</aside>

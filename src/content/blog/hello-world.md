@@ -1,34 +1,47 @@
 ---
-title: "Building nthings.dev"
-description: "Why this site exists, what it will hold, and why a small web presence still matters."
+title: "Building a portfolio as a documentation site"
+description: "Why I rebuilt nthings.dev to read like an engineering spec — and the layout decisions that make project work and writing share one format."
 pubDate: "2026-03-16"
-tags: ["development", "experiments"]
+tags: ["astro", "design-systems", "writing"]
 ---
 
-This site is intentionally small.
+Most portfolios are galleries. You scroll, you skim thumbnails, you maybe click through to a
+case study that has been art-directed to within an inch of its life. I wanted the opposite: a
+place where work is _read_, where each project is a reference document you could hand to another
+engineer.
 
-I wanted a place to collect the work and ideas that rarely fit inside a resume, a chat thread, or a project README. Something closer to a notebook than a feed, and closer to a portfolio than a stream of half-finished updates.
+So I rebuilt this site as a technical documentation site.
 
-For me, that means a few things:
+## The thesis
 
-- a clear home for selected projects
-- short writing about systems, interfaces, and product decisions
-- room for experiments that are useful even when they stay rough at the edges
+A documentation layout makes a strong claim — that the substance of the work is the architecture,
+the stack, and the code decisions, not the screenshots. Treating projects this way forces a
+useful kind of honesty. If a project cannot be written up as a spec, it probably is not worth
+showing.
 
-I rebuilt this space with Astro because it rewards restraint. It is fast, simple to reason about, and flexible enough to grow without dragging a lot of framework ceremony along with it.
+The same format then absorbs the blog for free. Deep dives, post-mortems, and innovation
+spotlights are just more documents in the same system, not a bolted-on "news" section.
 
-## What will show up here
+## The layout
 
-Most of the writing will sit somewhere between engineering notes and product thinking. I am usually interested in the part where architecture, tooling, and interface decisions start affecting real product quality.
+Every content page renders through one three-column grid:
 
-That includes topics like:
+- a left sidebar for navigating the whole directory of projects and posts,
+- a center column tuned purely for reading,
+- a right rail that mirrors the current document's headings.
 
-- AI-native workflows and agents
-- frontend systems and performance
-- practical architecture choices under product pressure
+```text
+[ nav ]   [ longform content ]   [ on this page ]
+```
 
-## Why publish it at all
+Because the right rail is generated from the rendered Markdown headings, the outline is never out
+of sync with the prose. Writing a new section is the only step required to update navigation.
 
-Publishing in public forces a useful kind of clarity. If I cannot explain the shape of a problem or the tradeoffs behind a solution, I probably do not understand it well enough yet.
+## Constraints as design
 
-This site is for that kind of work: making the thinking visible, one project and one note at a time.
+The palette is monochrome on purpose. Stripping out accent color removes the easiest crutch for
+creating hierarchy and forces typography, spacing, and weight to do the work instead. Inter for
+everything, generous whitespace, and a strict heading scale — a library, not a gallery.
+
+The result is a site that is fast, quiet, and durable: static HTML, no runtime framework, and a
+format that scales to as many projects and posts as I care to document.

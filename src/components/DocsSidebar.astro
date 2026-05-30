@@ -1,27 +1,50 @@
 ---
-import { getCollection } from 'astro:content';
-import Icon from './Icon.astro';
+import { getCollection } from "astro:content";
+import Icon from "./Icon.astro";
 
 const [allPosts, allProjects] = await Promise.all([
-  getCollection('blog'),
-  getCollection('projects'),
+  getCollection("blog"),
+  getCollection("projects"),
 ]);
 
-const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const posts = allPosts.sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
 const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
 
 const pathname = Astro.url.pathname;
-const projectsActive = pathname === '/projects' || pathname.startsWith('/projects/');
-const blogActive = pathname === '/blog' || pathname.startsWith('/blog/');
-const isItemActive = (href: string) => pathname === href || pathname === `${href}/`;
+const projectsActive =
+  pathname === "/projects" || pathname.startsWith("/projects/");
+const blogActive = pathname === "/blog" || pathname.startsWith("/blog/");
+const isItemActive = (href: string) =>
+  pathname === href || pathname === `${href}/`;
 ---
 
 <aside class="docs-sidebar" aria-label="Section navigation">
-  <p class="docs-sidebar__heading">Portfolio</p>
+  <p class="docs-sidebar__heading">Index</p>
 
   <ul class="docs-sidebar__group">
     <li>
-      <a href="/#about" class="docs-sidebar__top-link">About</a>
+      <a
+        href="/"
+        class:list={[
+          "docs-sidebar__top-link",
+          { "is-active": pathname === "/" },
+        ]}
+      >
+        Home
+      </a>
+    </li>
+    <li>
+      <a
+        href="/about"
+        class:list={[
+          "docs-sidebar__top-link",
+          { "is-active": isItemActive("/about") },
+        ]}
+      >
+        About
+      </a>
     </li>
   </ul>
 
@@ -34,25 +57,33 @@ const isItemActive = (href: string) => pathname === href || pathname === `${href
           </span>
           <a
             href="/projects"
-            class:list={['docs-sidebar__summary-link', { 'is-active': pathname === '/projects' }]}
+            class:list={[
+              "docs-sidebar__summary-link",
+              { "is-active": pathname === "/projects" },
+            ]}
           >
             Projects
           </a>
         </summary>
         <ul class="docs-sidebar__items">
-          {projects.map((project) => {
-            const href = `/projects/${project.id}`;
-            return (
-              <li>
-                <a
-                  href={href}
-                  class:list={['docs-sidebar__link', { 'is-active': isItemActive(href) }]}
-                >
-                  {project.data.title}
-                </a>
-              </li>
-            );
-          })}
+          {
+            projects.map((project) => {
+              const href = `/projects/${project.id}`;
+              return (
+                <li>
+                  <a
+                    href={href}
+                    class:list={[
+                      "docs-sidebar__link",
+                      { "is-active": isItemActive(href) },
+                    ]}
+                  >
+                    {project.data.title}
+                  </a>
+                </li>
+              );
+            })
+          }
         </ul>
       </details>
     </li>
@@ -67,25 +98,33 @@ const isItemActive = (href: string) => pathname === href || pathname === `${href
           </span>
           <a
             href="/blog"
-            class:list={['docs-sidebar__summary-link', { 'is-active': pathname === '/blog' }]}
+            class:list={[
+              "docs-sidebar__summary-link",
+              { "is-active": pathname === "/blog" },
+            ]}
           >
-            Blog
+            Writing
           </a>
         </summary>
         <ul class="docs-sidebar__items">
-          {posts.map((post) => {
-            const href = `/blog/${post.id}`;
-            return (
-              <li>
-                <a
-                  href={href}
-                  class:list={['docs-sidebar__link', { 'is-active': isItemActive(href) }]}
-                >
-                  {post.data.title}
-                </a>
-              </li>
-            );
-          })}
+          {
+            posts.map((post) => {
+              const href = `/blog/${post.id}`;
+              return (
+                <li>
+                  <a
+                    href={href}
+                    class:list={[
+                      "docs-sidebar__link",
+                      { "is-active": isItemActive(href) },
+                    ]}
+                  >
+                    {post.data.title}
+                  </a>
+                </li>
+              );
+            })
+          }
         </ul>
       </details>
     </li>

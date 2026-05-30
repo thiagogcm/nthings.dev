@@ -1,39 +1,48 @@
 ---
-import { getCollection } from 'astro:content';
-import PostCard from '../../components/PostCard.astro';
-import DocsLayout from '../../layouts/DocsLayout.astro';
+import { getCollection } from "astro:content";
+import DirectoryEntry from "../../components/DirectoryEntry.astro";
+import { formatDate } from "../../lib/format-date";
+import DocsLayout from "../../layouts/DocsLayout.astro";
 
-const allPosts = await getCollection('blog');
-const posts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const allPosts = await getCollection("blog");
+const posts = allPosts.sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
 ---
 
 <DocsLayout
-  title="Blog"
-  description="Notes on software engineering, AI-native product work, and the systems behind them."
+  title="Writing"
+  description="Deep dives, post-mortems, and innovation spotlights on software and systems."
 >
-  <div class="fade-sequence">
-    <header class="collection-header">
-      <p class="eyebrow" transition:name="page-kicker">Blog</p>
-      <h1 class="page-intro__title" transition:name="page-heading">
-        Writing in public about software, product, and systems.
-      </h1>
+  <div class="collection">
+    <header class="collection__header">
+      <p class="eyebrow">Writing</p>
+      <h1 class="page-intro__title">Deep dives and post-mortems.</h1>
       <p class="page-intro__lede">
-        A running set of notes on the decisions, tradeoffs, and tools behind the work. Newest
-        entries land first.
+        Longform notes on architecture, tooling, and product systems — written
+        in the same documentation format as the project specs.
       </p>
     </header>
 
-    <div class="content-grid">
-      {posts.map((post) => <PostCard post={post} />)}
+    <div class="directory">
+      {
+        posts.map((post) => (
+          <DirectoryEntry
+            title={post.data.title}
+            href={`/blog/${post.id}`}
+            description={post.data.description}
+            meta={formatDate(post.data.pubDate)}
+            tags={post.data.tags}
+          />
+        ))
+      }
     </div>
   </div>
 </DocsLayout>
 
 <style>
-  .collection-header {
-    display: grid;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-    max-width: 42rem;
+  .collection__header {
+    max-width: 44rem;
+    margin-bottom: 2.5rem;
   }
 </style>

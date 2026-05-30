@@ -1,39 +1,44 @@
 ---
-import { getCollection } from 'astro:content';
-import ProjectCard from '../../components/ProjectCard.astro';
-import DocsLayout from '../../layouts/DocsLayout.astro';
+import { getCollection } from "astro:content";
+import DirectoryEntry from "../../components/DirectoryEntry.astro";
+import DocsLayout from "../../layouts/DocsLayout.astro";
 
-const allProjects = await getCollection('projects');
+const allProjects = await getCollection("projects");
 const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
 ---
 
 <DocsLayout
   title="Projects"
-  description="Selected projects, experiments, and product explorations by Thiago Moura."
+  description="Selected builds, documented as engineering references by Thiago Moura."
 >
-  <div class="fade-sequence">
-    <header class="collection-header">
-      <p class="eyebrow" transition:name="page-kicker">Projects</p>
-      <h1 class="page-intro__title" transition:name="page-heading">
-        Selected builds, experiments, and working systems.
-      </h1>
+  <div class="collection">
+    <header class="collection__header">
+      <p class="eyebrow">Projects</p>
+      <h1 class="page-intro__title">Engineering references.</h1>
       <p class="page-intro__lede">
-        Some are polished, some are exploratory. All of them reflect how I think about product,
-        tooling, and practical engineering.
+        Each entry is a technical specification — architecture, stack, and the
+        implementation decisions behind the build.
       </p>
     </header>
 
-    <div class="content-grid">
-      {projects.map((project) => <ProjectCard project={project} />)}
+    <div class="directory">
+      {
+        projects.map((project) => (
+          <DirectoryEntry
+            title={project.data.title}
+            href={`/projects/${project.id}`}
+            description={project.data.description}
+            tags={project.data.tags}
+          />
+        ))
+      }
     </div>
   </div>
 </DocsLayout>
 
 <style>
-  .collection-header {
-    display: grid;
-    gap: 0.5rem;
-    margin-bottom: 2rem;
-    max-width: 42rem;
+  .collection__header {
+    max-width: 44rem;
+    margin-bottom: 2.5rem;
   }
 </style>

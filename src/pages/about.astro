@@ -1,0 +1,83 @@
+---
+import DocsLayout from "../layouts/DocsLayout.astro";
+import { SITE, CURRENT_FOCUS } from "../consts";
+---
+
+<DocsLayout
+  title="About"
+  description={`Professional philosophy and technical focus of ${SITE.author}.`}
+>
+  <article class="doc">
+    <header class="doc__header">
+      <p class="eyebrow">About</p>
+      <h1>{SITE.author}</h1>
+      <p class="lede">{SITE.role} based in {SITE.location}.</p>
+    </header>
+
+    <div class="prose">
+      <p>
+        I build AI-native products and the systems that keep them legible. My
+        work sits at the point where architecture, tooling, and interface
+        decisions start to determine real product quality — and I prefer to
+        document that work the way I think about it: as engineering reference,
+        not marketing.
+      </p>
+
+      <h2>Philosophy</h2>
+      <p>
+        Good software stays understandable under pressure. Product surfaces
+        should remain calm when the systems beneath them grow complex,
+        asynchronous, or operationally noisy. I favor interfaces and
+        architectures that a new engineer can reason about, and AI features that
+        meaningfully improve decisions rather than decorate the product with
+        novelty.
+      </p>
+      <p>
+        Writing things down is part of the method. If I cannot explain the shape
+        of a problem or the tradeoffs behind a solution, I usually do not
+        understand it well enough yet. This site is where that thinking is made
+        visible — one specification and one post-mortem at a time.
+      </p>
+
+      <h2>Technical focus</h2>
+      <ul>
+        {CURRENT_FOCUS.map((item) => <li>{item}</li>)}
+      </ul>
+      <p>
+        Most of the work lands between engineering and product: AI-native
+        workflows and agents, frontend systems and performance, observability,
+        and practical architecture choices made under real constraints.
+      </p>
+
+      <h2>Elsewhere</h2>
+      <p>
+        Read the <a href="/projects">project references</a> or the <a
+          href="/blog">writing</a
+        >, or find me on <a
+          href="https://github.com/thiagogcm"
+          target="_blank"
+          rel="noopener noreferrer">GitHub</a
+        >
+        and <a
+          href="https://linkedin.com/in/thiagomoura"
+          target="_blank"
+          rel="noopener noreferrer">LinkedIn</a
+        >.
+      </p>
+    </div>
+  </article>
+</DocsLayout>
+
+<style>
+  .doc {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .doc__header {
+    display: grid;
+    gap: 0.85rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+</style>

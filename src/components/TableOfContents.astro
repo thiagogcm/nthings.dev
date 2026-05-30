@@ -1,5 +1,5 @@
 ---
-import type { MarkdownHeading } from 'astro';
+import type { MarkdownHeading } from "astro";
 
 interface Props {
   headings: MarkdownHeading[];
@@ -9,20 +9,22 @@ const { headings } = Astro.props;
 const toc = headings.filter((h) => h.depth > 1 && h.depth < 4);
 ---
 
-{toc.length > 0 && (
-  <aside class="site-toc" aria-label="On this page">
-    <p class="site-toc__heading">On this page</p>
-    <ul class="site-toc__list">
-      {toc.map((heading) => (
-        <li class={`site-toc__item depth-${heading.depth}`}>
-          <a href={`#${heading.slug}`} class="site-toc__link">
-            {heading.text}
-          </a>
-        </li>
-      ))}
-    </ul>
-  </aside>
-)}
+{
+  toc.length > 0 && (
+    <aside class="site-toc" aria-label="On this page">
+      <p class="site-toc__heading">On this page</p>
+      <ul class="site-toc__list">
+        {toc.map((heading) => (
+          <li class={`site-toc__item depth-${heading.depth}`}>
+            <a href={`#${heading.slug}`} class="site-toc__link">
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  )
+}
 
 <style>
   .site-toc {
@@ -63,7 +65,7 @@ const toc = headings.filter((h) => h.depth > 1 && h.depth < 4);
 
   .site-toc__link:hover,
   .site-toc__link:focus-visible {
-    color: var(--accent);
+    color: var(--text);
   }
 
   .depth-3 {

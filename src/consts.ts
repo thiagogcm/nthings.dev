@@ -13,16 +13,22 @@ export const SITE = {
 
 export const NAV_LINKS = [
   {
-    href: '/blog',
-    label: 'Journal',
-    icon: 'lucide:notebook-tabs',
-    description: 'Writing on product, software, and systems.',
-  },
-  {
     href: '/projects',
     label: 'Projects',
     icon: 'lucide:folder-kanban',
-    description: 'Selected builds, experiments, and case studies.',
+    description: 'Engineering references for selected builds.',
+  },
+  {
+    href: '/blog',
+    label: 'Writing',
+    icon: 'lucide:notebook-tabs',
+    description: 'Deep dives, post-mortems, and innovation spotlights.',
+  },
+  {
+    href: '/about',
+    label: 'About',
+    icon: 'lucide:badge-check',
+    description: 'Professional philosophy and technical focus.',
   },
 ] as const;
 
@@ -33,24 +39,3 @@ export const SOCIAL_LINKS = [
 ] as const;
 
 export const CURRENT_FOCUS = ['AI agents', 'Observability', 'Product systems'] as const;
-
-export const PRINCIPLES = [
-  {
-    title: 'Interfaces that stay calm',
-    description:
-      'Product surfaces should remain clear when the underlying systems get complex, asynchronous, or operationally noisy.',
-    icon: 'lucide:sparkles',
-  },
-  {
-    title: 'AI features with real utility',
-    description:
-      'I prefer copilots, workflows, and internal tools that meaningfully improve decisions instead of decorating the product with novelty.',
-    icon: 'lucide:bot',
-  },
-  {
-    title: 'Systems that remain legible',
-    description:
-      'Architecture, observability, and delivery paths need to stay understandable so teams can move quickly without losing their footing.',
-    icon: 'lucide:waypoints',
-  },
-] as const;

@@ -22,19 +22,19 @@ export default defineConfig({
   fonts: [
     {
       provider: fontProviders.google(),
-      name: 'Manrope',
+      name: 'Inter',
       cssVariable: '--font-body',
       weights: [400, 500, 600, 700],
       subsets: ['latin'],
-      fallbacks: ['system-ui', 'sans-serif'],
+      fallbacks: ['system-ui', '-apple-system', 'sans-serif'],
     },
     {
       provider: fontProviders.google(),
-      name: 'Newsreader',
-      cssVariable: '--font-display',
-      weights: [400, 600, 700],
+      name: 'JetBrains Mono',
+      cssVariable: '--font-code',
+      weights: [400, 500],
       subsets: ['latin'],
-      fallbacks: ['Georgia', 'serif'],
+      fallbacks: ['ui-monospace', 'monospace'],
     },
   ],
 });

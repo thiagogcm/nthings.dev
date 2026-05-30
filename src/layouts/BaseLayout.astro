@@ -1,10 +1,10 @@
 ---
-import '../styles/global.css';
-import { Font } from 'astro:assets';
-import { ClientRouter, slide } from 'astro:transitions';
-import Header from '../components/Header.astro';
-import Icon from '../components/Icon.astro';
-import { SITE, SOCIAL_LINKS } from '../consts';
+import "../styles/global.css";
+import { Font } from "astro:assets";
+import { ClientRouter, slide } from "astro:transitions";
+import Header from "../components/Header.astro";
+import Icon from "../components/Icon.astro";
+import { SITE, SOCIAL_LINKS } from "../consts";
 
 interface Props {
   title?: string;
@@ -12,12 +12,20 @@ interface Props {
   image?: string;
 }
 
-const { title, description = SITE.description, image = SITE.ogImage } = Astro.props;
+const {
+  title,
+  description = SITE.description,
+  image = SITE.ogImage,
+} = Astro.props;
 const siteUrl = Astro.site ?? new URL(SITE.url);
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
 const socialImage = new URL(image, siteUrl);
-const pageTitle = title ? (title === SITE.title ? title : `${title} | ${SITE.title}`) : SITE.title;
-const isArticle = Astro.url.pathname.startsWith('/blog/');
+const pageTitle = title
+  ? title === SITE.title
+    ? title
+    : `${title} | ${SITE.title}`
+  : SITE.title;
+const isArticle = Astro.url.pathname.startsWith("/blog/");
 const currentYear = new Date().getUTCFullYear();
 ---
 
@@ -29,17 +37,26 @@ const currentYear = new Date().getUTCFullYear();
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f7f7f5" />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#ffffff"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#0a0a0a"
+    />
     <meta name="color-scheme" content="light dark" />
     <link rel="canonical" href={canonicalUrl.toString()} />
     <link
       rel="alternate"
       type="application/rss+xml"
       title={`${SITE.title} RSS Feed`}
-      href={new URL('/rss.xml', siteUrl).toString()}
+      href={new URL("/rss.xml", siteUrl).toString()}
     />
     <meta property="og:site_name" content={SITE.title} />
-    <meta property="og:type" content={isArticle ? 'article' : 'website'} />
+    <meta property="og:type" content={isArticle ? "article" : "website"} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl.toString()} />
@@ -49,8 +66,11 @@ const currentYear = new Date().getUTCFullYear();
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={socialImage.toString()} />
     <title>{pageTitle}</title>
-    <Font cssVariable="--font-body" preload={[{ weight: 400 }, { weight: 600 }]} />
-    <Font cssVariable="--font-display" preload={[{ weight: 600 }]} />
+    <Font
+      cssVariable="--font-body"
+      preload={[{ weight: 400 }, { weight: 600 }]}
+    />
+    <Font cssVariable="--font-code" preload={[{ weight: 400 }]} />
     <ClientRouter />
   </head>
   <body>
@@ -62,7 +82,7 @@ const currentYear = new Date().getUTCFullYear();
         id="main-content"
         class="site-main"
         transition:name="page-shell"
-        transition:animate={slide({ duration: '0.32s' })}
+        transition:animate={slide({ duration: "0.32s" })}
       >
         <div class="shell">
           <slot />
@@ -78,21 +98,23 @@ const currentYear = new Date().getUTCFullYear();
           </div>
 
           <div class="site-footer__links">
-            {SOCIAL_LINKS.map((link) => {
-              const isExternal = link.href.startsWith('http');
+            {
+              SOCIAL_LINKS.map((link) => {
+                const isExternal = link.href.startsWith("http");
 
-              return (
-                <a
-                  class="site-footer__link"
-                  href={link.href}
-                  target={isExternal ? '_blank' : undefined}
-                  rel={isExternal ? 'noopener noreferrer' : undefined}
-                >
-                  <Icon name={link.icon} aria-hidden="true" />
-                  <span>{link.label}</span>
-                </a>
-              );
-            })}
+                return (
+                  <a
+                    class="site-footer__link"
+                    href={link.href}
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
+                  >
+                    <Icon name={link.icon} aria-hidden="true" />
+                    <span>{link.label}</span>
+                  </a>
+                );
+              })
+            }
           </div>
         </div>
       </footer>

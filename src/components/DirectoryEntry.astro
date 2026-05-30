@@ -1,0 +1,30 @@
+---
+interface Props {
+  title: string;
+  href: string;
+  description?: string;
+  meta?: string;
+  tags?: readonly string[];
+}
+
+const { title, href, description, meta, tags } = Astro.props;
+---
+
+<article class="directory-entry">
+  <div class="directory-entry__head">
+    <h2 class="directory-entry__title"><a href={href}>{title}</a></h2>
+    {meta && <span class="directory-entry__meta">{meta}</span>}
+  </div>
+
+  {description && <p class="directory-entry__desc">{description}</p>}
+
+  {
+    tags && tags.length > 0 && (
+      <ul class="tag-list">
+        {tags.map((tag) => (
+          <li class="tag">{tag}</li>
+        ))}
+      </ul>
+    )
+  }
+</article>

@@ -4,6 +4,8 @@ import DirectoryEntry from "../components/DirectoryEntry.astro";
 import { formatDate } from "../lib/format-date";
 import { SITE } from "../consts";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import StatusIsland from "../components/StatusIsland.astro";
+import StatusFallback from "../components/StatusFallback.astro";
 
 const allProjects = await getCollection("projects");
 const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
@@ -24,6 +26,11 @@ const recentPosts = allPosts
         written up as a technical specification — architecture, stack, and the
         code decisions behind it.
       </p>
+      <div class="page-intro__status">
+        <StatusIsland server:defer>
+          <StatusFallback slot="fallback" />
+        </StatusIsland>
+      </div>
     </header>
 
     <section class="home-section" aria-labelledby="projects-heading">
@@ -97,5 +104,9 @@ const recentPosts = allPosts
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--text-soft);
+  }
+
+  .page-intro__status {
+    margin-top: 1.5rem;
   }
 </style>

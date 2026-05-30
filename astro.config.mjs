@@ -1,6 +1,6 @@
-// @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
+import { unified } from '@astrojs/markdown-remark';
 
 // https://astro.build/config
 export default defineConfig({
@@ -8,9 +8,11 @@ export default defineConfig({
   adapter: cloudflare(),
   markdown: {
     syntaxHighlight: 'prism',
-    smartypants: {
-      dashes: 'oldschool',
-    },
+    processor: unified({
+      smartypants: {
+        dashes: 'oldschool',
+      },
+    }),
   },
   prefetch: {
     prefetchAll: true,

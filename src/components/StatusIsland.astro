@@ -1,0 +1,115 @@
+---
+// This will render dynamically on the server at request time!
+const timestamp = new Date();
+const timeString = timestamp.toLocaleTimeString('en-US', {
+  timeZone: 'America/Sao_Paulo',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+});
+const dateString = timestamp.toLocaleDateString('en-US', {
+  timeZone: 'America/Sao_Paulo',
+  month: 'short',
+  day: 'numeric',
+});
+
+// A dynamic simulation of server performance & checks for the "Observability" theme
+const randomLatency = Math.floor(Math.random() * 8) + 8; // 8-15ms
+---
+
+<div class="status-widget">
+  <div class="status-row">
+    <span class="status-dot pulsing"></span>
+    <span class="status-label">Belo Horizonte, BR:</span>
+    <span class="status-value">{dateString}, {timeString} BRT</span>
+  </div>
+  <div class="status-row">
+    <span class="status-dot green"></span>
+    <span class="status-label">System status:</span>
+    <span class="status-value">Active & select collab open</span>
+  </div>
+  <div class="status-row hide-mobile">
+    <span class="status-dot blue"></span>
+    <span class="status-label">Observability:</span>
+    <span class="status-value">Latency {randomLatency}ms · SSR Active</span>
+  </div>
+</div>
+
+<style>
+  .status-widget {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0.5rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-subtle);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--text-soft);
+  }
+
+  .status-dot.pulsing {
+    background-color: #10b981;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    animation: pulse 2s infinite;
+  }
+
+  .status-dot.green {
+    background-color: #10b981;
+  }
+
+  .status-dot.blue {
+    background-color: #3b82f6;
+  }
+
+  .status-label {
+    color: var(--text-soft);
+    font-weight: 500;
+  }
+
+  .status-value {
+    color: var(--text);
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+      transform: scale(1);
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0);
+    }
+    100% {
+      transform: scale(0.95);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+  }
+
+  @keyframes pulse-placeholder {
+    0% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.4; }
+  }
+
+  @media (max-width: 48rem) {
+    .hide-mobile {
+      display: none;
+    }
+  }
+</style>

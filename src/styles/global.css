@@ -44,7 +44,7 @@
   width: 100%;
   max-width: 84rem;
   margin-inline: auto;
-  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+  padding-inline: clamp(1rem, 2.5vw, 1.75rem);
 }
 
 @utility status-widget {
@@ -317,13 +317,13 @@
   /* Docs grid: 3-track desktop, collapsible sidebar, mobile drawer. */
   .docs-grid {
     display: grid;
-    gap: clamp(1.75rem, 3.5vw, 3rem);
-    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: clamp(1.25rem, 2.5vw, 2rem);
+    grid-template-columns: 13.5rem minmax(0, 1fr);
     align-items: start;
   }
 
   .docs-grid--with-toc {
-    grid-template-columns: 15rem minmax(0, 1fr) 14rem;
+    grid-template-columns: 13.5rem minmax(0, 1fr) 13rem;
   }
 
   .docs-main {
@@ -382,7 +382,7 @@
     }
 
     :root[data-sidebar="collapsed"] .docs-grid--with-toc {
-      grid-template-columns: minmax(0, 1fr) 14rem;
+      grid-template-columns: minmax(0, 1fr) 13rem;
     }
 
     :root[data-sidebar="collapsed"] .docs-grid > .docs-sidebar {
@@ -550,7 +550,7 @@
 
   @media (max-width: 75rem) {
     .docs-grid--with-toc {
-      grid-template-columns: 15rem minmax(0, 1fr);
+      grid-template-columns: 13.5rem minmax(0, 1fr);
     }
 
     .site-toc {

@@ -19,10 +19,7 @@ const withToc = showToc && headings.length > 0;
 
 <BaseLayout title={title} description={description} image={image}>
   <div class:list={['docs-grid', { 'docs-grid--with-toc': withToc }]}>
-    <details class="docs-sidebar__drawer">
-      <summary>Sections</summary>
-      <DocsSidebar />
-    </details>
+    <div class="docs-sidebar-backdrop" data-mobile-sidebar-close></div>
 
     <DocsSidebar id="docs-sidebar" />
 
@@ -30,24 +27,16 @@ const withToc = showToc && headings.length > 0;
       <div class="docs-toolbar">
         <button
           type="button"
-          class="sidebar-toggle"
-          data-sidebar-toggle
-          aria-controls="docs-sidebar"
-          aria-expanded="true"
-          aria-label="Collapse sidebar"
+          class="sidebar-mobile-toggle"
+          data-mobile-sidebar-toggle
+          aria-label="Open navigation menu"
         >
           <Icon
-            name="lucide:panel-left-close"
+            name="lucide:menu"
             size={18}
-            class="sidebar-toggle__icon sidebar-toggle__icon--close"
             aria-hidden="true"
           />
-          <Icon
-            name="lucide:panel-left-open"
-            size={18}
-            class="sidebar-toggle__icon sidebar-toggle__icon--open"
-            aria-hidden="true"
-          />
+          <span>Sections</span>
         </button>
       </div>
 

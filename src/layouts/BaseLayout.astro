@@ -141,15 +141,6 @@ const currentYear = new Date().getUTCFullYear();
         const syncControls = () => {
           const themeBtn = document.querySelector("[data-theme-toggle]");
           if (themeBtn) themeBtn.setAttribute("aria-pressed", String(isDark()));
-          const sideBtn = document.querySelector("[data-sidebar-toggle]");
-          if (sideBtn) {
-            const expanded = root.getAttribute("data-sidebar") !== "collapsed";
-            sideBtn.setAttribute("aria-expanded", String(expanded));
-            sideBtn.setAttribute(
-              "aria-label",
-              expanded ? "Collapse sidebar" : "Expand sidebar",
-            );
-          }
         };
 
         document.addEventListener("click", (e) => {
@@ -167,14 +158,22 @@ const currentYear = new Date().getUTCFullYear();
             return;
           }
 
-          if (target.closest("[data-sidebar-toggle]")) {
-            const collapse = root.getAttribute("data-sidebar") !== "collapsed";
-            if (collapse) root.setAttribute("data-sidebar", "collapsed");
-            else root.removeAttribute("data-sidebar");
-            try {
-              localStorage.setItem("sidebar", collapse ? "collapsed" : "expanded");
-            } catch {}
-            syncControls();
+          if (target.closest("[data-mobile-sidebar-toggle]")) {
+            const isOpen = root.getAttribute("data-mobile-sidebar") === "open";
+            if (isOpen) {
+              root.removeAttribute("data-mobile-sidebar");
+            } else {
+              root.setAttribute("data-mobile-sidebar", "open");
+            }
+            return;
+          }
+
+          if (
+            target.closest("[data-mobile-sidebar-close]") ||
+            (target.closest(".docs-sidebar a") && root.getAttribute("data-mobile-sidebar") === "open")
+          ) {
+            root.removeAttribute("data-mobile-sidebar");
+            return;
           }
         });
 
@@ -187,6 +186,7 @@ const currentYear = new Date().getUTCFullYear();
         const refresh = () => {
           syncControls();
           onScroll();
+          root.removeAttribute("data-mobile-sidebar");
         };
         document.addEventListener("astro:page-load", refresh);
         document.addEventListener("astro:after-swap", refresh);

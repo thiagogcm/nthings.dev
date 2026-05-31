@@ -11,17 +11,17 @@ const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
   title="Projects"
   description="Selected builds, documented as engineering references by Thiago Moura."
 >
-  <div class="collection">
-    <header class="collection__header">
+  <div>
+    <header class="max-w-[44rem] mb-10">
       <p class="eyebrow">Projects</p>
-      <h1 class="page-intro__title">Engineering references.</h1>
-      <p class="page-intro__lede">
+      <h1>Engineering references.</h1>
+      <p class="lede mt-4">
         Each entry is a technical specification — architecture, stack, and the
         implementation decisions behind the build.
       </p>
     </header>
 
-    <div class="directory">
+    <div class="flex flex-col border-t border-border">
       {
         projects.map((project) => (
           <DirectoryEntry
@@ -35,10 +35,3 @@ const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
     </div>
   </div>
 </DocsLayout>
-
-<style>
-  .collection__header {
-    max-width: 44rem;
-    margin-bottom: 2.5rem;
-  }
-</style>

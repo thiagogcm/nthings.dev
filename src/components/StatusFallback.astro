@@ -2,64 +2,10 @@
 // Immediate fallback state for the static page shell
 ---
 
-<div class="status-widget loading">
-  <div class="status-row">
-    <span class="status-dot placeholder"></span>
-    <span class="status-label">Belo Horizonte, BR:</span>
-    <span class="status-value placeholder-text">establishing connection...</span>
+<div class="status-widget border-dashed opacity-70">
+  <div class="flex items-center gap-1.5">
+    <span class="size-1.5 rounded-full bg-border-strong animate-[status-fade_1.5s_infinite_ease-in-out]"></span>
+    <span class="text-fg-soft font-medium">Belo Horizonte, BR:</span>
+    <span class="text-fg-soft animate-[status-fade_1.5s_infinite_ease-in-out]">establishing connection...</span>
   </div>
 </div>
-
-<style>
-  .status-widget {
-    display: inline-flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 1.25rem;
-    padding: 0.5rem 0.85rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--bg-subtle);
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--text-muted);
-  }
-
-  .status-widget.loading {
-    border-style: dashed;
-    opacity: 0.7;
-  }
-
-  .status-row {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-
-  .status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-  }
-
-  .status-dot.placeholder {
-    background-color: var(--border-strong);
-    animation: pulse-placeholder 1.5s infinite ease-in-out;
-  }
-
-  .status-label {
-    color: var(--text-soft);
-    font-weight: 500;
-  }
-
-  .placeholder-text {
-    color: var(--text-soft);
-    animation: pulse-placeholder 1.5s infinite ease-in-out;
-  }
-
-  @keyframes pulse-placeholder {
-    0% { opacity: 0.4; }
-    50% { opacity: 0.8; }
-    100% { opacity: 0.4; }
-  }
-</style>

@@ -14,17 +14,17 @@ const posts = allPosts.sort(
   title="Writing"
   description="Deep dives, post-mortems, and innovation spotlights on software and systems."
 >
-  <div class="collection">
-    <header class="collection__header">
+  <div>
+    <header class="max-w-[44rem] mb-10">
       <p class="eyebrow">Writing</p>
-      <h1 class="page-intro__title">Deep dives and post-mortems.</h1>
-      <p class="page-intro__lede">
+      <h1>Deep dives and post-mortems.</h1>
+      <p class="lede mt-4">
         Longform notes on architecture, tooling, and product systems — written
         in the same documentation format as the project specs.
       </p>
     </header>
 
-    <div class="directory">
+    <div class="flex flex-col border-t border-border">
       {
         posts.map((post) => (
           <DirectoryEntry
@@ -39,10 +39,3 @@ const posts = allPosts.sort(
     </div>
   </div>
 </DocsLayout>
-
-<style>
-  .collection__header {
-    max-width: 44rem;
-    margin-bottom: 2.5rem;
-  }
-</style>

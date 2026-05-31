@@ -2,6 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import DocsSidebar from '../components/DocsSidebar.astro';
 import TableOfContents from '../components/TableOfContents.astro';
+import Icon from '../components/Icon.astro';
 import type { MarkdownHeading } from 'astro';
 
 interface Props {
@@ -23,9 +24,33 @@ const withToc = showToc && headings.length > 0;
       <DocsSidebar />
     </details>
 
-    <DocsSidebar />
+    <DocsSidebar id="docs-sidebar" />
 
     <div class="docs-main">
+      <div class="docs-toolbar">
+        <button
+          type="button"
+          class="sidebar-toggle"
+          data-sidebar-toggle
+          aria-controls="docs-sidebar"
+          aria-expanded="true"
+          aria-label="Collapse sidebar"
+        >
+          <Icon
+            name="lucide:panel-left-close"
+            size={18}
+            class="sidebar-toggle__icon sidebar-toggle__icon--close"
+            aria-hidden="true"
+          />
+          <Icon
+            name="lucide:panel-left-open"
+            size={18}
+            class="sidebar-toggle__icon sidebar-toggle__icon--open"
+            aria-hidden="true"
+          />
+        </button>
+      </div>
+
       <slot />
     </div>
 

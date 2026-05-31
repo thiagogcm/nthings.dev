@@ -22,10 +22,10 @@ const { Content, headings } = await render(project);
   headings={headings}
   showToc={true}
 >
-  <article class="doc">
-    <header class="doc__header">
-      <a class="text-link text-link--muted doc__back" href="/projects">
-        <Icon name="lucide:arrow-right" aria-hidden="true" />
+  <article class="grid gap-10">
+    <header class="grid gap-[0.85rem] pb-8 border-b border-border">
+      <a class="text-link text-link--muted w-fit mb-2 text-[0.85rem]" href="/projects">
+        <Icon name="lucide:arrow-right" class="rotate-180" aria-hidden="true" />
         <span>Projects</span>
       </a>
 
@@ -33,7 +33,7 @@ const { Content, headings } = await render(project);
       <h1>{project.data.title}</h1>
       <p class="lede">{project.data.description}</p>
 
-      <div class="doc__links">
+      <div class="flex flex-wrap gap-x-6 gap-y-2 mt-2">
         {
           project.data.website && (
             <a
@@ -78,34 +78,3 @@ const { Content, headings } = await render(project);
     </div>
   </article>
 </DocsLayout>
-
-<style>
-  .doc {
-    display: grid;
-    gap: 2.5rem;
-  }
-
-  .doc__header {
-    display: grid;
-    gap: 0.85rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .doc__back {
-    width: fit-content;
-    margin-bottom: 0.5rem;
-    font-size: 0.85rem;
-  }
-
-  .doc__back :global(svg) {
-    transform: rotate(180deg);
-  }
-
-  .doc__links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.5rem;
-    margin-top: 0.5rem;
-  }
-</style>

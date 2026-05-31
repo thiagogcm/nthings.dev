@@ -12,6 +12,12 @@ const posts = allPosts.sort(
 );
 const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
 
+interface Props {
+  id?: string;
+}
+
+const { id } = Astro.props;
+
 const pathname = Astro.url.pathname;
 const projectsActive =
   pathname === "/projects" || pathname.startsWith("/projects/");
@@ -20,9 +26,7 @@ const isItemActive = (href: string) =>
   pathname === href || pathname === `${href}/`;
 ---
 
-<aside class="docs-sidebar" aria-label="Section navigation">
-  <p class="docs-sidebar__heading">Index</p>
-
+<aside id={id} class="docs-sidebar" aria-label="Section navigation">
   <ul class="docs-sidebar__group">
     <li>
       <a

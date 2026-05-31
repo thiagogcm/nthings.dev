@@ -5,6 +5,7 @@ import { ClientRouter, slide } from "astro:transitions";
 import Header from "../components/Header.astro";
 import Icon from "../components/Icon.astro";
 import { SITE, SOCIAL_LINKS } from "../consts";
+import { UI_INIT_SCRIPT } from "../lib/theme-init";
 
 interface Props {
   title?: string;
@@ -37,17 +38,14 @@ const currentYear = new Date().getUTCFullYear();
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <meta
-      name="theme-color"
-      media="(prefers-color-scheme: light)"
-      content="#ffffff"
-    />
-    <meta
-      name="theme-color"
-      media="(prefers-color-scheme: dark)"
-      content="#0a0a0a"
-    />
+    <!-- Single (non-media) theme-color; the init script below sets it to match the
+         resolved theme before paint, so explicit choices override the system. -->
+    <meta name="theme-color" content="#fcfcfd" />
     <meta name="color-scheme" content="light dark" />
+    <!-- Anti-FOUC: apply persisted theme + sidebar state before first paint. This is
+         the only is:inline script; its CSP hash is computed in astro.config.mjs. -->
+    <script is:inline set:html={UI_INIT_SCRIPT} />
+
     <link rel="canonical" href={canonicalUrl.toString()} />
     <link
       rel="alternate"
@@ -74,13 +72,15 @@ const currentYear = new Date().getUTCFullYear();
     <ClientRouter />
   </head>
   <body>
-    <a class="skip-link" href="#main-content">Skip to content</a>
-    <div class="site-shell">
+    <a
+      class="absolute left-4 -top-16 z-20 px-4 py-3 border border-border rounded-md bg-bg transition-[top] duration-150 focus:top-4"
+      href="#main-content">Skip to content</a>
+    <div class="flex flex-col min-h-screen">
       <Header />
 
       <main
         id="main-content"
-        class="site-main"
+        class="flex-1 min-w-0 py-[clamp(2.5rem,5vw,4rem)]"
         transition:name="page-shell"
         transition:animate={slide({ duration: "0.32s" })}
       >
@@ -89,22 +89,24 @@ const currentYear = new Date().getUTCFullYear();
         </div>
       </main>
 
-      <footer class="site-footer">
-        <div class="shell site-footer__inner">
-          <div class="site-footer__copy">
+      <footer class="mt-auto py-10 border-t border-border text-fg-soft text-[0.85rem]">
+        <div
+          class="shell flex flex-wrap items-center justify-between gap-4 max-[42rem]:flex-col max-[42rem]:items-start"
+        >
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
             <span>© {currentYear} {SITE.author}</span>
             <span>·</span>
             <span>{SITE.location}</span>
           </div>
 
-          <div class="site-footer__links">
+          <div class="flex flex-wrap gap-1">
             {
               SOCIAL_LINKS.map((link) => {
                 const isExternal = link.href.startsWith("http");
 
                 return (
                   <a
-                    class="site-footer__link"
+                    class="inline-flex items-center gap-1.5 px-[0.6rem] py-[0.35rem] rounded-sm text-fg-muted font-medium transition-colors duration-150 hover:text-fg hover:bg-surface focus-visible:text-fg focus-visible:bg-surface"
                     href={link.href}
                     target={isExternal ? "_blank" : undefined}
                     rel={isExternal ? "noopener noreferrer" : undefined}
@@ -119,5 +121,77 @@ const currentYear = new Date().getUTCFullYear();
         </div>
       </footer>
     </div>
+
+    <script>
+      // Interactive UI wiring. Processed (not is:inline) so Astro auto-hashes it for
+      // CSP. Uses event delegation on `document` so it survives view-transition swaps
+      // (the script runs once; buttons are replaced on each navigation).
+      (function () {
+        if ((window as any).__nthingsUIBound) return;
+        (window as any).__nthingsUIBound = true;
+        const root = document.documentElement;
+
+        const isDark = () => {
+          const t = root.getAttribute("data-theme");
+          return t
+            ? t === "dark"
+            : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        };
+
+        const syncControls = () => {
+          const themeBtn = document.querySelector("[data-theme-toggle]");
+          if (themeBtn) themeBtn.setAttribute("aria-pressed", String(isDark()));
+          const sideBtn = document.querySelector("[data-sidebar-toggle]");
+          if (sideBtn) {
+            const expanded = root.getAttribute("data-sidebar") !== "collapsed";
+            sideBtn.setAttribute("aria-expanded", String(expanded));
+            sideBtn.setAttribute(
+              "aria-label",
+              expanded ? "Collapse sidebar" : "Expand sidebar",
+            );
+          }
+        };
+
+        document.addEventListener("click", (e) => {
+          const target = e.target as Element | null;
+          if (!target || !target.closest) return;
+
+          if (target.closest("[data-theme-toggle]")) {
+            const next = isDark() ? "light" : "dark";
+            root.setAttribute("data-theme", next);
+            try {
+              localStorage.setItem("theme", next);
+            } catch {}
+            (window as any).__themeSyncMeta?.();
+            syncControls();
+            return;
+          }
+
+          if (target.closest("[data-sidebar-toggle]")) {
+            const collapse = root.getAttribute("data-sidebar") !== "collapsed";
+            if (collapse) root.setAttribute("data-sidebar", "collapsed");
+            else root.removeAttribute("data-sidebar");
+            try {
+              localStorage.setItem("sidebar", collapse ? "collapsed" : "expanded");
+            } catch {}
+            syncControls();
+          }
+        });
+
+        const onScroll = () => {
+          if (window.scrollY > 4) root.setAttribute("data-scrolled", "");
+          else root.removeAttribute("data-scrolled");
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
+
+        const refresh = () => {
+          syncControls();
+          onScroll();
+        };
+        document.addEventListener("astro:page-load", refresh);
+        document.addEventListener("astro:after-swap", refresh);
+        refresh();
+      })();
+    </script>
   </body>
 </html>

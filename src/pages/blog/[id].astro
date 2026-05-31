@@ -23,10 +23,10 @@ const { Content, headings } = await render(post);
   headings={headings}
   showToc={true}
 >
-  <article class="doc">
-    <header class="doc__header">
-      <a class="text-link text-link--muted doc__back" href="/blog">
-        <Icon name="lucide:arrow-right" aria-hidden="true" />
+  <article class="grid gap-10">
+    <header class="grid gap-[0.85rem] pb-8 border-b border-border">
+      <a class="text-link text-link--muted w-fit mb-2 text-[0.85rem]" href="/blog">
+        <Icon name="lucide:arrow-right" class="rotate-180" aria-hidden="true" />
         <span>Writing</span>
       </a>
 
@@ -34,7 +34,7 @@ const { Content, headings } = await render(post);
       <h1>{post.data.title}</h1>
       <p class="lede">{post.data.description}</p>
 
-      <div class="doc__meta">
+      <div class="flex flex-wrap gap-2 text-fg-soft font-mono text-[0.82rem]">
         <span>Published {formatDate(post.data.pubDate)}</span>
         {
           post.data.updatedDate && (
@@ -62,36 +62,3 @@ const { Content, headings } = await render(post);
     </div>
   </article>
 </DocsLayout>
-
-<style>
-  .doc {
-    display: grid;
-    gap: 2.5rem;
-  }
-
-  .doc__header {
-    display: grid;
-    gap: 0.85rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .doc__back {
-    width: fit-content;
-    margin-bottom: 0.5rem;
-    font-size: 0.85rem;
-  }
-
-  .doc__back :global(svg) {
-    transform: rotate(180deg);
-  }
-
-  .doc__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    color: var(--text-soft);
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-  }
-</style>

@@ -7,8 +7,8 @@ import { SITE, CURRENT_FOCUS } from "../consts";
   title="About"
   description={`Professional philosophy and technical focus of ${SITE.author}.`}
 >
-  <article class="doc">
-    <header class="doc__header">
+  <article class="grid gap-10">
+    <header class="grid gap-[0.85rem] pb-8 border-b border-border">
       <p class="eyebrow">About</p>
       <h1>{SITE.author}</h1>
       <p class="lede">{SITE.role} based in {SITE.location}.</p>
@@ -67,17 +67,3 @@ import { SITE, CURRENT_FOCUS } from "../consts";
     </div>
   </article>
 </DocsLayout>
-
-<style>
-  .doc {
-    display: grid;
-    gap: 2.5rem;
-  }
-
-  .doc__header {
-    display: grid;
-    gap: 0.85rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--border);
-  }
-</style>

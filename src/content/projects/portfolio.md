@@ -30,13 +30,14 @@ output is plain HTML and CSS with zero runtime JavaScript beyond view transition
 | --------- | ------------------------------- |
 | Framework | Astro 6                         |
 | Language  | TypeScript (strict)             |
-| Styling   | Hand-authored CSS design tokens |
+| Styling   | Tailwind v4 (CSS-first `@theme` tokens) |
 | Content   | Markdown content collections    |
 | Hosting   | Cloudflare Workers via Wrangler |
 | Fonts     | Inter, JetBrains Mono           |
 
-There is no Tailwind, no CSS-in-JS, and no CMS. The design system is a single token sheet driving
-a monochrome palette with light and dark variants resolved through `prefers-color-scheme`.
+There is no CSS-in-JS and no CMS. Styling is Tailwind v4 in CSS-first mode: a single `@theme` token
+sheet drives a monochrome palette, with light and dark variants resolved through `light-dark()` and
+an optional explicit theme toggle.
 
 ## Code
 

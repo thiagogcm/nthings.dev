@@ -16,7 +16,7 @@ small, monochromatic, and content-first.
 The site is a fully static Astro build with no client framework. Pages are composed from a
 two-layer layout system:
 
-- `BaseLayout` owns the document head, header, and footer.
+- `BaseLayout` owns the document head and header.
 - `DocsLayout` wraps `BaseLayout` and adds the three-column documentation grid: a global
   navigation sidebar, the longform content column, and an in-page table of contents.
 
@@ -26,14 +26,14 @@ output is plain HTML and CSS with zero runtime JavaScript beyond view transition
 
 ## Tech Stack
 
-| Layer     | Choice                          |
-| --------- | ------------------------------- |
-| Framework | Astro 6                         |
-| Language  | TypeScript (strict)             |
+| Layer     | Choice                                  |
+| --------- | --------------------------------------- |
+| Framework | Astro 6                                 |
+| Language  | TypeScript (strict)                     |
 | Styling   | Tailwind v4 (CSS-first `@theme` tokens) |
-| Content   | Markdown content collections    |
-| Hosting   | Cloudflare Workers via Wrangler |
-| Fonts     | Inter, JetBrains Mono           |
+| Content   | Markdown content collections            |
+| Hosting   | Cloudflare Workers via Wrangler         |
+| Fonts     | Inter, JetBrains Mono                   |
 
 There is no CSS-in-JS and no CMS. Styling is Tailwind v4 in CSS-first mode: a single `@theme` token
 sheet drives a monochrome palette, with light and dark variants resolved through `light-dark()` and

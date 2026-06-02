@@ -15,7 +15,9 @@ const uiInitScriptHash =
 // https://astro.build/config
 export default defineConfig({
   site: 'https://nthings.dev',
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    platformProxy: { enabled: true },
+  }),
   vite: {
     plugins: [tailwindcss()],
   },

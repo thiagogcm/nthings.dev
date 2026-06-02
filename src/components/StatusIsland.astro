@@ -1,39 +1,55 @@
 ---
-// This will render dynamically on the server at request time!
-const timestamp = new Date();
-const timeString = timestamp.toLocaleTimeString('en-US', {
-  timeZone: 'America/Sao_Paulo',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: false,
-});
-const dateString = timestamp.toLocaleDateString('en-US', {
-  timeZone: 'America/Sao_Paulo',
-  month: 'short',
-  day: 'numeric',
-});
+import { env } from "cloudflare:workers";
+import { getGitHubStats, refreshGitHubStats } from "../lib/github-stats";
+import { formatDate } from "../lib/format-date";
 
-// A dynamic simulation of server performance & checks for the "Observability" theme
-const randomLatency = Math.floor(Math.random() * 8) + 8; // 8-15ms
+// Read the cron-populated cache. On a cold cache, kick off a background refresh
+// (without blocking the response) so the next render is populated.
+const stats = await getGitHubStats(env);
+if (!stats) {
+  Astro.locals.cfContext?.waitUntil(
+    refreshGitHubStats(env).catch(() => undefined),
+  );
+}
 
-const row = 'flex items-center gap-1.5';
-const dot = 'size-1.5 rounded-full';
+const numberFormatter = new Intl.NumberFormat("en-US");
+
+const row = "flex items-center gap-1.5";
+const dot = "size-1.5 rounded-full";
 ---
 
 <div class="status-widget">
-  <div class={row}>
-    <span class={`${dot} bg-ok animate-[status-pulse_2s_infinite]`}></span>
-    <span class="text-fg-soft font-medium">Belo Horizonte, BR:</span>
-    <span class="text-fg">{dateString}, {timeString} BRT</span>
-  </div>
-  <div class={row}>
-    <span class={`${dot} bg-ok`}></span>
-    <span class="text-fg-soft font-medium">System status:</span>
-    <span class="text-fg">Active & select collab open</span>
-  </div>
-  <div class={`${row} max-[48rem]:hidden`}>
-    <span class={`${dot} bg-accent`}></span>
-    <span class="text-fg-soft font-medium">Observability:</span>
-    <span class="text-fg">Latency {randomLatency}ms · SSR Active</span>
-  </div>
+  {
+    stats ? (
+      <>
+        <div class={row}>
+          <span class={`${dot} bg-ok animate-[status-pulse_2s_infinite]`} />
+          <span class="text-fg-soft font-medium">GitHub:</span>
+          <span class="text-fg">{stats.repoCount} repos</span>
+        </div>
+        <div class={row}>
+          <span class={`${dot} bg-ok`} />
+          <span class="text-fg-soft font-medium">Commits:</span>
+          <span class="text-fg">
+            {numberFormatter.format(stats.commitCount)}
+          </span>
+        </div>
+        <div class={`${row} max-[48rem]:hidden`}>
+          <span class={`${dot} bg-accent`} />
+          <span class="text-fg-soft font-medium">Last update:</span>
+          <span class="text-fg">{formatDate(new Date(stats.lastUpdate))}</span>
+        </div>
+      </>
+    ) : (
+      <div class={row}>
+        <span
+          class={`${dot} bg-border-strong animate-[status-fade_1.5s_infinite_ease-in-out]`}
+        />
+        <span class="text-fg-soft font-medium">GitHub:</span>
+        <span class="text-fg-soft animate-[status-fade_1.5s_infinite_ease-in-out]">
+          syncing stats...
+        </span>
+      </div>
+    )
+  }
 </div>

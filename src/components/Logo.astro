@@ -6,48 +6,11 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-<svg
-  viewBox="0 0 110 24"
-  class:list={['h-6 w-auto select-none', className]}
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
-  aria-label="n::things.dev logo"
->
-  <!-- Stylized Geometric "n" -->
-  <path
-    d="M3 17V8.5C3 6.01472 5.01472 4 7.5 4V4C9.98528 4 12 6.01472 12 8.5V17"
-    stroke="currentColor"
-    stroke-width="2.2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    class="text-accent"
-  />
-
-  <!-- Scope operator "::" -->
-  <circle cx="17.5" cy="8.5" r="1.35" fill="currentColor" class="text-accent" />
-  <circle cx="17.5" cy="14.5" r="1.35" fill="currentColor" class="text-accent" />
-
-  <!-- "things" in clean sans-serif -->
-  <text
-    x="25"
-    y="17"
-    font-family="var(--font-sans)"
-    font-weight="700"
-    font-size="14.5"
-    letter-spacing="-0.02em"
-    fill="currentColor"
-    class="fill-current text-fg"
-  >things</text>
-
-  <!-- ".dev" in clean code monospace -->
-  <text
-    x="73"
-    y="17"
-    font-family="var(--font-mono)"
-    font-weight="500"
-    font-size="12"
-    letter-spacing="-0.01em"
-    fill="currentColor"
-    class="fill-current text-fg-soft"
-  >.dev</text>
-</svg>
+<img
+  src="/nthings.svg"
+  alt="n::things.dev logo"
+  width="2816"
+  height="824"
+  class:list={["h-8 w-auto select-none", className]}
+  decoding="async"
+/>

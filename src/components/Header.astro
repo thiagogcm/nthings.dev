@@ -1,5 +1,6 @@
 ---
 import Icon from './Icon.astro';
+import Logo from './Logo.astro';
 import { NAV_LINKS, SOCIAL_LINKS } from '../consts';
 
 const pathname = Astro.url.pathname;
@@ -25,16 +26,11 @@ const iconButton =
 <header class={headerClass}>
   <div class="shell flex items-center gap-6 min-h-[var(--header-height)] max-[42rem]:gap-2">
     <a
-      class="inline-flex items-center gap-2.5 text-fg text-[0.95rem] font-semibold tracking-[-0.01em]"
+      class="inline-flex items-center text-fg"
       href="/"
       transition:name="site-brand"
     >
-      <span
-        class="grid place-items-center size-7 border border-border-strong rounded-sm text-[0.68rem] font-bold tracking-[0.04em] max-[42rem]:hidden"
-      >
-        TM
-      </span>
-      <span>nthings.dev</span>
+      <Logo />
     </a>
 
     <nav class="flex gap-1 ml-auto max-[60rem]:gap-0" aria-label="Primary">

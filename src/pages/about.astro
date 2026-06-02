@@ -3,15 +3,12 @@ import DocsLayout from "../layouts/DocsLayout.astro";
 import { SITE, CURRENT_FOCUS } from "../consts";
 ---
 
-<DocsLayout
-  title="About"
-  description={`Professional philosophy and technical focus of ${SITE.author}.`}
->
+<DocsLayout title="About" description={`Release notes`}>
   <article class="grid gap-10">
     <header class="grid gap-[0.85rem] pb-8 border-b border-border">
       <p class="eyebrow">About</p>
       <h1>{SITE.author}</h1>
-      <p class="lede">{SITE.role} based in {SITE.location}.</p>
+      <p class="lede">Software Engineer</p>
     </header>
 
     <div class="prose">
@@ -47,22 +44,6 @@ import { SITE, CURRENT_FOCUS } from "../consts";
         Most of the work lands between engineering and product: AI-native
         workflows and agents, frontend systems and performance, observability,
         and practical architecture choices made under real constraints.
-      </p>
-
-      <h2>Elsewhere</h2>
-      <p>
-        Read the <a href="/projects">project references</a> or the <a
-          href="/blog">writing</a
-        >, or find me on <a
-          href="https://github.com/thiagogcm"
-          target="_blank"
-          rel="noopener noreferrer">GitHub</a
-        >
-        and <a
-          href="https://linkedin.com/in/thiagomoura"
-          target="_blank"
-          rel="noopener noreferrer">LinkedIn</a
-        >.
       </p>
     </div>
   </article>

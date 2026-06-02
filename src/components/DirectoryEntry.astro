@@ -20,7 +20,7 @@ const { title, href, description, meta, tags } = Astro.props;
     {meta && <span class="text-fg-soft font-mono text-[0.8rem] whitespace-nowrap">{meta}</span>}
   </div>
 
-  {description && <p class="max-w-[52rem] text-fg-muted leading-[1.6]">{description}</p>}
+  {description && <p class="max-w-208 text-fg-muted leading-[1.6]">{description}</p>}
 
   {
     tags && tags.length > 0 && (

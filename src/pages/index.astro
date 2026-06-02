@@ -18,13 +18,11 @@ const recentPosts = allPosts
 
 <BaseLayout title={SITE.title}>
   <div class="grid gap-[clamp(2.5rem,5vw,4rem)]">
-    <header class="max-w-[48rem]">
+    <header class="max-w-3xl">
       <p class="eyebrow">{SITE.role}</p>
-      <h1>Engineering reference.</h1>
+      <h1>Public journal</h1>
       <p class="lede mt-4">
-        Work by {SITE.author}, documented rather than displayed. Each project is
-        written up as a technical specification — architecture, stack, and the
-        code decisions behind it.
+        Experiments, thoughts, and anything in between.
       </p>
       <div class="mt-6">
         <StatusIsland server:defer>

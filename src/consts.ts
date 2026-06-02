@@ -5,7 +5,7 @@ export const SITE = {
     'Portfolio, writing, and selected work from Thiago Moura, a software engineer building AI-native products and resilient product systems.',
   url: 'https://nthings.dev',
   locale: 'en-US',
-  ogImage: '/og-cover.svg',
+  ogImage: '/nthings.svg',
   location: 'Belo Horizonte, Brazil',
   role: 'AI-native product engineer',
   availability: 'Open to select collaborations',

@@ -1,9 +1,47 @@
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 128 128">
-    <path d="M50.4 78.5a75.1 75.1 0 0 0-28.5 6.9l24.2-65.7c.7-2 1.9-3.2 3.4-3.2h29c1.5 0 2.7 1.2 3.4 3.2l24.2 65.7s-11.6-7-28.5-7L67 45.5c-.4-1.7-1.6-2.8-2.9-2.8-1.3 0-2.5 1.1-2.9 2.7L50.4 78.5Zm-1.1 28.2Zm-4.2-20.2c-2 6.6-.6 15.8 4.2 20.2a17.5 17.5 0 0 1 .2-.7 5.5 5.5 0 0 1 5.7-4.5c2.8.1 4.3 1.5 4.7 4.7.2 1.1.2 2.3.2 3.5v.4c0 2.7.7 5.2 2.2 7.4a13 13 0 0 0 5.7 4.9v-.3l-.2-.3c-1.8-5.6-.5-9.5 4.4-12.8l1.5-1a73 73 0 0 0 3.2-2.2 16 16 0 0 0 6.8-11.4c.3-2 .1-4-.6-6l-.8.6-1.6 1a37 37 0 0 1-22.4 2.7c-5-.7-9.7-2-13.2-6.2Z" />
-    <style>
-        path { fill: #000; }
-        @media (prefers-color-scheme: dark) {
-            path { fill: #FFF; }
-        }
-    </style>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="n::t icon">
+  <defs>
+    <filter id="blueGlow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="1.6" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.11 0 0 0 0 0.44 0 0 0 0 0.82 0 0 0 0.9 0"/>
+    </filter>
+    <filter id="whiteGlow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="1.4" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.73 0 0 0 0 0.78 0 0 0 0 0.84 0 0 0 0.85 0"/>
+    </filter>
+    <filter id="greenGlow" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="1.8" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.78 0 0 0 0 0.91 0 0 0 0 0.43 0 0 0 0.9 0"/>
+    </filter>
+    <pattern id="screenGrid" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="0.8" height="4" fill="#010301" opacity="0.44"/>
+      <rect x="0" y="0" width="4" height="0.8" fill="#010301" opacity="0.30"/>
+    </pattern>
+    <pattern id="softScan" width="3" height="3" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="0.75" fill="#ffffff" opacity="0.08"/>
+    </pattern>
+    <path id="nShape" fill-rule="evenodd" d="M 630.0 374.0 C 626.5 371.9 613.1 364.2 607.0 363.0 C 600.9 361.8 579.6 362.1 574.0 363.0 C 568.4 363.9 559.8 368.3 555.0 371.0 C 550.2 373.7 533.4 388.5 530.0 388.0 C 526.6 387.5 527.9 368.3 524.0 366.0 C 520.1 363.7 497.2 345.7 494.0 367.0 C 490.8 388.3 490.4 541.7 494.0 563.0 C 497.6 584.3 523.1 564.2 527.0 564.0 C 530.9 563.8 529.7 576.1 530.0 561.0 C 530.3 545.9 527.3 442.6 530.0 425.0 C 532.7 407.4 550.1 402.5 555.0 399.0 C 559.9 395.5 571.0 393.5 575.0 393.0 C 579.0 392.5 588.6 392.8 592.0 394.0 C 595.4 395.2 603.8 401.3 606.0 404.0 C 608.2 406.7 611.4 402.0 612.0 419.0 C 612.6 436.0 611.7 545.3 612.0 561.0 C 612.3 576.7 611.0 563.8 615.0 564.0 C 619.0 564.2 645.3 580.1 649.0 563.0 C 652.7 545.9 650.1 425.6 649.0 406.0 C 647.9 386.4 641.1 385.5 639.0 382.0 C 636.9 378.5 633.5 376.1 630.0 374.0 Z"/>
+    <g id="colonShape">
+      <circle cx="60.5" cy="46.5" r="6.3"/>
+      <circle cx="75.5" cy="46.5" r="6.3"/>
+      <circle cx="60.5" cy="97.5" r="6.3"/>
+      <circle cx="75.5" cy="97.5" r="6.3"/>
+    </g>
+    <path id="tShape" fill-rule="evenodd" d="M 1141.0 321.0 C 1138.8 326.0 1141.0 358.0 1140.0 363.0 C 1139.0 368.0 1136.9 366.6 1132.0 367.0 C 1127.1 367.4 1099.1 364.1 1095.0 367.0 C 1090.9 369.9 1094.0 390.9 1094.0 394.0 C 1094.0 397.1 1090.5 395.8 1095.0 396.0 C 1099.5 396.2 1131.1 395.7 1136.0 396.0 C 1140.9 396.3 1139.6 385.6 1140.0 399.0 C 1140.4 412.4 1139.3 504.9 1140.0 520.0 C 1140.7 535.1 1143.8 534.1 1146.0 538.0 C 1148.2 541.9 1155.8 553.0 1160.0 556.0 C 1164.2 559.0 1177.8 564.7 1185.0 566.0 C 1192.2 567.3 1219.4 568.3 1226.0 568.0 C 1232.6 567.7 1242.2 564.5 1246.0 563.0 C 1249.8 561.5 1260.1 557.6 1261.0 554.0 C 1261.9 550.4 1255.3 532.7 1254.0 530.0 C 1252.7 527.3 1251.6 528.2 1249.0 529.0 C 1246.4 529.8 1235.1 535.9 1230.0 537.0 C 1224.9 538.1 1206.7 539.6 1202.0 539.0 C 1197.3 538.4 1189.8 533.7 1187.0 531.0 C 1184.2 528.3 1177.2 528.3 1176.0 514.0 C 1174.8 499.7 1175.6 411.8 1176.0 399.0 C 1176.4 386.2 1172.8 396.3 1180.0 396.0 C 1187.2 395.7 1235.1 398.9 1242.0 396.0 C 1248.9 393.1 1244.1 372.2 1244.0 369.0 C 1243.9 365.8 1247.9 366.2 1241.0 366.0 C 1234.1 365.8 1186.9 367.2 1180.0 367.0 C 1173.1 366.8 1177.4 369.3 1177.0 364.0 C 1176.6 358.7 1177.8 323.1 1176.0 318.0 C 1174.2 312.9 1163.8 316.7 1160.0 317.0 C 1156.2 317.3 1143.2 316.0 1141.0 321.0 Z"/>
+  </defs>
+  <use href="#nShape" fill="#1c71d0" filter="url(#blueGlow)" opacity="0.95" transform="matrix(0.27 0 0 0.39 -126.11 -111.15)"/>
+  <use href="#colonShape" fill="#bac8d6" filter="url(#whiteGlow)" opacity="0.95"/>
+  <use href="#tShape" fill="#c8e96d" filter="url(#greenGlow)" opacity="0.95" transform="matrix(0.22 0 0 0.39 -151.68 -111.15)"/>
+  <use href="#nShape" fill="#1c71d0" transform="matrix(0.27 0 0 0.39 -126.11 -111.15)"/>
+  <use href="#colonShape" fill="#bac8d6"/>
+  <use href="#tShape" fill="#c8e96d" transform="matrix(0.22 0 0 0.39 -151.68 -111.15)"/>
+  <g opacity="0.7">
+    <use href="#nShape" fill="url(#screenGrid)" transform="matrix(0.27 0 0 0.39 -126.11 -111.15)"/>
+    <use href="#colonShape" fill="url(#screenGrid)" opacity="0.55"/>
+    <use href="#tShape" fill="url(#screenGrid)" transform="matrix(0.22 0 0 0.39 -151.68 -111.15)"/>
+  </g>
+  <g opacity="0.42">
+    <use href="#nShape" fill="url(#softScan)" transform="matrix(0.27 0 0 0.39 -126.11 -111.15)"/>
+    <use href="#colonShape" fill="url(#softScan)"/>
+    <use href="#tShape" fill="url(#softScan)" transform="matrix(0.22 0 0 0.39 -151.68 -111.15)"/>
+  </g>
 </svg>

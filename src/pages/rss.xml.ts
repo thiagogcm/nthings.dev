@@ -5,7 +5,7 @@ import { SITE } from '../consts';
 export async function GET(context: { site?: URL }) {
   const posts = await getCollection('blog');
   const items = posts
-    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+    .toSorted((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
     .map((post) => ({
       title: post.data.title,
       description: post.data.description,

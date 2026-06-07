@@ -7,10 +7,10 @@ const [allPosts, allProjects] = await Promise.all([
   getCollection("projects"),
 ]);
 
-const posts = allPosts.sort(
+const posts = allPosts.toSorted(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
-const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
+const projects = allProjects.toSorted((a, b) => a.data.order - b.data.order);
 
 interface Props {
   id?: string;

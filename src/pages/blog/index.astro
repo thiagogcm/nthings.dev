@@ -5,7 +5,7 @@ import { formatDate } from "../../lib/format-date";
 import DocsLayout from "../../layouts/DocsLayout.astro";
 
 const allPosts = await getCollection("blog");
-const posts = allPosts.sort(
+const posts = allPosts.toSorted(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 ---

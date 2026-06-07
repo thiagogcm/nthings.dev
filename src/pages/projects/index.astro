@@ -4,7 +4,7 @@ import DirectoryEntry from "../../components/DirectoryEntry.astro";
 import DocsLayout from "../../layouts/DocsLayout.astro";
 
 const allProjects = await getCollection("projects");
-const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
+const projects = allProjects.toSorted((a, b) => a.data.order - b.data.order);
 ---
 
 <DocsLayout

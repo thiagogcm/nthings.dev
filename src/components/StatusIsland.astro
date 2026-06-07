@@ -34,7 +34,7 @@ const dot = "size-1.5 rounded-full";
             {numberFormatter.format(stats.commitCount)}
           </span>
         </div>
-        <div class={`${row} max-[48rem]:hidden`}>
+        <div class={`${row} status-widget__detail`}>
           <span class={`${dot} bg-accent`} />
           <span class="text-fg-soft font-medium">Last update:</span>
           <span class="text-fg">{formatDate(new Date(stats.lastUpdate))}</span>

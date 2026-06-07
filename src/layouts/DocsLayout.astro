@@ -32,7 +32,8 @@ const withToc = showToc && headings.length > 0;
         <button
           type="button"
           class="sidebar-mobile-toggle"
-          data-mobile-sidebar-toggle
+          command="show-modal"
+          commandfor="docs-sidebar"
           aria-haspopup="dialog"
           aria-controls="docs-sidebar"
           aria-expanded="false"

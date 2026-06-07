@@ -8,11 +8,11 @@ import StatusIsland from "../components/StatusIsland.astro";
 import StatusFallback from "../components/StatusFallback.astro";
 
 const allProjects = await getCollection("projects");
-const projects = allProjects.sort((a, b) => a.data.order - b.data.order);
+const projects = allProjects.toSorted((a, b) => a.data.order - b.data.order);
 
 const allPosts = await getCollection("blog");
 const recentPosts = allPosts
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .toSorted((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
   .slice(0, 4);
 ---
 
@@ -21,9 +21,7 @@ const recentPosts = allPosts
     <header class="max-w-3xl">
       <p class="eyebrow">{SITE.role}</p>
       <h1>Public journal</h1>
-      <p class="lede mt-4">
-        Experiments, thoughts, and anything in between.
-      </p>
+      <p class="lede mt-4">Experiments, thoughts, and anything in between.</p>
       <div class="mt-6">
         <StatusIsland server:defer>
           <StatusFallback slot="fallback" />

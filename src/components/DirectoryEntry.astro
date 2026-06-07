@@ -10,17 +10,32 @@ interface Props {
 const { title, href, description, meta, tags } = Astro.props;
 ---
 
-<article class="grid gap-1.5 py-[1.4rem] border-b border-border">
-  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
+<article
+  class="directory-entry grid gap-1.5 py-[1.4rem] border-b border-border"
+>
+  <div
+    class="directory-entry__header flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2"
+  >
     <h2 class="text-[1.15rem] font-semibold tracking-[-0.01em]">
       <a
         class="text-fg transition-colors duration-150 hover:text-accent focus-visible:text-accent"
-        href={href}>{title}</a>
+        href={href}>{title}</a
+      >
     </h2>
-    {meta && <span class="text-fg-soft font-mono text-[0.8rem] whitespace-nowrap">{meta}</span>}
+    {
+      meta && (
+        <span class="directory-entry__meta text-fg-soft font-mono text-[0.8rem] whitespace-nowrap">
+          {meta}
+        </span>
+      )
+    }
   </div>
 
-  {description && <p class="max-w-208 text-fg-muted leading-[1.6]">{description}</p>}
+  {
+    description && (
+      <p class="max-w-208 text-fg-muted leading-[1.6]">{description}</p>
+    )
+  }
 
   {
     tags && tags.length > 0 && (

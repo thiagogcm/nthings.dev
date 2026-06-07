@@ -13,6 +13,7 @@ type GitHubStatsEnv = {
 
 const KV_PREFIX = 'github:';
 const CACHE_TTL_SECONDS = 86_400;
+const GITHUB_FETCH_TIMEOUT_MS = 15_000;
 
 const REPOS_QUERY = `
   query($login: String!, $cursor: String) {
@@ -129,6 +130,7 @@ async function fetchReposPage(username: string, cursor: string | null, token?: s
       query: REPOS_QUERY,
       variables: { login: username, cursor },
     }),
+    signal: AbortSignal.timeout(GITHUB_FETCH_TIMEOUT_MS),
   });
 
   if (!response.ok) {

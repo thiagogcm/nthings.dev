@@ -1,9 +1,9 @@
 ---
-import BaseLayout from './BaseLayout.astro';
-import DocsSidebar from '../components/DocsSidebar.astro';
-import TableOfContents from '../components/TableOfContents.astro';
-import Icon from '../components/Icon.astro';
-import type { MarkdownHeading } from 'astro';
+import BaseLayout from "./BaseLayout.astro";
+import DocsSidebar from "../components/DocsSidebar.astro";
+import TableOfContents from "../components/TableOfContents.astro";
+import Icon from "../components/Icon.astro";
+import type { MarkdownHeading } from "astro";
 
 interface Props {
   title?: string;
@@ -13,14 +13,18 @@ interface Props {
   showToc?: boolean;
 }
 
-const { title, description, image, headings = [], showToc = false } = Astro.props;
+const {
+  title,
+  description,
+  image,
+  headings = [],
+  showToc = false,
+} = Astro.props;
 const withToc = showToc && headings.length > 0;
 ---
 
 <BaseLayout title={title} description={description} image={image}>
-  <div class:list={['docs-grid', { 'docs-grid--with-toc': withToc }]}>
-    <div class="docs-sidebar-backdrop" data-mobile-sidebar-close></div>
-
+  <div class:list={["docs-grid", { "docs-grid--with-toc": withToc }]}>
     <DocsSidebar id="docs-sidebar" />
 
     <div class="docs-main">
@@ -29,13 +33,12 @@ const withToc = showToc && headings.length > 0;
           type="button"
           class="sidebar-mobile-toggle"
           data-mobile-sidebar-toggle
+          aria-haspopup="dialog"
+          aria-controls="docs-sidebar"
+          aria-expanded="false"
           aria-label="Open navigation menu"
         >
-          <Icon
-            name="lucide:menu"
-            size={18}
-            aria-hidden="true"
-          />
+          <Icon name="lucide:menu" size={18} aria-hidden="true" />
           <span>Sections</span>
         </button>
       </div>

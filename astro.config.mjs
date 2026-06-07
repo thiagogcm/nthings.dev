@@ -5,10 +5,8 @@ import { unified } from '@astrojs/markdown-remark';
 import tailwindcss from '@tailwindcss/vite';
 import { UI_INIT_SCRIPT } from './src/lib/theme-init.ts';
 
-// CSP is enabled below. Astro auto-hashes processed <script>/<style> tags, but NOT
-// `is:inline` scripts — so we compute the SHA-256 of the one inline init script
-// (theme + sidebar state, see src/lib/theme-init.ts) and add it to script-src here.
-// Derived from the script's exact bytes, so it stays correct whenever the script changes.
+// Astro auto-hashes processed scripts for CSP but not is:inline ones, so we hash the
+// inline theme init (src/lib/theme-init.ts) from its bytes and allowlist it here.
 const uiInitScriptHash =
   'sha256-' + createHash('sha256').update(UI_INIT_SCRIPT).digest('base64');
 

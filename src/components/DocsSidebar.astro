@@ -26,7 +26,7 @@ const isItemActive = (href: string) =>
   pathname === href || pathname === `${href}/`;
 ---
 
-<aside id={id} class="docs-sidebar" aria-label="Section navigation">
+<dialog id={id} class="docs-sidebar" aria-label="Section navigation">
   <ul class="docs-sidebar__group">
     <li>
       <a
@@ -54,20 +54,17 @@ const isItemActive = (href: string) =>
 
   <ul class="docs-sidebar__group">
     <li>
-      <details open={projectsActive}>
-        <summary>
+      <details name="sidebar-sections" open={projectsActive}>
+        <summary
+          class:list={[
+            "docs-sidebar__summary",
+            { "is-active": pathname === "/projects" },
+          ]}
+        >
           <span class="docs-sidebar__chevron" aria-hidden="true">
             <Icon name="lucide:chevron-right" size={14} />
           </span>
-          <a
-            href="/projects"
-            class:list={[
-              "docs-sidebar__summary-link",
-              { "is-active": pathname === "/projects" },
-            ]}
-          >
-            Projects
-          </a>
+          <span class="docs-sidebar__summary-link">Projects</span>
         </summary>
         <ul class="docs-sidebar__items">
           {
@@ -95,20 +92,17 @@ const isItemActive = (href: string) =>
 
   <ul class="docs-sidebar__group">
     <li>
-      <details open={blogActive}>
-        <summary>
+      <details name="sidebar-sections" open={blogActive}>
+        <summary
+          class:list={[
+            "docs-sidebar__summary",
+            { "is-active": pathname === "/blog" },
+          ]}
+        >
           <span class="docs-sidebar__chevron" aria-hidden="true">
             <Icon name="lucide:chevron-right" size={14} />
           </span>
-          <a
-            href="/blog"
-            class:list={[
-              "docs-sidebar__summary-link",
-              { "is-active": pathname === "/blog" },
-            ]}
-          >
-            Writing
-          </a>
+          <span class="docs-sidebar__summary-link">Writing</span>
         </summary>
         <ul class="docs-sidebar__items">
           {
@@ -133,4 +127,4 @@ const isItemActive = (href: string) =>
       </details>
     </li>
   </ul>
-</aside>
+</dialog>

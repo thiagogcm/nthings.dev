@@ -1,30 +1,30 @@
 ---
-import Icon from './Icon.astro';
-import Logo from './Logo.astro';
-import { NAV_LINKS, SOCIAL_LINKS } from '../consts';
+import Icon from "./Icon.astro";
+import Logo from "./Logo.astro";
+import { NAV_LINKS, SOCIAL_LINKS } from "../consts";
 
 const pathname = Astro.url.pathname;
 const isActive = (href: string) =>
-  pathname === href || (href !== '/' && pathname.startsWith(`${href}/`));
+  pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 
-// Glass sticky bar; border + lift fade in on scroll (see the `scrolled` variant).
 const headerClass = [
-  'sticky top-0 z-10 border-b border-transparent',
-  'bg-[color-mix(in_srgb,var(--color-bg)_82%,transparent)]',
-  'backdrop-blur-md backdrop-saturate-150',
-  'transition-[border-color,box-shadow] duration-200',
-  'scrolled:border-border scrolled:shadow-[var(--shadow-elevated)]',
-].join(' ');
+  "sticky top-0 z-10 border-b border-border",
+  "bg-[color-mix(in_srgb,var(--color-bg)_82%,transparent)]",
+  "backdrop-blur-md backdrop-saturate-150",
+  "shadow-[var(--shadow-elevated)]",
+].join(" ");
 
 const navLinkBase =
-  'inline-flex items-center px-[0.7rem] py-[0.4rem] rounded-sm text-[0.9rem] transition-colors duration-150 hover:text-fg hover:bg-surface focus-visible:text-fg focus-visible:bg-surface max-[60rem]:px-2';
+  "inline-flex items-center px-[0.7rem] py-[0.4rem] rounded-sm text-[0.9rem] transition-colors duration-150 hover:text-fg hover:bg-surface focus-visible:text-fg focus-visible:bg-surface max-[60rem]:px-2";
 
 const iconButton =
-  'inline-flex items-center justify-center size-[2.1rem] rounded-sm text-fg-muted transition-colors duration-150 hover:text-fg hover:bg-surface focus-visible:text-fg focus-visible:bg-surface';
+  "inline-flex items-center justify-center size-[2.1rem] rounded-sm text-fg-muted transition-colors duration-150 hover:text-fg hover:bg-surface focus-visible:text-fg focus-visible:bg-surface";
 ---
 
 <header class={headerClass}>
-  <div class="shell flex items-center gap-6 min-h-(--header-height) max-[42rem]:gap-2">
+  <div
+    class="shell flex items-center gap-6 min-h-(--header-height) max-[42rem]:gap-2"
+  >
     <a
       class="inline-flex items-center text-fg"
       href="/"
@@ -34,54 +34,49 @@ const iconButton =
     </a>
 
     <nav class="flex gap-1 ml-auto max-[60rem]:gap-0" aria-label="Primary">
-      {NAV_LINKS.map((link) => {
-        const active = isActive(link.href);
+      {
+        NAV_LINKS.map((link) => {
+          const active = isActive(link.href);
 
-        return (
-          <a
-            href={link.href}
-            aria-current={active ? 'page' : undefined}
-            class:list={[
-              navLinkBase,
-              active ? 'text-accent font-semibold' : 'text-fg-muted font-medium',
-            ]}
-          >
-            {link.label}
-          </a>
-        );
-      })}
+          return (
+            <a
+              href={link.href}
+              aria-current={active ? "page" : undefined}
+              class:list={[
+                navLinkBase,
+                active
+                  ? "text-accent font-semibold"
+                  : "text-fg-muted font-medium",
+              ]}
+            >
+              {link.label}
+            </a>
+          );
+        })
+      }
     </nav>
 
     <div
       class="inline-flex gap-0.5 pl-[0.6rem] border-l border-border max-[42rem]:pl-1"
       aria-label="Social links"
     >
-      {SOCIAL_LINKS.map((link) => {
-        const isExternal = link.href.startsWith('http');
+      {
+        SOCIAL_LINKS.map((link) => {
+          const isExternal = link.href.startsWith("http");
 
-        return (
-          <a
-            class={iconButton}
-            href={link.href}
-            target={isExternal ? '_blank' : undefined}
-            rel={isExternal ? 'noopener noreferrer' : undefined}
-            aria-label={link.label}
-          >
-            <Icon name={link.icon} aria-hidden="true" />
-          </a>
-        );
-      })}
-
-      <button
-        type="button"
-        class={`${iconButton} cursor-pointer`}
-        data-theme-toggle
-        aria-pressed="false"
-        aria-label="Toggle dark mode"
-      >
-        <Icon name="lucide:sun" size={18} class="hidden dark:inline-flex" aria-hidden="true" />
-        <Icon name="lucide:moon" size={18} class="inline-flex dark:hidden" aria-hidden="true" />
-      </button>
+          return (
+            <a
+              class={iconButton}
+              href={link.href}
+              target={isExternal ? "_blank" : undefined}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              aria-label={link.label}
+            >
+              <Icon name={link.icon} aria-hidden="true" />
+            </a>
+          );
+        })
+      }
     </div>
   </div>
 </header>

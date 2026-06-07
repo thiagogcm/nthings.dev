@@ -1,14 +1,7 @@
-import { createHash } from 'node:crypto';
 import { defineConfig, fontProviders } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import { unified } from '@astrojs/markdown-remark';
 import tailwindcss from '@tailwindcss/vite';
-import { UI_INIT_SCRIPT } from './src/lib/theme-init.ts';
-
-// Astro auto-hashes processed scripts for CSP but not is:inline ones, so we hash the
-// inline theme init (src/lib/theme-init.ts) from its bytes and allowlist it here.
-const uiInitScriptHash =
-  'sha256-' + createHash('sha256').update(UI_INIT_SCRIPT).digest('base64');
 
 // https://astro.build/config
 export default defineConfig({
@@ -30,13 +23,6 @@ export default defineConfig({
   prefetch: {
     prefetchAll: true,
     defaultStrategy: 'hover',
-  },
-  security: {
-    csp: {
-      scriptDirective: {
-        hashes: [uiInitScriptHash],
-      },
-    },
   },
   fonts: [
     {

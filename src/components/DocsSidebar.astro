@@ -16,7 +16,8 @@ interface Props {
   id?: string;
 }
 
-const { id } = Astro.props;
+const { id }: Props = Astro.props;
+const sidebarId = id ?? "docs-sidebar";
 
 const pathname = Astro.url.pathname;
 const projectsActive =
@@ -24,6 +25,11 @@ const projectsActive =
 const blogActive = pathname === "/blog" || pathname.startsWith("/blog/");
 const isItemActive = (href: string) =>
   pathname === href || pathname === `${href}/`;
+
+const closeAttrs = {
+  command: "close",
+  commandfor: sidebarId,
+} as const;
 ---
 
 <dialog id={id} class="docs-sidebar" aria-label="Section navigation">
@@ -31,6 +37,7 @@ const isItemActive = (href: string) =>
     <li>
       <a
         href="/"
+        {...closeAttrs}
         class:list={[
           "docs-sidebar__top-link",
           { "is-active": pathname === "/" },
@@ -42,6 +49,7 @@ const isItemActive = (href: string) =>
     <li>
       <a
         href="/about"
+        {...closeAttrs}
         class:list={[
           "docs-sidebar__top-link",
           { "is-active": isItemActive("/about") },
@@ -74,6 +82,7 @@ const isItemActive = (href: string) =>
                 <li>
                   <a
                     href={href}
+                    {...closeAttrs}
                     class:list={[
                       "docs-sidebar__link",
                       { "is-active": isItemActive(href) },
@@ -112,6 +121,7 @@ const isItemActive = (href: string) =>
                 <li>
                   <a
                     href={href}
+                    {...closeAttrs}
                     class:list={[
                       "docs-sidebar__link",
                       { "is-active": isItemActive(href) },

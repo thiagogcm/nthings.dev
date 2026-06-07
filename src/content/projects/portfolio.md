@@ -37,7 +37,7 @@ output is plain HTML and CSS with zero runtime JavaScript beyond view transition
 
 There is no CSS-in-JS and no CMS. Styling is Tailwind v4 in CSS-first mode: a single `@theme` token
 sheet drives a monochrome palette, with light and dark variants resolved through `light-dark()` and
-an optional explicit theme toggle.
+the user's system `prefers-color-scheme` preference.
 
 ## Code
 

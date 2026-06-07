@@ -1,20 +1,11 @@
 @import "tailwindcss";
 
-/* `dark`: explicit data-theme="dark", or system dark when unset — resolved in
-   CSS so the right theme paints before JS. `scrolled` keys off data-scrolled. */
+/* `dark`: system preference only — pairs with light-dark() tokens. */
 @custom-variant dark {
-  &:where([data-theme="dark"], [data-theme="dark"] *) {
+  @media (prefers-color-scheme: dark) {
     @slot;
   }
-
-  @media (prefers-color-scheme: dark) {
-    &:where(:root:not([data-theme]), :root:not([data-theme]) *) {
-      @slot;
-    }
-  }
 }
-
-@custom-variant scrolled (&:where(:root[data-scrolled] *));
 
 /* Design tokens — both themes per value via light-dark(), resolved from the
    color-scheme set below. Also generate utilities (bg-bg, text-fg-muted, …). */
@@ -72,15 +63,6 @@
       light-dark(0 2px 8px rgba(15, 23, 36, 0.05), 0 2px 8px rgba(0, 0, 0, 0.35));
   }
 
-  /* Explicit choices pin color-scheme; light-dark() tokens resolve from it. */
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-  }
-
-  :root[data-theme="light"] {
-    color-scheme: light;
-  }
-
   html {
     background: var(--color-bg);
     color: var(--color-fg);
@@ -88,6 +70,8 @@
     line-height: 1.7;
     scroll-behavior: smooth;
     scrollbar-gutter: stable;
+    scrollbar-color: var(--color-border) var(--color-bg);
+    scrollbar-width: thin;
     -webkit-text-size-adjust: 100%;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -240,6 +224,8 @@
   .directory-entry {
     container-type: inline-size;
     container-name: entry;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 6rem;
   }
 
   @container entry (max-width: 28rem) {
@@ -269,6 +255,7 @@
       font-size: 1rem;
       line-height: 1.8;
       text-wrap: pretty;
+      hyphens: auto;
     }
 
     h2,
@@ -402,6 +389,8 @@
       background: transparent;
       color: inherit;
       overflow-y: auto;
+      scrollbar-color: var(--color-border) var(--color-bg);
+      scrollbar-width: thin;
     }
 
     .docs-sidebar__group {
@@ -612,6 +601,8 @@
     overflow-y: auto;
     padding-left: 1rem;
     border-left: 1px solid var(--color-border);
+    scrollbar-color: var(--color-border) var(--color-bg);
+    scrollbar-width: thin;
   }
 
   .site-toc__heading {

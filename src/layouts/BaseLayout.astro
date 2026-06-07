@@ -3,8 +3,7 @@ import "../styles/global.css";
 import { Font } from "astro:assets";
 import { ClientRouter, slide } from "astro:transitions";
 import Header from "../components/Header.astro";
-import { SITE } from "../consts";
-import { UI_INIT_SCRIPT } from "../lib/theme-init";
+import { SITE, SOCIAL_LINKS } from "../consts";
 
 interface Props {
   title?: string;
@@ -26,6 +25,14 @@ const pageTitle = title
     : `${title} | ${SITE.title}`
   : SITE.title;
 const isArticle = Astro.url.pathname.startsWith("/blog/");
+
+const dnsPrefetchHosts = [
+  ...new Set(
+    SOCIAL_LINKS.map((link) => link.href)
+      .filter((href) => href.startsWith("http"))
+      .map((href) => new URL(href).hostname),
+  ),
+];
 ---
 
 <!doctype html>
@@ -36,11 +43,23 @@ const isArticle = Astro.url.pathname.startsWith("/blog/");
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
-    <!-- Single (non-media) theme-color; the init script syncs it to the resolved theme. -->
-    <meta name="theme-color" content="#fcfcfd" />
+    <meta
+      name="theme-color"
+      content="#fcfcfd"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#0a0b0d"
+      media="(prefers-color-scheme: dark)"
+    />
     <meta name="color-scheme" content="light dark" />
-    <!-- Anti-FOUC theme init (only is:inline script; CSP-hashed in astro.config.mjs). -->
-    <script is:inline set:html={UI_INIT_SCRIPT} />
+
+    {
+      dnsPrefetchHosts.map((host) => (
+        <link rel="dns-prefetch" href={`https://${host}`} />
+      ))
+    }
 
     <link rel="canonical" href={canonicalUrl.toString()} />
     <link
@@ -60,11 +79,18 @@ const isArticle = Astro.url.pathname.startsWith("/blog/");
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={socialImage.toString()} />
     <title>{pageTitle}</title>
+    <!-- Astro <Font> has no fetchpriority API; narrow preloads to normal style only. -->
     <Font
       cssVariable="--font-body"
-      preload={[{ weight: 400 }, { weight: 600 }]}
+      preload={[
+        { weight: 400, style: "normal" },
+        { weight: 600, style: "normal" },
+      ]}
     />
-    <Font cssVariable="--font-code" preload={[{ weight: 400 }]} />
+    <Font
+      cssVariable="--font-code"
+      preload={[{ weight: 400, style: "normal" }]}
+    />
     <ClientRouter />
   </head>
   <body>
@@ -88,24 +114,10 @@ const isArticle = Astro.url.pathname.startsWith("/blog/");
     </div>
 
     <script>
-      // Interactive UI wiring. Processed (not is:inline) so Astro hashes it for CSP, and
-      // delegated on `document` so it survives view-transition swaps.
+      // Sync drawer toggle aria-expanded after view-transition swaps.
       (function () {
         if ((window as any).__nthingsUIBound) return;
         (window as any).__nthingsUIBound = true;
-        const root = document.documentElement;
-
-        const isDark = () => {
-          const t = root.getAttribute("data-theme");
-          return t
-            ? t === "dark"
-            : window.matchMedia("(prefers-color-scheme: dark)").matches;
-        };
-
-        const syncControls = () => {
-          const themeBtn = document.querySelector("[data-theme-toggle]");
-          if (themeBtn) themeBtn.setAttribute("aria-pressed", String(isDark()));
-        };
 
         const bindSidebar = () => {
           const dialog = document.getElementById(
@@ -121,55 +133,9 @@ const isArticle = Astro.url.pathname.startsWith("/blog/");
             const { newState } = e as ToggleEvent;
             toggle.setAttribute("aria-expanded", String(newState === "open"));
           });
-
-          // Light-dismiss: backdrop clicks target the dialog outside the panel.
-          dialog.addEventListener("click", (e) => {
-            if (e.target !== dialog) return;
-            const r = dialog.getBoundingClientRect();
-            const outside =
-              e.clientX < r.left ||
-              e.clientX > r.right ||
-              e.clientY < r.top ||
-              e.clientY > r.bottom;
-            if (!outside) return;
-            dialog.requestClose();
-          });
         };
 
-        document.addEventListener("click", (e) => {
-          const target = e.target as Element | null;
-          if (!target?.closest) return;
-
-          if (target.closest("[data-theme-toggle]")) {
-            const next = isDark() ? "light" : "dark";
-            root.setAttribute("data-theme", next);
-            try {
-              localStorage.setItem("theme", next);
-            } catch {}
-            (window as any).__themeSyncMeta?.();
-            syncControls();
-            return;
-          }
-
-          const dialog = document.getElementById(
-            "docs-sidebar",
-          ) as HTMLDialogElement | null;
-          if (dialog?.open && target.closest(".docs-sidebar a")) {
-            dialog.requestClose();
-          }
-        });
-
-        const onScroll = () => {
-          if (window.scrollY > 4) root.setAttribute("data-scrolled", "");
-          else root.removeAttribute("data-scrolled");
-        };
-        window.addEventListener("scroll", onScroll, { passive: true });
-
-        const refresh = () => {
-          syncControls();
-          bindSidebar();
-          onScroll();
-        };
+        const refresh = () => bindSidebar();
         document.addEventListener("astro:page-load", refresh);
         document.addEventListener("astro:after-swap", refresh);
         refresh();

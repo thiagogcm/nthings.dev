@@ -138,7 +138,9 @@ const dnsPrefetchHosts = [
     <script>
       // Keep invoker toggle aria-expanded in sync after view-transition swaps.
       (function () {
-        if ((window as any).__nthingsDrawerBound) return;
+        if ((window as any).__nthingsDrawerBound) {
+          return;
+        }
         (window as any).__nthingsDrawerBound = true;
 
         const sync = () => {
@@ -148,7 +150,9 @@ const dnsPrefetchHosts = [
           const toggle = document.querySelector(
             '[commandfor="site-drawer"][command="show-modal"]',
           ) as HTMLButtonElement | null;
-          if (!dialog || !toggle || (dialog as any).__bound) return;
+          if (!dialog || !toggle || (dialog as any).__bound) {
+            return;
+          }
           (dialog as any).__bound = true;
           dialog.addEventListener("toggle", (e) => {
             const { newState } = e as ToggleEvent;
@@ -163,7 +167,9 @@ const dnsPrefetchHosts = [
 
       // Lift the sticky header (shadow + solidified bg) once the page scrolls.
       (function () {
-        if ((window as any).__nthingsScrollBound) return;
+        if ((window as any).__nthingsScrollBound) {
+          return;
+        }
         (window as any).__nthingsScrollBound = true;
 
         let ticking = false;
@@ -175,7 +181,9 @@ const dnsPrefetchHosts = [
           );
         };
         const onScroll = () => {
-          if (ticking) return;
+          if (ticking) {
+            return;
+          }
           ticking = true;
           requestAnimationFrame(apply);
         };

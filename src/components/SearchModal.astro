@@ -70,7 +70,9 @@ import Icon from "./Icon.astro";
   }
 
   (function () {
-    if (window.__nthingsSearchBound) return;
+    if (window.__nthingsSearchBound) {
+      return;
+    }
     window.__nthingsSearchBound = true;
 
     const MAX_RESULTS = 12;
@@ -116,19 +118,27 @@ import Icon from "./Icon.astro";
     // Prebuilt per-term regexes (built once per render) wrap matches in <mark>.
     const highlight = (text: string, regexes: RegExp[]) => {
       let out = escapeHtml(text);
-      for (const re of regexes) out = out.replace(re, "<mark>$1</mark>");
+      for (const re of regexes) {
+        out = out.replace(re, "<mark>$1</mark>");
+      }
       return out;
     };
 
     const snippet = (doc: IndexedDoc, terms: string[]) => {
       const { hay, lcHay } = doc;
-      if (!hay) return "";
+      if (!hay) {
+        return "";
+      }
       let pos = -1;
       for (const term of terms) {
         const i = lcHay.indexOf(term);
-        if (i !== -1 && (pos === -1 || i < pos)) pos = i;
+        if (i !== -1 && (pos === -1 || i < pos)) {
+          pos = i;
+        }
       }
-      if (pos === -1) return hay.slice(0, 140);
+      if (pos === -1) {
+        return hay.slice(0, 140);
+      }
       const start = Math.max(0, pos - 50);
       const end = Math.min(hay.length, pos + 110);
       return (start > 0 ? "…" : "") + hay.slice(start, end) + (end < hay.length ? "…" : "");
@@ -138,11 +148,21 @@ import Icon from "./Icon.astro";
       let total = 0;
       for (const term of terms) {
         let termScore = 0;
-        if (doc.lcTitle.includes(term)) termScore += doc.lcTitle.startsWith(term) ? 16 : 10;
-        if (doc.lcTags.includes(term)) termScore += 8;
-        if (doc.lcDesc.includes(term)) termScore += 4;
-        if (doc.lcText.includes(term)) termScore += 1;
-        if (termScore === 0) return 0; // every term must match somewhere (AND)
+        if (doc.lcTitle.includes(term)) {
+          termScore += doc.lcTitle.startsWith(term) ? 16 : 10;
+        }
+        if (doc.lcTags.includes(term)) {
+          termScore += 8;
+        }
+        if (doc.lcDesc.includes(term)) {
+          termScore += 4;
+        }
+        if (doc.lcText.includes(term)) {
+          termScore += 1;
+        }
+        if (termScore === 0) {
+          return 0; // every term must match somewhere (AND)
+        }
         total += termScore;
       }
       return total;
@@ -152,17 +172,25 @@ import Icon from "./Icon.astro";
       const ul = list();
       const empty = document.querySelector("[data-search-empty]") as HTMLElement | null;
       const hint = document.querySelector("[data-search-hint]") as HTMLElement | null;
-      if (!ul) return;
+      if (!ul) {
+        return;
+      }
 
       const q = query.trim().toLowerCase();
       if (!q) {
         ul.innerHTML = "";
         current = [];
-        if (empty) empty.hidden = true;
-        if (hint) hint.hidden = false;
+        if (empty) {
+          empty.hidden = true;
+        }
+        if (hint) {
+          hint.hidden = false;
+        }
         return;
       }
-      if (hint) hint.hidden = true;
+      if (hint) {
+        hint.hidden = true;
+      }
 
       const terms = q.split(/\s+/).filter(Boolean);
       const regexes = terms.map(
@@ -180,10 +208,14 @@ import Icon from "./Icon.astro";
 
       if (ranked.length === 0) {
         ul.innerHTML = "";
-        if (empty) empty.hidden = false;
+        if (empty) {
+          empty.hidden = false;
+        }
         return;
       }
-      if (empty) empty.hidden = true;
+      if (empty) {
+        empty.hidden = true;
+      }
 
       ul.innerHTML = ranked
         .map(
@@ -203,16 +235,22 @@ import Icon from "./Icon.astro";
       const items = Array.from(
         document.querySelectorAll<HTMLElement>("[data-search-result]"),
       );
-      if (items.length === 0) return;
+      if (items.length === 0) {
+        return;
+      }
       activeIndex = (next + items.length) % items.length;
       items.forEach((el, i) => {
         const on = i === activeIndex;
         el.classList.toggle("is-active", on);
         el.setAttribute("aria-selected", String(on));
-        if (on) el.scrollIntoView({ block: "nearest" });
+        if (on) {
+          el.scrollIntoView({ block: "nearest" });
+        }
       });
       const inp = input();
-      if (inp) inp.setAttribute("aria-activedescendant", `search-result-${activeIndex}`);
+      if (inp) {
+        inp.setAttribute("aria-activedescendant", `search-result-${activeIndex}`);
+      }
     };
 
     const go = (url: string) => {
@@ -222,8 +260,12 @@ import Icon from "./Icon.astro";
 
     const openDialog = () => {
       const d = dialog();
-      if (!d) return;
-      if (!d.open) d.showModal();
+      if (!d) {
+        return;
+      }
+      if (!d.open) {
+        d.showModal();
+      }
       const inp = input();
       if (inp) {
         inp.value = "";
@@ -234,7 +276,9 @@ import Icon from "./Icon.astro";
 
     const closeDialog = () => {
       const d = dialog();
-      if (d?.open) d.close();
+      if (d?.open) {
+        d.close();
+      }
     };
 
     // Document-level delegation survives view-transition swaps.
@@ -242,8 +286,11 @@ import Icon from "./Icon.astro";
       if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         const d = dialog();
-        if (d?.open) closeDialog();
-        else openDialog();
+        if (d?.open) {
+          closeDialog();
+        } else {
+          openDialog();
+        }
         return;
       }
       if (e.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test((e.target as HTMLElement)?.tagName) && !dialog()?.open) {
@@ -252,7 +299,9 @@ import Icon from "./Icon.astro";
         return;
       }
       const d = dialog();
-      if (!d?.open) return;
+      if (!d?.open) {
+        return;
+      }
       if (e.key === "ArrowDown") {
         e.preventDefault();
         setActive(activeIndex + 1);
@@ -282,26 +331,36 @@ import Icon from "./Icon.astro";
       const result = t.closest("[data-search-result]") as HTMLElement | null;
       if (result) {
         const url = result.getAttribute("data-url");
-        if (url) go(url);
+        if (url) {
+          go(url);
+        }
         return;
       }
       // Click on backdrop (the dialog element itself) closes.
-      if (t.id === "search-dialog") closeDialog();
+      if (t.id === "search-dialog") {
+        closeDialog();
+      }
     });
 
     document.addEventListener("input", (e) => {
       const t = e.target as HTMLElement;
-      if (t.id === "search-input") render((t as HTMLInputElement).value);
+      if (t.id === "search-input") {
+        render((t as HTMLInputElement).value);
+      }
     });
 
     document.addEventListener("mousemove", (e) => {
-      if (!dialog()?.open) return;
+      if (!dialog()?.open) {
+        return;
+      }
       const result = (e.target as HTMLElement).closest?.(
         "[data-search-result]",
       ) as HTMLElement | null;
       if (result) {
         const idx = Number(result.getAttribute("data-index"));
-        if (!Number.isNaN(idx) && idx !== activeIndex) setActive(idx);
+        if (!Number.isNaN(idx) && idx !== activeIndex) {
+          setActive(idx);
+        }
       }
     });
 

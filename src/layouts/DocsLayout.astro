@@ -38,7 +38,9 @@ const withToc = showToc && tocHeadings(headings).length > 0;
 <script>
   // Add a copy-to-clipboard permalink to every in-content heading.
   (function () {
-    if ((window as any).__nthingsPermalinks) return;
+    if ((window as any).__nthingsPermalinks) {
+      return;
+    }
     (window as any).__nthingsPermalinks = true;
 
     const ICON =
@@ -73,7 +75,9 @@ const withToc = showToc && tocHeadings(headings).length > 0;
         ".prose h2[id], .prose h3[id], .prose h4[id]",
       );
       heads.forEach((h) => {
-        if (h.querySelector(".heading-anchor")) return;
+        if (h.querySelector(".heading-anchor")) {
+          return;
+        }
         const label = (h.textContent || "").trim();
         const anchor = document.createElement("a");
         anchor.className = "heading-anchor";

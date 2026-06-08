@@ -22,7 +22,9 @@ import Icon from "./Icon.astro";
 
 <script>
   (function () {
-    if ((window as any).__nthingsThemeBound) return;
+    if ((window as any).__nthingsThemeBound) {
+      return;
+    }
     (window as any).__nthingsThemeBound = true;
 
     const order = ["system", "light", "dark"] as const;
@@ -38,12 +40,17 @@ import Icon from "./Icon.astro";
 
     document.addEventListener("click", (e) => {
       const btn = (e.target as HTMLElement).closest("[data-theme-toggle]");
-      if (!btn) return;
+      if (!btn) {
+        return;
+      }
       const cur = document.documentElement.dataset.theme || "system";
       const next = order[(order.indexOf(cur as any) + 1) % order.length];
       try {
-        if (next === "system") localStorage.removeItem("theme");
-        else localStorage.setItem("theme", next);
+        if (next === "system") {
+          localStorage.removeItem("theme");
+        } else {
+          localStorage.setItem("theme", next);
+        }
       } catch (err) {}
       apply(next);
     });

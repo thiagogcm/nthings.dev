@@ -29,7 +29,9 @@ const toc = tocHeadings(headings);
 
 <script>
   (function () {
-    if ((window as any).__nthingsTocBound) return;
+    if ((window as any).__nthingsTocBound) {
+      return;
+    }
     (window as any).__nthingsTocBound = true;
 
     let links: HTMLAnchorElement[] = [];
@@ -65,14 +67,18 @@ const toc = tocHeadings(headings);
       const gap = Math.max(1, Math.min(0.25 * window.innerHeight, maxScrollTop / n));
       const out = natural.slice();
       out[n - 1] = Math.min(out[n - 1], maxScrollTop);
-      for (let i = n - 2; i >= 0; i--) out[i] = Math.min(out[i], out[i + 1] - gap);
+      for (let i = n - 2; i >= 0; i--) {
+        out[i] = Math.min(out[i], out[i + 1] - gap);
+      }
       thresholds = out;
     };
 
     // Reflect the current section in the URL, except above the first heading.
     const syncHash = (id: string, sy: number) => {
       const hash = sy + 1 >= firstActivate ? `#${id}` : "";
-      if (hash === lastHash) return;
+      if (hash === lastHash) {
+        return;
+      }
       lastHash = hash;
       history.replaceState(
         history.state,
@@ -82,7 +88,9 @@ const toc = tocHeadings(headings);
     };
 
     const mark = (id: string | null) => {
-      if (id === activeId) return;
+      if (id === activeId) {
+        return;
+      }
       activeId = id;
       let active: HTMLAnchorElement | null = null;
       for (const l of links) {
@@ -99,21 +107,28 @@ const toc = tocHeadings(headings);
       if (active && rail && rail.scrollHeight > rail.clientHeight + 4) {
         const lr = active.getBoundingClientRect();
         const rr = rail.getBoundingClientRect();
-        if (lr.top < rr.top + 8) rail.scrollTop -= rr.top + 8 - lr.top;
-        else if (lr.bottom > rr.bottom - 8)
+        if (lr.top < rr.top + 8) {
+          rail.scrollTop -= rr.top + 8 - lr.top;
+        } else if (lr.bottom > rr.bottom - 8) {
           rail.scrollTop += lr.bottom - (rr.bottom - 8);
+        }
       }
     };
 
     const update = () => {
       ticking = false;
-      if (headings.length === 0) return;
+      if (headings.length === 0) {
+        return;
+      }
       // Last heading whose (remapped) activation point has been scrolled past.
       const sy = window.scrollY;
       let idx = 0;
       for (let i = 0; i < thresholds.length; i++) {
-        if (sy + 1 >= thresholds[i]) idx = i;
-        else break;
+        if (sy + 1 >= thresholds[i]) {
+          idx = i;
+        } else {
+          break;
+        }
       }
       const id = headings[idx].id;
       mark(id);
@@ -121,13 +136,17 @@ const toc = tocHeadings(headings);
     };
 
     const onScroll = () => {
-      if (ticking) return;
+      if (ticking) {
+        return;
+      }
       ticking = true;
       requestAnimationFrame(update);
     };
 
     const remeasure = () => {
-      if (headings.length === 0) return;
+      if (headings.length === 0) {
+        return;
+      }
       measure();
       update();
     };
@@ -142,7 +161,9 @@ const toc = tocHeadings(headings);
         .filter((el): el is HTMLElement => !!el);
       activeId = null;
       lastHash = null;
-      if (headings.length === 0) return;
+      if (headings.length === 0) {
+        return;
+      }
       measure();
       update();
     };
@@ -152,7 +173,9 @@ const toc = tocHeadings(headings);
     // Late image/asset loads can shift heading positions after first paint.
     window.addEventListener("load", remeasure);
     // Web-font swaps shift heading positions; re-measure once they settle.
-    if (document.fonts?.ready) document.fonts.ready.then(remeasure);
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(remeasure);
+    }
     document.addEventListener("astro:page-load", setup);
     setup();
   })();

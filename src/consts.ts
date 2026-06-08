@@ -12,6 +12,12 @@ export const SITE = {
 
 export const NAV_LINKS = [
   {
+    href: '/',
+    label: 'Home',
+    icon: 'lucide:home',
+    description: 'Public journal',
+  },
+  {
     href: '/projects',
     label: 'Projects',
     icon: 'lucide:folder-kanban',
@@ -19,7 +25,7 @@ export const NAV_LINKS = [
   },
   {
     href: '/blog',
-    label: 'Writing',
+    label: 'Blog',
     icon: 'lucide:notebook-tabs',
     description: 'Logs, stack traces, and few diagrams',
   },

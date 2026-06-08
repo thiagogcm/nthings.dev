@@ -1,22 +1,19 @@
 ---
-import { getCollection } from "astro:content";
 import DirectoryEntry from "../../components/DirectoryEntry.astro";
 import { formatDate } from "../../lib/format-date";
 import DocsLayout from "../../layouts/DocsLayout.astro";
+import { getSortedPosts } from "../../lib/collections";
 
-const allPosts = await getCollection("blog");
-const posts = allPosts.toSorted(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+const posts = await getSortedPosts();
 ---
 
 <DocsLayout
-  title="Writing"
+  title="Blog"
   description="Deep dives, post-mortems, and innovation spotlights on software and systems."
 >
   <div>
     <header class="max-w-[44rem] mb-10">
-      <p class="eyebrow">Writing</p>
+      <p class="eyebrow">Blog</p>
       <h1>Deep dives and post-mortems.</h1>
       <p class="lede mt-4">
         Longform notes on architecture, tooling, and product systems — written

@@ -1,22 +1,17 @@
 ---
-import { getCollection } from "astro:content";
 import DirectoryEntry from "../components/DirectoryEntry.astro";
 import { formatDate } from "../lib/format-date";
 import { SITE } from "../consts";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import StatusIsland from "../components/StatusIsland.astro";
 import StatusFallback from "../components/StatusFallback.astro";
+import { getSortedPosts, getSortedProjects } from "../lib/collections";
 
-const allProjects = await getCollection("projects");
-const projects = allProjects.toSorted((a, b) => a.data.order - b.data.order);
-
-const allPosts = await getCollection("blog");
-const recentPosts = allPosts
-  .toSorted((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 4);
+const projects = await getSortedProjects();
+const recentPosts = (await getSortedPosts()).slice(0, 4);
 ---
 
-<BaseLayout title={SITE.title}>
+<BaseLayout title={SITE.title} contained>
   <div class="grid gap-[clamp(2.5rem,5vw,4rem)]">
     <header class="max-w-3xl">
       <p class="eyebrow">{SITE.role}</p>
@@ -61,10 +56,10 @@ const recentPosts = allPosts
               id="writing-heading"
               class="text-[0.78rem] font-semibold tracking-[0.16em] uppercase text-fg-soft"
             >
-              Writing
+              Blog
             </h2>
             <a class="text-link text-link--muted" href="/blog">
-              All writing
+              All posts
             </a>
           </div>
 

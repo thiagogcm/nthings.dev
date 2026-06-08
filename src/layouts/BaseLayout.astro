@@ -3,18 +3,23 @@ import "../styles/global.css";
 import { Font } from "astro:assets";
 import { ClientRouter, slide } from "astro:transitions";
 import Header from "../components/Header.astro";
+import SiteDrawer from "../components/SiteDrawer.astro";
+import SearchModal from "../components/SearchModal.astro";
 import { SITE, SOCIAL_LINKS } from "../consts";
 
 interface Props {
   title?: string;
   description?: string;
   image?: string;
+  /** Wrap the slot in the centered reading container (home / about). */
+  contained?: boolean;
 }
 
 const {
   title,
   description = SITE.description,
   image = SITE.ogImage,
+  contained = false,
 } = Astro.props;
 const siteUrl = Astro.site ?? new URL(SITE.url);
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl);
@@ -39,7 +44,7 @@ const dnsPrefetchHosts = [
 <html lang="en" transition:name="root" transition:animate="none">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
@@ -54,6 +59,18 @@ const dnsPrefetchHosts = [
       media="(prefers-color-scheme: dark)"
     />
     <meta name="color-scheme" content="light dark" />
+
+    <!-- No-flash theme: apply the saved preference before first paint. -->
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem("theme");
+          if (t === "light" || t === "dark") {
+            document.documentElement.dataset.theme = t;
+          }
+        } catch (e) {}
+      })();
+    </script>
 
     {
       dnsPrefetchHosts.map((host) => (
@@ -95,50 +112,55 @@ const dnsPrefetchHosts = [
   </head>
   <body>
     <a
-      class="absolute left-4 -top-16 z-20 px-4 py-3 border border-border rounded-md bg-bg transition-[top] duration-150 focus:top-4"
+      class="skip-link"
       href="#main-content">Skip to content</a
     >
-    <div class="flex flex-col min-h-screen">
-      <Header />
 
-      <main
-        id="main-content"
-        class="flex-1 min-w-0 py-[clamp(2.5rem,5vw,4rem)]"
-        transition:name="page-shell"
-        transition:animate={slide({ duration: "0.32s" })}
-      >
-        <div class="shell">
+    <Header />
+    <SiteDrawer />
+    <SearchModal />
+
+    <main
+      id="main-content"
+      class="site-main"
+      transition:name="page-shell"
+      transition:animate={slide({ duration: "0.32s" })}
+    >
+      {
+        contained ? (
+          <div class="shell">
+            <slot />
+          </div>
+        ) : (
           <slot />
-        </div>
-      </main>
-    </div>
+        )
+      }
+    </main>
 
     <script>
-      // Sync drawer toggle aria-expanded after view-transition swaps.
+      // Keep invoker toggle aria-expanded in sync after view-transition swaps.
       (function () {
-        if ((window as any).__nthingsUIBound) return;
-        (window as any).__nthingsUIBound = true;
+        if ((window as any).__nthingsDrawerBound) return;
+        (window as any).__nthingsDrawerBound = true;
 
-        const bindSidebar = () => {
+        const sync = () => {
           const dialog = document.getElementById(
-            "docs-sidebar",
+            "site-drawer",
           ) as HTMLDialogElement | null;
           const toggle = document.querySelector(
-            '[commandfor="docs-sidebar"]',
+            '[commandfor="site-drawer"][command="show-modal"]',
           ) as HTMLButtonElement | null;
-          if (!dialog || !toggle || (dialog as any).__sidebarBound) return;
-          (dialog as any).__sidebarBound = true;
-
+          if (!dialog || !toggle || (dialog as any).__bound) return;
+          (dialog as any).__bound = true;
           dialog.addEventListener("toggle", (e) => {
             const { newState } = e as ToggleEvent;
             toggle.setAttribute("aria-expanded", String(newState === "open"));
           });
         };
 
-        const refresh = () => bindSidebar();
-        document.addEventListener("astro:page-load", refresh);
-        document.addEventListener("astro:after-swap", refresh);
-        refresh();
+        document.addEventListener("astro:page-load", sync);
+        document.addEventListener("astro:after-swap", sync);
+        sync();
       })();
     </script>
   </body>

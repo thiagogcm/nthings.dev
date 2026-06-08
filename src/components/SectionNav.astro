@@ -1,0 +1,79 @@
+---
+import Icon from "./Icon.astro";
+import { getSortedPosts, getSortedProjects } from "../lib/collections";
+import { isActive } from "../lib/nav";
+
+interface Props {
+  /** When rendered inside the mobile drawer, links close the drawer on click. */
+  closeFor?: string;
+}
+
+const { closeFor }: Props = Astro.props;
+
+const [posts, projects] = await Promise.all([
+  getSortedPosts(),
+  getSortedProjects(),
+]);
+
+const pathname = Astro.url.pathname;
+const closeAttrs = closeFor ? { command: "close", commandfor: closeFor } : {};
+
+const sections = [
+  {
+    key: "projects",
+    label: "Projects",
+    href: "/projects",
+    items: projects.map((p) => ({ href: `/projects/${p.id}`, title: p.data.title })),
+  },
+  {
+    key: "blog",
+    label: "Blog",
+    href: "/blog",
+    items: posts.map((p) => ({ href: `/blog/${p.id}`, title: p.data.title })),
+  },
+] as const;
+---
+
+<nav class="section-nav" aria-label="Sections">
+  {
+    sections.map((section) => (
+      <details class="section-nav__group" open={isActive(pathname, section.href)}>
+        <summary
+          class:list={[
+            "section-nav__summary",
+            { "is-active": isActive(pathname, section.href, true) },
+          ]}
+        >
+          <span class="section-nav__chevron" aria-hidden="true">
+            <Icon name="lucide:chevron-right" size={14} />
+          </span>
+          <a
+            href={section.href}
+            class="section-nav__summary-link"
+            {...closeAttrs}
+          >
+            {section.label}
+          </a>
+        </summary>
+        {section.items.length > 0 && (
+          <ul class="section-nav__items">
+            {section.items.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  {...closeAttrs}
+                  class:list={[
+                    "section-nav__link",
+                    { "is-active": isActive(pathname, item.href, true) },
+                  ]}
+                >
+                  {item.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </details>
+    ))
+  }
+</nav>

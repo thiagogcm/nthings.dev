@@ -2,7 +2,7 @@
 import BaseLayout from "./BaseLayout.astro";
 import DocsSidebar from "../components/DocsSidebar.astro";
 import TableOfContents from "../components/TableOfContents.astro";
-import Icon from "../components/Icon.astro";
+import { tocHeadings } from "../lib/nav";
 import type { MarkdownHeading } from "astro";
 
 interface Props {
@@ -20,30 +20,14 @@ const {
   headings = [],
   showToc = false,
 } = Astro.props;
-const withToc = showToc && headings.length > 0;
+const withToc = showToc && tocHeadings(headings).length > 0;
 ---
 
 <BaseLayout title={title} description={description} image={image}>
-  <div class:list={["docs-grid", { "docs-grid--with-toc": withToc }]}>
-    <DocsSidebar id="docs-sidebar" />
+  <div class:list={["docs-layout", { "docs-layout--with-toc": withToc }]}>
+    <DocsSidebar />
 
-    <div class="docs-main">
-      <div class="docs-toolbar">
-        <button
-          type="button"
-          class="sidebar-mobile-toggle"
-          command="show-modal"
-          commandfor="docs-sidebar"
-          aria-haspopup="dialog"
-          aria-controls="docs-sidebar"
-          aria-expanded="false"
-          aria-label="Open navigation menu"
-        >
-          <Icon name="lucide:menu" size={18} aria-hidden="true" />
-          <span>Sections</span>
-        </button>
-      </div>
-
+    <div class="docs-content">
       <slot />
     </div>
 

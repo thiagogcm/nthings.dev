@@ -1,10 +1,9 @@
 ---
-import { getCollection } from "astro:content";
 import DirectoryEntry from "../../components/DirectoryEntry.astro";
 import DocsLayout from "../../layouts/DocsLayout.astro";
+import { getSortedProjects } from "../../lib/collections";
 
-const allProjects = await getCollection("projects");
-const projects = allProjects.toSorted((a, b) => a.data.order - b.data.order);
+const projects = await getSortedProjects();
 ---
 
 <DocsLayout

@@ -1,0 +1,51 @@
+---
+import Icon from "./Icon.astro";
+---
+
+<button
+  type="button"
+  class="theme-toggle icon-button"
+  data-theme-toggle
+  aria-label="Toggle color theme"
+  title="Toggle color theme"
+>
+  <span class="theme-toggle__icon" data-theme-icon="light">
+    <Icon name="lucide:sun" size={18} aria-hidden="true" />
+  </span>
+  <span class="theme-toggle__icon" data-theme-icon="dark">
+    <Icon name="lucide:moon" size={18} aria-hidden="true" />
+  </span>
+  <span class="theme-toggle__icon" data-theme-icon="system">
+    <Icon name="lucide:monitor" size={18} aria-hidden="true" />
+  </span>
+</button>
+
+<script>
+  (function () {
+    if ((window as any).__nthingsThemeBound) return;
+    (window as any).__nthingsThemeBound = true;
+
+    const order = ["system", "light", "dark"] as const;
+
+    const apply = (theme: string) => {
+      const root = document.documentElement;
+      if (theme === "light" || theme === "dark") {
+        root.dataset.theme = theme;
+      } else {
+        delete root.dataset.theme;
+      }
+    };
+
+    document.addEventListener("click", (e) => {
+      const btn = (e.target as HTMLElement).closest("[data-theme-toggle]");
+      if (!btn) return;
+      const cur = document.documentElement.dataset.theme || "system";
+      const next = order[(order.indexOf(cur as any) + 1) % order.length];
+      try {
+        if (next === "system") localStorage.removeItem("theme");
+        else localStorage.setItem("theme", next);
+      } catch (err) {}
+      apply(next);
+    });
+  })();
+</script>

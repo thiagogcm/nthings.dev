@@ -1,7 +1,7 @@
 ---
 import "../styles/global.css";
 import { Font } from "astro:assets";
-import { ClientRouter, slide } from "astro:transitions";
+import { ClientRouter, fade } from "astro:transitions";
 import Header from "../components/Header.astro";
 import SiteDrawer from "../components/SiteDrawer.astro";
 import SearchModal from "../components/SearchModal.astro";
@@ -124,7 +124,7 @@ const dnsPrefetchHosts = [
       id="main-content"
       class="site-main"
       transition:name="page-shell"
-      transition:animate={slide({ duration: "0.32s" })}
+      transition:animate={fade({ duration: "0.22s" })}
     >
       {
         contained ? (
@@ -161,6 +161,31 @@ const dnsPrefetchHosts = [
         document.addEventListener("astro:page-load", sync);
         document.addEventListener("astro:after-swap", sync);
         sync();
+      })();
+
+      // Lift the sticky header (shadow + solidified bg) once the page scrolls.
+      (function () {
+        if ((window as any).__nthingsScrollBound) return;
+        (window as any).__nthingsScrollBound = true;
+
+        let ticking = false;
+        const apply = () => {
+          ticking = false;
+          document.documentElement.toggleAttribute(
+            "data-scrolled",
+            window.scrollY > 4,
+          );
+        };
+        const onScroll = () => {
+          if (ticking) return;
+          ticking = true;
+          requestAnimationFrame(apply);
+        };
+
+        window.addEventListener("scroll", onScroll, { passive: true });
+        document.addEventListener("astro:page-load", apply);
+        document.addEventListener("astro:after-swap", apply);
+        apply();
       })();
     </script>
   </body>

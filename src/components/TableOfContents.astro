@@ -13,18 +13,16 @@ const toc = tocHeadings(headings);
 {
   toc.length > 0 && (
     <aside class="site-toc" aria-label="On this page">
-      <div class="site-toc__inner">
-        <p class="site-toc__heading">On this page</p>
-        <ul class="site-toc__list">
-          {toc.map((heading) => (
-            <li class={`site-toc__item depth-${heading.depth}`}>
-              <a href={`#${heading.slug}`} class="site-toc__link" data-toc-link={heading.slug}>
-                {heading.text}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <p class="site-toc__heading">On this page</p>
+      <ul class="site-toc__list">
+        {toc.map((heading) => (
+          <li class={`site-toc__item depth-${heading.depth}`}>
+            <a href={`#${heading.slug}`} class="site-toc__link" data-toc-link={heading.slug}>
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
     </aside>
   )
 }
@@ -34,46 +32,97 @@ const toc = tocHeadings(headings);
     if ((window as any).__nthingsTocBound) return;
     (window as any).__nthingsTocBound = true;
 
-    let observer: IntersectionObserver | null = null;
+    let links: HTMLAnchorElement[] = [];
+    let headings: HTMLElement[] = [];
+    let rail: HTMLElement | null = null;
+    let activeId: string | null = null;
+    let ticking = false;
 
-    const setup = () => {
-      observer?.disconnect();
-      const links = Array.from(
-        document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"),
-      );
-      if (links.length === 0) return;
+    // Layout positions cached once per setup/resize so the per-frame scroll
+    // handler stays free of forced reflows (no getBoundingClientRect on scroll).
+    let headingTops: number[] = [];
+    let headerOffset = 0;
+    let maxScrollTop = 0;
 
-      const headings = links
-        .map((l) => document.getElementById(l.getAttribute("data-toc-link")!))
-        .filter((el): el is HTMLElement => !!el);
-
-      const visible = new Set<string>();
-      const mark = (id: string | null) => {
-        links.forEach((l) =>
-          l.classList.toggle(
-            "is-active",
-            l.getAttribute("data-toc-link") === id,
-          ),
-        );
-      };
-
-      observer = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) visible.add(entry.target.id);
-            else visible.delete(entry.target.id);
-          }
-          // Highlight the first visible heading in document order.
-          const firstVisible = headings.find((h) => visible.has(h.id));
-          if (firstVisible) mark(firstVisible.id);
-        },
-        { rootMargin: "-80px 0px -70% 0px", threshold: 0 },
-      );
-
-      headings.forEach((h) => observer!.observe(h));
-      mark(headings[0]?.id ?? null);
+    const measure = () => {
+      const header = document.querySelector(".site-header");
+      // The line (below the sticky header) a heading must cross to be active.
+      headerOffset = (header ? header.getBoundingClientRect().height : 0) + 28;
+      const sy = window.scrollY;
+      headingTops = headings.map((h) => h.getBoundingClientRect().top + sy);
+      maxScrollTop =
+        document.documentElement.scrollHeight - window.innerHeight;
     };
 
+    const mark = (id: string | null) => {
+      if (id === activeId) return;
+      activeId = id;
+      let active: HTMLAnchorElement | null = null;
+      for (const l of links) {
+        const on = l.getAttribute("data-toc-link") === id;
+        l.classList.toggle("is-active", on);
+        if (on) {
+          l.setAttribute("aria-current", "true");
+          active = l;
+        } else {
+          l.removeAttribute("aria-current");
+        }
+      }
+      // Keep the active link in view inside the (independently scrollable) rail.
+      if (active && rail && rail.scrollHeight > rail.clientHeight + 4) {
+        const lr = active.getBoundingClientRect();
+        const rr = rail.getBoundingClientRect();
+        if (lr.top < rr.top + 8) rail.scrollTop -= rr.top + 8 - lr.top;
+        else if (lr.bottom > rr.bottom - 8)
+          rail.scrollTop += lr.bottom - (rr.bottom - 8);
+      }
+    };
+
+    const update = () => {
+      ticking = false;
+      if (headings.length === 0) return;
+      // Last heading whose cached top has scrolled past the header line.
+      const line = window.scrollY + headerOffset;
+      let idx = 0;
+      for (let i = 0; i < headingTops.length; i++) {
+        if (headingTops[i] - line <= 1) idx = i;
+        else break;
+      }
+      // Pin the last section once scrolled to the very bottom.
+      if (window.scrollY >= maxScrollTop - 2) idx = headings.length - 1;
+      mark(headings[idx].id);
+    };
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    };
+
+    const remeasure = () => {
+      if (headings.length === 0) return;
+      measure();
+      update();
+    };
+
+    const setup = () => {
+      links = Array.from(
+        document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"),
+      );
+      rail = document.querySelector<HTMLElement>(".site-toc");
+      headings = links
+        .map((l) => document.getElementById(l.getAttribute("data-toc-link")!))
+        .filter((el): el is HTMLElement => !!el);
+      activeId = null;
+      if (headings.length === 0) return;
+      measure();
+      update();
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", remeasure, { passive: true });
+    // Web-font swaps shift heading positions; re-measure once they settle.
+    if (document.fonts?.ready) document.fonts.ready.then(remeasure);
     document.addEventListener("astro:page-load", setup);
     setup();
   })();

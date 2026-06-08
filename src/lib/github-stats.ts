@@ -68,7 +68,9 @@ type ReposResponse = {
   errors?: { message: string }[];
 };
 
-const kvKey = (username: string) => `${KV_PREFIX}${username}`;
+const kvKey = (username: string) => {
+  return `${KV_PREFIX}${username}`;
+};
 
 export async function getGitHubStats(env: GitHubStatsEnv): Promise<GitHubStats | null> {
   try {
@@ -139,7 +141,9 @@ async function fetchReposPage(username: string, cursor: string | null, token?: s
 
   const payload = (await response.json()) as ReposResponse;
   if (payload.errors?.length) {
-    throw new Error(`GitHub GraphQL errors: ${payload.errors.map((e) => e.message).join(', ')}`);
+    throw new Error(`GitHub GraphQL errors: ${payload.errors.map((e) => {
+      return e.message;
+    }).join(', ')}`);
   }
 
   const repositories = payload.data?.user?.repositories;

@@ -1,0 +1,32 @@
+---
+import { isActive } from "../lib/nav";
+
+interface Props {
+  items: { href: string; title: string }[];
+  flat?: boolean;
+  closeFor?: string;
+}
+
+const { items, flat = false, closeFor }: Props = Astro.props;
+const pathname = Astro.url.pathname;
+const closeAttrs = closeFor ? { command: "close", commandfor: closeFor } : {};
+---
+
+<ul class:list={["section-nav__items", { "section-nav__items--flat": flat }]}>
+  {
+    items.map((item) => (
+      <li>
+        <a
+          href={item.href}
+          {...closeAttrs}
+          class:list={[
+            "section-nav__link",
+            { "is-active": isActive(pathname, item.href, true) },
+          ]}
+        >
+          {item.title}
+        </a>
+      </li>
+    ))
+  }
+</ul>

@@ -1,14 +1,14 @@
 ---
 import Icon from "./Icon.astro";
+import SectionLinks from "./SectionLinks.astro";
 import { getSortedPosts, getSortedProjects } from "../lib/collections";
 import { isActive } from "../lib/nav";
 
 interface Props {
   closeFor?: string;
-  activeOnly?: boolean;
 }
 
-const { closeFor, activeOnly = false }: Props = Astro.props;
+const { closeFor }: Props = Astro.props;
 
 const [posts, projects] = await Promise.all([
   getSortedPosts(),
@@ -33,53 +33,42 @@ const allSections = [
   },
 ] as const;
 
-// Docs sidebar shows only the active section; fall back to all if none match.
-const scoped = activeOnly
-  ? allSections.filter((section) => isActive(pathname, section.href))
-  : allSections;
-const sections = scoped.length > 0 ? scoped : allSections;
+// Inside a section, drop the redundant parent and show a flat list; elsewhere
+// (home/about) keep grouped, collapsible sections so the labels tell them apart.
+const currentSection =
+  allSections.find((section) => isActive(pathname, section.href)) ?? null;
 ---
 
-<nav class="section-nav" aria-label="Sections">
-  {
-    sections.map((section) => (
-      <details class="section-nav__group" open={isActive(pathname, section.href)}>
-        <summary
-          class:list={[
-            "section-nav__summary",
-            { "is-active": isActive(pathname, section.href, true) },
-          ]}
+{
+  currentSection ? (
+    <nav class="section-nav" aria-label={currentSection.label}>
+      <SectionLinks items={currentSection.items} flat closeFor={closeFor} />
+    </nav>
+  ) : (
+    <nav class="section-nav" aria-label="Sections">
+      {allSections.map((section) => (
+        <details
+          class="section-nav__group"
+          open={isActive(pathname, section.href)}
         >
-          <span class="section-nav__chevron" aria-hidden="true">
-            <Icon name="lucide:chevron-right" size={14} />
-          </span>
-          <a
-            href={section.href}
-            class="section-nav__summary-link"
-            {...closeAttrs}
+          <summary
+            class:list={[
+              "section-nav__summary",
+              { "is-active": isActive(pathname, section.href, true) },
+            ]}
           >
-            {section.label}
-          </a>
-        </summary>
-        {section.items.length > 0 && (
-          <ul class="section-nav__items">
-            {section.items.map((item) => (
-              <li>
-                <a
-                  href={item.href}
-                  {...closeAttrs}
-                  class:list={[
-                    "section-nav__link",
-                    { "is-active": isActive(pathname, item.href, true) },
-                  ]}
-                >
-                  {item.title}
-                </a>
-              </li>
-            ))}
-          </ul>
-        )}
-      </details>
-    ))
-  }
-</nav>
+            <span class="section-nav__chevron" aria-hidden="true">
+              <Icon name="lucide:chevron-right" size={14} />
+            </span>
+            <a href={section.href} class="section-nav__summary-link" {...closeAttrs}>
+              {section.label}
+            </a>
+          </summary>
+          {section.items.length > 0 && (
+            <SectionLinks items={section.items} closeFor={closeFor} />
+          )}
+        </details>
+      ))}
+    </nav>
+  )
+}

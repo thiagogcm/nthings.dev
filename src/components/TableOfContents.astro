@@ -36,22 +36,54 @@ const toc = tocHeadings(headings);
     let headings: HTMLElement[] = [];
     let rail: HTMLElement | null = null;
     let activeId: string | null = null;
+    let lastHash: string | null = null;
     let ticking = false;
 
     // Layout positions cached once per setup/resize so the per-frame scroll
     // handler stays free of forced reflows (no getBoundingClientRect on scroll).
-    let headingTops: number[] = [];
-    let headerOffset = 0;
-    let maxScrollTop = 0;
+    // `thresholds[i]` is the scrollY at which heading i becomes the active one.
+    let thresholds: number[] = [];
+    let firstActivate = 0;
 
     const measure = () => {
       const header = document.querySelector(".site-header");
       // The line (below the sticky header) a heading must cross to be active.
-      headerOffset = (header ? header.getBoundingClientRect().height : 0) + 28;
+      const headerOffset =
+        (header ? header.getBoundingClientRect().height : 0) + 28;
       const sy = window.scrollY;
-      headingTops = headings.map((h) => h.getBoundingClientRect().top + sy);
-      maxScrollTop =
-        document.documentElement.scrollHeight - window.innerHeight;
+      const tops = headings.map((h) => h.getBoundingClientRect().top + sy);
+      const maxScrollTop = Math.max(
+        0,
+        document.documentElement.scrollHeight - window.innerHeight,
+      );
+
+      // Natural activation point: the scrollY at which a heading reaches the
+      // line just below the header.
+      const natural = tops.map((t) => Math.max(0, t - headerOffset));
+      firstActivate = natural[0] ?? 0;
+
+      // Trailing headings on a short page can't reach the line, so they'd be
+      // skipped. Pull out-of-reach thresholds back into the scroll range (from
+      // the end), kept ordered so every section gets a turn.
+      const n = natural.length;
+      const gap = Math.max(1, Math.min(0.25 * window.innerHeight, maxScrollTop / n));
+      const out = natural.slice();
+      out[n - 1] = Math.min(out[n - 1], maxScrollTop);
+      for (let i = n - 2; i >= 0; i--) out[i] = Math.min(out[i], out[i + 1] - gap);
+      thresholds = out;
+    };
+
+    // Reflect the current section in the URL, but not while above the first
+    // heading (the intro region).
+    const syncHash = (id: string, sy: number) => {
+      const hash = sy + 1 >= firstActivate ? `#${id}` : "";
+      if (hash === lastHash) return;
+      lastHash = hash;
+      history.replaceState(
+        history.state,
+        "",
+        location.pathname + location.search + hash,
+      );
     };
 
     const mark = (id: string | null) => {
@@ -81,16 +113,16 @@ const toc = tocHeadings(headings);
     const update = () => {
       ticking = false;
       if (headings.length === 0) return;
-      // Last heading whose cached top has scrolled past the header line.
-      const line = window.scrollY + headerOffset;
+      // Last heading whose (remapped) activation point has been scrolled past.
+      const sy = window.scrollY;
       let idx = 0;
-      for (let i = 0; i < headingTops.length; i++) {
-        if (headingTops[i] - line <= 1) idx = i;
+      for (let i = 0; i < thresholds.length; i++) {
+        if (sy + 1 >= thresholds[i]) idx = i;
         else break;
       }
-      // Pin the last section once scrolled to the very bottom.
-      if (window.scrollY >= maxScrollTop - 2) idx = headings.length - 1;
-      mark(headings[idx].id);
+      const id = headings[idx].id;
+      mark(id);
+      syncHash(id, sy);
     };
 
     const onScroll = () => {
@@ -114,6 +146,7 @@ const toc = tocHeadings(headings);
         .map((l) => document.getElementById(l.getAttribute("data-toc-link")!))
         .filter((el): el is HTMLElement => !!el);
       activeId = null;
+      lastHash = null;
       if (headings.length === 0) return;
       measure();
       update();
@@ -121,6 +154,8 @@ const toc = tocHeadings(headings);
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", remeasure, { passive: true });
+    // Late image/asset loads can shift heading positions after first paint.
+    window.addEventListener("load", remeasure);
     // Web-font swaps shift heading positions; re-measure once they settle.
     if (document.fonts?.ready) document.fonts.ready.then(remeasure);
     document.addEventListener("astro:page-load", setup);

@@ -6,9 +6,11 @@ import { isActive } from "../lib/nav";
 interface Props {
   /** When rendered inside the mobile drawer, links close the drawer on click. */
   closeFor?: string;
+  /** Show only the section matching the current route (used by the docs sidebar). */
+  activeOnly?: boolean;
 }
 
-const { closeFor }: Props = Astro.props;
+const { closeFor, activeOnly = false }: Props = Astro.props;
 
 const [posts, projects] = await Promise.all([
   getSortedPosts(),
@@ -18,7 +20,7 @@ const [posts, projects] = await Promise.all([
 const pathname = Astro.url.pathname;
 const closeAttrs = closeFor ? { command: "close", commandfor: closeFor } : {};
 
-const sections = [
+const allSections = [
   {
     key: "projects",
     label: "Projects",
@@ -32,6 +34,13 @@ const sections = [
     items: posts.map((p) => ({ href: `/blog/${p.id}`, title: p.data.title })),
   },
 ] as const;
+
+// In the docs sidebar, show only the active section; fall back to all if the
+// route matches none.
+const scoped = activeOnly
+  ? allSections.filter((section) => isActive(pathname, section.href))
+  : allSections;
+const sections = scoped.length > 0 ? scoped : allSections;
 ---
 
 <nav class="section-nav" aria-label="Sections">

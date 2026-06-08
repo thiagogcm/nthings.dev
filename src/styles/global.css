@@ -1019,6 +1019,71 @@
       margin-top: 1.5rem;
     }
 
+    /* Copy-link affordance injected after each heading; revealed on hover. */
+    .heading-anchor {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.15em;
+      height: 1.15em;
+      margin-left: 0.35em;
+      vertical-align: -0.14em;
+      color: var(--color-fg-soft);
+      opacity: 0;
+      border-radius: 0.25rem;
+      text-decoration: none;
+      transition: opacity 140ms ease, color 140ms ease;
+    }
+
+    .heading-anchor svg {
+      width: 0.85em;
+      height: 0.85em;
+    }
+
+    h2:hover > .heading-anchor,
+    h3:hover > .heading-anchor,
+    h4:hover > .heading-anchor,
+    .heading-anchor:focus-visible {
+      opacity: 1;
+    }
+
+    .heading-anchor:hover,
+    .heading-anchor:focus-visible {
+      color: var(--color-accent);
+      text-decoration: none;
+    }
+
+    .heading-anchor[data-copied] {
+      opacity: 1;
+      color: var(--color-ok);
+    }
+
+    .heading-anchor[data-copied]::after {
+      content: "Copied";
+      position: absolute;
+      bottom: calc(100% + 0.4rem);
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.3rem;
+      background: var(--color-fg);
+      color: var(--color-bg);
+      font-size: 0.66rem;
+      font-weight: 600;
+      line-height: 1;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* No hover on touch devices — keep the affordance faintly visible. */
+    @media (hover: none) {
+      .heading-anchor {
+        opacity: 0.55;
+      }
+    }
+
     a {
       color: var(--color-accent);
       text-decoration: underline;

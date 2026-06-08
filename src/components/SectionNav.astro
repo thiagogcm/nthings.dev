@@ -4,9 +4,7 @@ import { getSortedPosts, getSortedProjects } from "../lib/collections";
 import { isActive } from "../lib/nav";
 
 interface Props {
-  /** When rendered inside the mobile drawer, links close the drawer on click. */
   closeFor?: string;
-  /** Show only the section matching the current route (used by the docs sidebar). */
   activeOnly?: boolean;
 }
 
@@ -35,8 +33,7 @@ const allSections = [
   },
 ] as const;
 
-// In the docs sidebar, show only the active section; fall back to all if the
-// route matches none.
+// Docs sidebar shows only the active section; fall back to all if none match.
 const scoped = activeOnly
   ? allSections.filter((section) => isActive(pathname, section.href))
   : allSections;

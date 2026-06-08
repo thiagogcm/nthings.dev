@@ -39,15 +39,13 @@ const toc = tocHeadings(headings);
     let lastHash: string | null = null;
     let ticking = false;
 
-    // Layout positions cached once per setup/resize so the per-frame scroll
-    // handler stays free of forced reflows (no getBoundingClientRect on scroll).
-    // `thresholds[i]` is the scrollY at which heading i becomes the active one.
+    // Cached once per setup/resize so the per-frame scroll handler avoids reflows.
+    // `thresholds[i]` is the scrollY at which heading i becomes active.
     let thresholds: number[] = [];
     let firstActivate = 0;
 
     const measure = () => {
       const header = document.querySelector(".site-header");
-      // The line (below the sticky header) a heading must cross to be active.
       const headerOffset =
         (header ? header.getBoundingClientRect().height : 0) + 28;
       const sy = window.scrollY;
@@ -57,14 +55,12 @@ const toc = tocHeadings(headings);
         document.documentElement.scrollHeight - window.innerHeight,
       );
 
-      // Natural activation point: the scrollY at which a heading reaches the
-      // line just below the header.
+      // scrollY at which each heading reaches the line just below the header.
       const natural = tops.map((t) => Math.max(0, t - headerOffset));
       firstActivate = natural[0] ?? 0;
 
-      // Trailing headings on a short page can't reach the line, so they'd be
-      // skipped. Pull out-of-reach thresholds back into the scroll range (from
-      // the end), kept ordered so every section gets a turn.
+      // Trailing headings on a short page can't reach the line; pull out-of-reach
+      // thresholds back into range (from the end), kept ordered so each gets a turn.
       const n = natural.length;
       const gap = Math.max(1, Math.min(0.25 * window.innerHeight, maxScrollTop / n));
       const out = natural.slice();
@@ -73,8 +69,7 @@ const toc = tocHeadings(headings);
       thresholds = out;
     };
 
-    // Reflect the current section in the URL, but not while above the first
-    // heading (the intro region).
+    // Reflect the current section in the URL, except above the first heading.
     const syncHash = (id: string, sy: number) => {
       const hash = sy + 1 >= firstActivate ? `#${id}` : "";
       if (hash === lastHash) return;

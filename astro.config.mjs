@@ -3,7 +3,6 @@ import cloudflare from '@astrojs/cloudflare';
 import { unified } from '@astrojs/markdown-remark';
 import tailwindcss from '@tailwindcss/vite';
 
-// https://astro.build/config
 export default defineConfig({
   site: 'https://nthings.dev',
   adapter: cloudflare({
@@ -13,7 +12,14 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   markdown: {
-    syntaxHighlight: 'prism',
+    syntaxHighlight: 'shiki',
+    // Dual themes: light colors inline, dark swapped via --shiki-dark in global.css.
+    shikiConfig: {
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark',
+      },
+    },
     processor: unified({
       smartypants: {
         dashes: 'oldschool',

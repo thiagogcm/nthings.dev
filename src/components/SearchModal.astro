@@ -51,8 +51,8 @@ import Icon from "./Icon.astro";
     text: string;
   };
 
-  // SearchDoc with case-folded fields + snippet haystack precomputed once,
-  // so each keystroke only runs cheap `includes` against ready strings.
+  // Case-folded fields + snippet haystack precomputed once, so each keystroke
+  // only runs cheap `includes` against ready strings.
   type IndexedDoc = SearchDoc & {
     lcTitle: string;
     lcDesc: string;
@@ -237,7 +237,7 @@ import Icon from "./Icon.astro";
       if (d?.open) d.close();
     };
 
-    // ---- Document-level delegation (survives view-transition swaps) ----
+    // Document-level delegation survives view-transition swaps.
     document.addEventListener("keydown", (e) => {
       if ((e.key === "k" || e.key === "K") && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();

@@ -2,14 +2,12 @@ import type { APIRoute } from "astro";
 import { NAV_LINKS } from "../consts";
 import { getSortedPosts, getSortedProjects } from "../lib/collections";
 
-// Nav entries whose href is a collection index — covered by per-entry docs below.
+// Collection index routes — covered by their per-entry docs below.
 const COLLECTION_ROOTS = new Set(["/projects", "/blog"]);
 
-// Prebuilt static search index — shipped as a single JSON file so the client
-// fetches it once and searches entirely in memory (no server round-trips).
+// Prebuilt static index: one JSON file the client fetches once and searches in memory.
 export const prerender = true;
 
-/** Roughly strip Markdown to plain text for the search body. */
 function stripMarkdown(md: string): string {
   return md
     .replace(/```[\s\S]*?```/g, " ") // fenced code blocks

@@ -40,7 +40,6 @@ export const NAV_LINKS = [
 export const SOCIAL_LINKS = [
   { href: 'https://github.com/thiagogcm', label: 'GitHub', icon: 'lucide:github' },
   { href: 'https://linkedin.com/in/thiago-moura-77a30030', label: 'LinkedIn', icon: 'lucide:linkedin' },
-  { href: '/rss.xml', label: 'RSS', icon: 'lucide:rss' },
 ] as const;
 
 export const CURRENT_FOCUS = ['AI agents', 'Observability', 'Product systems'] as const;

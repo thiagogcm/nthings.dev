@@ -3,8 +3,7 @@ import { env } from "cloudflare:workers";
 import { getGitHubStats, refreshGitHubStats } from "../lib/github-stats";
 import { formatDate } from "../lib/format-date";
 
-// Read the cron-populated cache. On a cold cache, kick off a background refresh
-// (without blocking the response) so the next render is populated.
+// On a cold cache, kick off a non-blocking refresh so the next render is populated.
 const stats = await getGitHubStats(env);
 if (!stats) {
   Astro.locals.cfContext?.waitUntil(

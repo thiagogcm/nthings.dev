@@ -11,7 +11,6 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
-  /** Wrap the slot in the centered reading container (home / about). */
   contained?: boolean;
 }
 
@@ -60,8 +59,7 @@ const dnsPrefetchHosts = [
     />
     <meta name="color-scheme" content="light dark" />
 
-    <!-- No-flash theme: apply the saved preference before first paint, and
-         re-apply after each view-transition swap (which resets <html> attrs). -->
+    <!-- No-flash theme: apply before first paint and after each view-transition swap. -->
     <script is:inline>
       (function () {
         function applyTheme() {
@@ -86,12 +84,6 @@ const dnsPrefetchHosts = [
     }
 
     <link rel="canonical" href={canonicalUrl.toString()} />
-    <link
-      rel="alternate"
-      type="application/rss+xml"
-      title={`${SITE.title} RSS Feed`}
-      href={new URL("/rss.xml", siteUrl).toString()}
-    />
     <meta property="og:site_name" content={SITE.title} />
     <meta property="og:type" content={isArticle ? "article" : "website"} />
     <meta property="og:title" content={pageTitle} />
@@ -103,7 +95,6 @@ const dnsPrefetchHosts = [
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={socialImage.toString()} />
     <title>{pageTitle}</title>
-    <!-- Astro <Font> has no fetchpriority API; narrow preloads to normal style only. -->
     <Font
       cssVariable="--font-body"
       preload={[

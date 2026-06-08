@@ -7,8 +7,7 @@
   }
 }
 
-/* Design tokens — both themes per value via light-dark(), resolved from the
-   color-scheme set below. Also generate utilities (bg-bg, text-fg-muted, …). */
+/* Design tokens — both themes per value via light-dark(); also generate utilities. */
 @theme {
   --color-bg: light-dark(#fcfcfd, #0a0b0d);
   --color-surface: light-dark(#f2f4f7, #15171b);
@@ -56,6 +55,8 @@
 @layer base {
   :root {
     color-scheme: light dark;
+    /* Animate block-size to/from intrinsic keywords (section-nav details 0 → auto). */
+    interpolate-size: allow-keywords;
     --header-height: 3.75rem;
     --tabs-height: 2.9rem;
     --header-stack: calc(var(--header-height) + var(--tabs-height));
@@ -172,7 +173,6 @@
   }
 }
 
-/* Reused atoms + stateful/responsive chrome (prose, docs nav) kept as CSS. */
 @layer components {
   .eyebrow {
     display: inline-flex;
@@ -233,9 +233,7 @@
     font-weight: 400;
   }
 
-  /* ------------------------------------------------------------------ */
-  /* Shared chrome                                                       */
-  /* ------------------------------------------------------------------ */
+  /* Shared chrome */
 
   .skip-link {
     position: absolute;
@@ -278,9 +276,7 @@
     padding-block: clamp(2rem, 4vw, 3.25rem);
   }
 
-  /* ------------------------------------------------------------------ */
-  /* Header + tabs                                                      */
-  /* ------------------------------------------------------------------ */
+  /* Header + tabs */
 
   .site-header {
     position: sticky;
@@ -457,9 +453,7 @@
     color: var(--color-accent);
   }
 
-  /* ------------------------------------------------------------------ */
-  /* Mobile drawer                                                      */
-  /* ------------------------------------------------------------------ */
+  /* Mobile drawer */
 
   .site-drawer {
     position: fixed;
@@ -540,9 +534,7 @@
     margin: 0;
   }
 
-  /* ------------------------------------------------------------------ */
-  /* Section navigation (docs sidebar + drawer)                         */
-  /* ------------------------------------------------------------------ */
+  /* Section navigation (docs sidebar + drawer) */
 
   .section-nav {
     display: flex;
@@ -655,9 +647,7 @@
     box-shadow: inset 2px 0 0 var(--color-accent);
   }
 
-  /* ------------------------------------------------------------------ */
-  /* Docs layout: nav + content + ToC, hugging the page margins         */
-  /* ------------------------------------------------------------------ */
+  /* Docs layout: nav + content + ToC, hugging the page margins */
 
   .docs-layout {
     width: 100%;
@@ -674,10 +664,8 @@
     min-width: 0;
   }
 
-  /* Sidebar + ToC are grid items pinned with sticky. The sticky lives on the
-     grid item itself (not an inner wrapper) so its containing block is the
-     full-height grid area, giving it room to travel as the page scrolls.
-     (The grid's `align-items: start` already keeps them content-height.) */
+  /* Sticky lives on the grid item itself so its containing block is the
+     full-height grid area, giving it room to travel as the page scrolls. */
   .docs-sidebar,
   .site-toc {
     display: none;
@@ -745,8 +733,7 @@
     font-size: 0.82rem;
   }
 
-  /* At this width the sidebar becomes a column and the header tabs replace the
-     hamburger; the drawer is only for narrower viewports. */
+  /* Sidebar becomes a column and header tabs replace the hamburger. */
   @media (min-width: 60rem) {
     .docs-layout {
       grid-template-columns: 14rem minmax(0, 1fr);
@@ -804,9 +791,7 @@
     }
   }
 
-  /* ------------------------------------------------------------------ */
-  /* Search modal                                                       */
-  /* ------------------------------------------------------------------ */
+  /* Search modal */
 
   .search-dialog {
     position: fixed;
@@ -1145,6 +1130,20 @@
       border: none;
       border-top: 1px solid var(--color-border);
     }
+  }
+
+  /* Shiki dual-theme: swap inline light token colors for `--shiki-dark` when the
+     resolved scheme is dark. Outside `@scope (.prose)` to key off `html` state. */
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) .astro-code,
+    html:not([data-theme="light"]) .astro-code span {
+      color: var(--shiki-dark) !important;
+    }
+  }
+
+  html[data-theme="dark"] .astro-code,
+  html[data-theme="dark"] .astro-code span {
+    color: var(--shiki-dark) !important;
   }
 
   /* Container-query targets: status widget, directory rows. */

@@ -60,15 +60,22 @@ const dnsPrefetchHosts = [
     />
     <meta name="color-scheme" content="light dark" />
 
-    <!-- No-flash theme: apply the saved preference before first paint. -->
+    <!-- No-flash theme: apply the saved preference before first paint, and
+         re-apply after each view-transition swap (which resets <html> attrs). -->
     <script is:inline>
       (function () {
-        try {
-          var t = localStorage.getItem("theme");
-          if (t === "light" || t === "dark") {
-            document.documentElement.dataset.theme = t;
-          }
-        } catch (e) {}
+        function applyTheme() {
+          try {
+            var t = localStorage.getItem("theme");
+            if (t === "light" || t === "dark") {
+              document.documentElement.dataset.theme = t;
+            } else {
+              delete document.documentElement.dataset.theme;
+            }
+          } catch (e) {}
+        }
+        applyTheme();
+        document.addEventListener("astro:after-swap", applyTheme);
       })();
     </script>
 

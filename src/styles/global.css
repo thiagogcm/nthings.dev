@@ -826,17 +826,18 @@
     }
 
     .search-trigger {
+      flex: none;
       gap: 0;
       padding: 0;
       width: 2.1rem;
+      min-width: 2.1rem;
       justify-content: center;
-      border-color: transparent;
-      background: transparent;
+      border-color: var(--color-border);
+      background: var(--color-surface);
       color: var(--color-fg-muted);
     }
 
-    .search-trigger__label,
-    .search-trigger__kbd {
+    .search-trigger__label {
       display: none;
     }
 
@@ -944,6 +945,12 @@
     gap: 1px;
     padding-inline: 0.35rem;
     background: var(--color-bg);
+  }
+
+  @media (max-width: 30rem) {
+    .search-trigger__kbd {
+      display: none;
+    }
   }
 
   .search-dialog__body {

@@ -36,7 +36,6 @@ const toc = tocHeadings(headings);
 
     let links: HTMLAnchorElement[] = [];
     let headings: HTMLElement[] = [];
-    let rail: HTMLElement | null = null;
     let activeId: string | null = null;
     let lastHash: string | null = null;
     let ticking = false;
@@ -48,8 +47,14 @@ const toc = tocHeadings(headings);
 
     const measure = () => {
       const header = document.querySelector(".site-header");
-      const headerOffset =
+      const mobileNav = document.querySelector(".mobile-doc-nav");
+      const mobileNavVisible =
+        mobileNav && getComputedStyle(mobileNav).display !== "none";
+      const baseHeaderOffset =
         (header ? header.getBoundingClientRect().height : 0) + 28;
+      const headerOffset = mobileNavVisible
+        ? Math.max(baseHeaderOffset, window.innerHeight * 0.32)
+        : baseHeaderOffset;
       const sy = window.scrollY;
       const tops = headings.map((h) => h.getBoundingClientRect().top + sy);
       const maxScrollTop = Math.max(
@@ -92,18 +97,23 @@ const toc = tocHeadings(headings);
         return;
       }
       activeId = id;
-      let active: HTMLAnchorElement | null = null;
+      const activeLinks: HTMLAnchorElement[] = [];
       for (const l of links) {
         const on = l.getAttribute("data-toc-link") === id;
         l.classList.toggle("is-active", on);
         if (on) {
           l.setAttribute("aria-current", "true");
-          active = l;
+          activeLinks.push(l);
         } else {
           l.removeAttribute("aria-current");
         }
       }
-      // Keep the active link in view inside the (independently scrollable) rail.
+      const active =
+        activeLinks.find((l) => l.getClientRects().length > 0) ??
+        activeLinks[0] ??
+        null;
+      const rail = active?.closest<HTMLElement>(".site-toc, .mobile-doc-nav__body");
+      // Keep the active link in view inside its independently scrollable rail.
       if (active && rail && rail.scrollHeight > rail.clientHeight + 4) {
         const lr = active.getBoundingClientRect();
         const rr = rail.getBoundingClientRect();
@@ -155,9 +165,18 @@ const toc = tocHeadings(headings);
       links = Array.from(
         document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"),
       );
-      rail = document.querySelector<HTMLElement>(".site-toc");
-      headings = links
-        .map((l) => document.getElementById(l.getAttribute("data-toc-link")!))
+      const seen = new Set<string>();
+      const ids = links
+        .map((l) => l.getAttribute("data-toc-link"))
+        .filter((id): id is string => {
+          if (!id || seen.has(id)) {
+            return false;
+          }
+          seen.add(id);
+          return true;
+        });
+      headings = ids
+        .map((id) => document.getElementById(id))
         .filter((el): el is HTMLElement => !!el);
       activeId = null;
       lastHash = null;

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
 import DocsSidebar from "../components/DocsSidebar.astro";
+import MobileDocsNav from "../components/MobileDocsNav.astro";
 import TableOfContents from "../components/TableOfContents.astro";
 import { tocHeadings } from "../lib/nav";
 import type { MarkdownHeading } from "astro";
@@ -36,6 +37,8 @@ const withToc = showToc && tocHeadings(headings).length > 0;
     ]}
   >
     {showSidebar && <DocsSidebar />}
+
+    <MobileDocsNav headings={withToc ? headings : []} showSidebar={showSidebar} />
 
     <div class="docs-content">
       <slot />

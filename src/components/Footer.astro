@@ -1,0 +1,47 @@
+---
+import Icon from "./Icon.astro";
+import Logo from "./Logo.astro";
+import { SITE, SOCIAL_LINKS } from "../consts";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <a class="site-footer__brand" href="/" aria-label={`${SITE.title} home`}>
+      <Logo />
+    </a>
+
+    <p class="site-footer__copy">
+      &copy; {year} {SITE.author}
+    </p>
+
+    <div class="site-footer__links" aria-label="Footer links">
+      <a
+        class="icon-button"
+        href="https://github.com/thiagogcm/nthings.dev"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Source code"
+      >
+        <Icon name="lucide:code-xml" size={18} aria-hidden="true" />
+      </a>
+      {
+        SOCIAL_LINKS.map((link) => {
+          const isExternal = link.href.startsWith("http");
+          return (
+            <a
+              class="icon-button"
+              href={link.href}
+              target={isExternal ? "_blank" : undefined}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              aria-label={link.label}
+            >
+              <Icon name={link.icon} size={18} aria-hidden="true" />
+            </a>
+          );
+        })
+      }
+    </div>
+  </div>
+</footer>

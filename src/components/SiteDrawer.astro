@@ -2,7 +2,6 @@
 import Logo from "./Logo.astro";
 import Icon from "./Icon.astro";
 import Tabs from "./Tabs.astro";
-import SectionNav from "./SectionNav.astro";
 
 const drawerId = "site-drawer";
 const closeAttrs = { command: "close", commandfor: drawerId } as const;
@@ -25,9 +24,5 @@ const closeAttrs = { command: "close", commandfor: drawerId } as const;
     </div>
 
     <Tabs variant="drawer" closeFor={drawerId} />
-
-    <hr class="site-drawer__divider" />
-
-    <SectionNav closeFor={drawerId} />
   </div>
 </dialog>

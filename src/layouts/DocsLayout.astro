@@ -11,6 +11,7 @@ interface Props {
   image?: string;
   headings?: MarkdownHeading[];
   showToc?: boolean;
+  showSidebar?: boolean;
 }
 
 const {
@@ -19,13 +20,22 @@ const {
   image,
   headings = [],
   showToc = false,
+  showSidebar = true,
 } = Astro.props;
 const withToc = showToc && tocHeadings(headings).length > 0;
 ---
 
 <BaseLayout title={title} description={description} image={image}>
-  <div class:list={["docs-layout", { "docs-layout--with-toc": withToc }]}>
-    <DocsSidebar />
+  <div
+    class:list={[
+      "docs-layout",
+      {
+        "docs-layout--with-sidebar": showSidebar,
+        "docs-layout--with-toc": withToc,
+      },
+    ]}
+  >
+    {showSidebar && <DocsSidebar />}
 
     <div class="docs-content">
       <slot />
@@ -52,15 +62,7 @@ const withToc = showToc && tocHeadings(headings).length > 0;
       try {
         await navigator.clipboard.writeText(url);
       } catch {
-        const ta = document.createElement("textarea");
-        ta.value = url;
-        ta.style.cssText = "position:fixed;opacity:0;pointer-events:none";
-        document.body.appendChild(ta);
-        ta.select();
-        try {
-          document.execCommand("copy");
-        } catch {}
-        ta.remove();
+        return;
       }
       anchor.setAttribute("data-copied", "true");
       window.clearTimeout(toastTimer);

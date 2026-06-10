@@ -6,8 +6,8 @@ import Icon from "./Icon.astro";
   type="button"
   class="theme-toggle icon-button"
   data-theme-toggle
-  aria-label="Toggle color theme"
-  title="Toggle color theme"
+  aria-label="Theme: system. Activate to use light theme"
+  title="Theme: system. Activate to use light theme"
 >
   <span class="theme-toggle__icon" data-theme-icon="light">
     <Icon name="lucide:sun" size={18} aria-hidden="true" />
@@ -16,7 +16,7 @@ import Icon from "./Icon.astro";
     <Icon name="lucide:moon" size={18} aria-hidden="true" />
   </span>
   <span class="theme-toggle__icon" data-theme-icon="system">
-    <Icon name="lucide:monitor" size={18} aria-hidden="true" />
+    <Icon name="lucide:sun-moon" size={18} aria-hidden="true" />
   </span>
 </button>
 
@@ -28,6 +28,11 @@ import Icon from "./Icon.astro";
     (window as any).__nthingsThemeBound = true;
 
     const order = ["system", "light", "dark"] as const;
+    const labels = {
+      system: "Theme: system. Activate to use light theme",
+      light: "Theme: light. Activate to use dark theme",
+      dark: "Theme: dark. Activate to use system theme",
+    } as const;
 
     const apply = (theme: string) => {
       const root = document.documentElement;
@@ -36,6 +41,15 @@ import Icon from "./Icon.astro";
       } else {
         delete root.dataset.theme;
       }
+      document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]").forEach((btn) => {
+        const label = labels[(theme as keyof typeof labels) || "system"] ?? labels.system;
+        btn.setAttribute("aria-label", label);
+        btn.setAttribute("title", label);
+      });
+    };
+
+    const sync = () => {
+      apply(document.documentElement.dataset.theme || "system");
     };
 
     document.addEventListener("click", (e) => {
@@ -54,5 +68,8 @@ import Icon from "./Icon.astro";
       } catch (err) {}
       apply(next);
     });
+    document.addEventListener("astro:page-load", sync);
+    document.addEventListener("astro:after-swap", sync);
+    sync();
   })();
 </script>

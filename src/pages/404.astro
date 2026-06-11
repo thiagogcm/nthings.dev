@@ -1,0 +1,53 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { NAV_LINKS } from "../consts";
+---
+
+<BaseLayout
+  title="404: Not found"
+  description="Nothing is documented at this address."
+  contained
+>
+  <article class="grid grid-cols-[minmax(0,1fr)] gap-10 max-w-(--reading-width)">
+    <header class="grid gap-[0.85rem] pb-8 border-b border-border">
+      <p class="eyebrow">404 — Not found</p>
+      <h1>Page not found</h1>
+      <p class="lede">
+        Nothing is documented at this address — the link may be stale, or the
+        URL has a typo.
+      </p>
+    </header>
+
+    <p class="font-mono text-[0.8rem] text-fg-muted">
+      Path: <code id="not-found-path" class="tag"></code>
+    </p>
+
+    <nav aria-label="Site sections" class="grid gap-2">
+      <p class="text-fg-muted">Start from one of these sections instead:</p>
+      <ul class="grid gap-2 list-none">
+        {
+          NAV_LINKS.map((link) => (
+            <li>
+              <a href={link.href} class="text-link">
+                {link.label}
+              </a>
+              <span class="text-fg-muted text-[0.9rem]"> — {link.description}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </article>
+</BaseLayout>
+
+<script>
+  // The page is prerendered once, so the requested path is filled in client-side.
+  const apply = () => {
+    const el = document.getElementById("not-found-path");
+    if (el) {
+      el.textContent = window.location.pathname;
+    }
+  };
+  document.addEventListener("astro:page-load", apply);
+  apply();
+</script>

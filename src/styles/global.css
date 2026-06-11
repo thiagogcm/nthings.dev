@@ -31,7 +31,7 @@
 
 @utility shell {
   width: 100%;
-  max-width: 84rem;
+  max-width: var(--page-max);
   margin-inline: auto;
   padding-inline: var(--page-pad);
 }
@@ -371,6 +371,13 @@
 
   .search-trigger__cmd {
     font-size: 0.85rem;
+  }
+
+  /* Platform-aware shortcut hints: ⌘ on Apple devices, Ctrl elsewhere (and as
+     the no-JS fallback, since data-os is set by the inline head script). */
+  html[data-os="mac"] [data-kbd-ctrl],
+  html:not([data-os="mac"]) [data-kbd-mac] {
+    display: none;
   }
 
   .theme-toggle__icon {

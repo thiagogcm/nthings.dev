@@ -37,7 +37,8 @@ import { SOCIAL_LINKS } from "../consts";
       >
         <Icon name="lucide:search" size={16} aria-hidden="true" />
         <span class="search-trigger__label">Search</span>
-        <kbd class="search-trigger__kbd"><span class="search-trigger__cmd">⌘</span>K</kbd>
+        <kbd class="search-trigger__kbd" data-kbd-mac><span class="search-trigger__cmd">⌘</span>K</kbd>
+        <kbd class="search-trigger__kbd" data-kbd-ctrl>Ctrl K</kbd>
       </button>
 
       <ThemeToggle />

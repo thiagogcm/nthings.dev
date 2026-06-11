@@ -60,7 +60,7 @@ const dnsPrefetchHosts = [
     />
     <meta name="color-scheme" content="light dark" />
 
-    <!-- No-flash theme: apply before first paint and after each view-transition swap. -->
+    <!-- No-flash theme + platform: apply before first paint and after each view-transition swap. -->
     <script is:inline>
       (function () {
         function applyTheme() {
@@ -73,8 +73,23 @@ const dnsPrefetchHosts = [
             }
           } catch (e) {}
         }
+        function applyPlatform() {
+          try {
+            var p =
+              (navigator.userAgentData && navigator.userAgentData.platform) ||
+              navigator.platform ||
+              "";
+            if (/mac|iphone|ipad|ipod/i.test(p)) {
+              document.documentElement.dataset.os = "mac";
+            }
+          } catch (e) {}
+        }
         applyTheme();
-        document.addEventListener("astro:after-swap", applyTheme);
+        applyPlatform();
+        document.addEventListener("astro:after-swap", function () {
+          applyTheme();
+          applyPlatform();
+        });
       })();
     </script>
 

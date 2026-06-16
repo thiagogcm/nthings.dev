@@ -3,6 +3,8 @@ dist/
 # generated types
 .astro/
 .wrangler/
+# synced external content cache
+.cache/content-sources/
 
 # dependencies
 node_modules/
@@ -24,3 +26,5 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+.notes/

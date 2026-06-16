@@ -1,27 +1,24 @@
 ---
 import type { MarkdownHeading } from "astro";
 import Icon from "./Icon.astro";
-import SectionNav from "./SectionNav.astro";
 import { tocHeadings } from "../lib/nav";
 
 interface Props {
   headings?: MarkdownHeading[];
-  showSidebar?: boolean;
 }
 
-const { headings = [], showSidebar = true } = Astro.props;
+const { headings = [] } = Astro.props;
 const toc = tocHeadings(headings);
-const hasNav = showSidebar || toc.length > 0;
 ---
 
 {
-  hasNav && (
-    <aside class="mobile-doc-nav" aria-label="Document navigation">
+  toc.length > 0 && (
+    <aside class="mobile-doc-nav" aria-label="On this page">
       <details class="mobile-doc-nav__details">
         <summary class="mobile-doc-nav__summary">
           <span class="mobile-doc-nav__summary-label">
             <Icon name="lucide:notebook-tabs" size={16} aria-hidden="true" />
-            <span>Document navigation</span>
+            <span>On this page</span>
           </span>
           <Icon
             name="lucide:chevron-right"
@@ -32,38 +29,21 @@ const hasNav = showSidebar || toc.length > 0;
         </summary>
 
         <div class="mobile-doc-nav__body">
-          {showSidebar && (
-            <section class="mobile-doc-nav__section" aria-labelledby="mobile-doc-directory">
-              <p id="mobile-doc-directory" class="mobile-doc-nav__heading">
-                Directory
-              </p>
-              <SectionNav />
-            </section>
-          )}
-
-          {toc.length > 0 && (
-            <nav
-              class="mobile-doc-nav__section"
-              aria-labelledby="mobile-doc-on-this-page"
-            >
-              <p id="mobile-doc-on-this-page" class="mobile-doc-nav__heading">
-                On this page
-              </p>
-              <ul class="mobile-doc-nav__toc">
-                {toc.map((heading) => (
-                  <li class={`mobile-doc-nav__toc-item depth-${heading.depth}`}>
-                    <a
-                      href={`#${heading.slug}`}
-                      class="mobile-doc-nav__toc-link"
-                      data-toc-link={heading.slug}
-                    >
-                      {heading.text}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          )}
+          <nav aria-label="On this page">
+            <ul class="mobile-doc-nav__toc">
+              {toc.map((heading) => (
+                <li class={`mobile-doc-nav__toc-item depth-${heading.depth}`}>
+                  <a
+                    href={`#${heading.slug}`}
+                    class="mobile-doc-nav__toc-link"
+                    data-toc-link={heading.slug}
+                  >
+                    {heading.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
       </details>
     </aside>

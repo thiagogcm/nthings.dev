@@ -9,19 +9,6 @@ import { SOCIAL_LINKS } from "../consts";
 <header class="site-header">
   <div class="site-header__bar">
     <div class="site-header__left">
-      <button
-        type="button"
-        class="site-header__menu icon-button"
-        command="show-modal"
-        commandfor="site-drawer"
-        aria-haspopup="dialog"
-        aria-controls="site-drawer"
-        aria-expanded="false"
-        aria-label="Open navigation menu"
-      >
-        <Icon name="lucide:menu" size={20} aria-hidden="true" />
-      </button>
-
       <a class="site-header__brand" href="/" transition:name="site-brand">
         <Logo />
       </a>
@@ -37,7 +24,9 @@ import { SOCIAL_LINKS } from "../consts";
       >
         <Icon name="lucide:search" size={16} aria-hidden="true" />
         <span class="search-trigger__label">Search</span>
-        <kbd class="search-trigger__kbd" data-kbd-mac><span class="search-trigger__cmd">⌘</span>K</kbd>
+        <kbd class="search-trigger__kbd" data-kbd-mac
+          ><span class="search-trigger__cmd">⌘</span>K</kbd
+        >
         <kbd class="search-trigger__kbd" data-kbd-ctrl>Ctrl K</kbd>
       </button>
 

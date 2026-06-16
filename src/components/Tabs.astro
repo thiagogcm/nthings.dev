@@ -3,20 +3,10 @@ import Icon from "./Icon.astro";
 import { NAV_LINKS } from "../consts";
 import { isActive } from "../lib/nav";
 
-interface Props {
-  variant?: "bar" | "drawer";
-  closeFor?: string;
-}
-
-const { variant = "bar", closeFor }: Props = Astro.props;
-
 const pathname = Astro.url.pathname;
-const closeAttrs = closeFor
-  ? { command: "close", commandfor: closeFor }
-  : {};
 ---
 
-<nav class:list={["tabs", `tabs--${variant}`]} aria-label="Primary">
+<nav class="tabs tabs--bar" aria-label="Primary">
   {
     NAV_LINKS.map((link) => {
       const active = isActive(pathname, link.href);
@@ -25,11 +15,13 @@ const closeAttrs = closeFor
           href={link.href}
           class:list={["tabs__link", { "is-active": active }]}
           aria-current={active ? "page" : undefined}
-          {...closeAttrs}
         >
-          {variant === "drawer" && (
-            <Icon name={link.icon} size={18} aria-hidden="true" />
-          )}
+          <Icon
+            name={link.icon}
+            size={16}
+            class="tabs__icon"
+            aria-hidden="true"
+          />
           <span>{link.label}</span>
         </a>
       );

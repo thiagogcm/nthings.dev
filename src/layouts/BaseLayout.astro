@@ -3,7 +3,6 @@ import "../styles/global.css";
 import { Font } from "astro:assets";
 import { ClientRouter, fade } from "astro:transitions";
 import Header from "../components/Header.astro";
-import SiteDrawer from "../components/SiteDrawer.astro";
 import SearchModal from "../components/SearchModal.astro";
 import Footer from "../components/Footer.astro";
 import { SITE, SOCIAL_LINKS } from "../consts";
@@ -125,13 +124,9 @@ const dnsPrefetchHosts = [
     <ClientRouter />
   </head>
   <body>
-    <a
-      class="skip-link"
-      href="#main-content">Skip to content</a
-    >
+    <a class="skip-link" href="#main-content">Skip to content</a>
 
     <Header />
-    <SiteDrawer />
     <SearchModal />
 
     <main
@@ -154,35 +149,6 @@ const dnsPrefetchHosts = [
     <Footer />
 
     <script>
-      // Keep invoker toggle aria-expanded in sync after view-transition swaps.
-      (function () {
-        if ((window as any).__nthingsDrawerBound) {
-          return;
-        }
-        (window as any).__nthingsDrawerBound = true;
-
-        const sync = () => {
-          const dialog = document.getElementById(
-            "site-drawer",
-          ) as HTMLDialogElement | null;
-          const toggle = document.querySelector(
-            '[commandfor="site-drawer"][command="show-modal"]',
-          ) as HTMLButtonElement | null;
-          if (!dialog || !toggle || (dialog as any).__bound) {
-            return;
-          }
-          (dialog as any).__bound = true;
-          dialog.addEventListener("toggle", (e) => {
-            const { newState } = e as ToggleEvent;
-            toggle.setAttribute("aria-expanded", String(newState === "open"));
-          });
-        };
-
-        document.addEventListener("astro:page-load", sync);
-        document.addEventListener("astro:after-swap", sync);
-        sync();
-      })();
-
       // Lift the sticky header (shadow + solidified bg) once the page scrolls.
       (function () {
         if ((window as any).__nthingsScrollBound) {

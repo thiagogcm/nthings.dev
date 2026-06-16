@@ -40,6 +40,23 @@ scripts/             sync-content-sources.mjs and validation helpers
 
 Other repositories can publish project pages and blog posts by adopting a specific `docs/` layout. Register each repo in [`content-sources.yaml`](content-sources.yaml); the sync script fetches each configured repo with `degit`, reads its `docRoot`, then writes generated collection entries into `.cache/content-sources/` before Astro builds.
 
+External docs can include `docs/nthings.meta.yaml` for site-specific sync options:
+
+```yaml
+slug: adf4j
+include:
+  project: true
+exclude:
+  - "spec/**"
+pageOrder:
+  - architecture.md
+  - getting-started.md
+  - guide.md
+  - reference.md
+```
+
+`pageOrder` accepts page paths relative to the configured `docRoot`, with or without the `.md` extension. Pages not listed are appended after the listed pages in filename order. A page's own frontmatter `order` still takes precedence for one-off overrides, and validation fails if `pageOrder` references a missing page.
+
 ## Commands
 
 | Command                    | Action                                         |

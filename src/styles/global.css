@@ -1021,6 +1021,7 @@
   @scope (.prose) {
     :scope {
       max-width: var(--reading-width);
+      min-width: 0;
     }
 
     :scope>*+* {
@@ -1160,6 +1161,7 @@
     }
 
     pre {
+      max-width: 100%;
       overflow-x: auto;
       padding: 1rem;
       border: 1px solid var(--color-border);
@@ -1167,6 +1169,16 @@
       background: var(--color-surface) !important;
       font-size: 0.875rem;
       line-height: 1.6;
+    }
+
+    pre code {
+      display: block;
+      width: max-content;
+      min-width: 100%;
+    }
+
+    .astro-code {
+      max-width: 100%;
     }
 
     :not(pre)>code {
@@ -1180,6 +1192,7 @@
 
     table {
       width: 100%;
+      max-width: 100%;
       border-collapse: collapse;
       font-size: 0.9rem;
       line-height: 1.6;
@@ -1220,6 +1233,37 @@
       margin: 2.5rem 0;
       border: none;
       border-top: 1px solid var(--color-border);
+    }
+
+    @media (max-width: 48rem) {
+      :scope {
+        overflow-x: clip;
+      }
+
+      pre {
+        white-space: pre-wrap;
+      }
+
+      pre code {
+        width: 100%;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+
+      pre .line {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+      }
+
+      th,
+      td {
+        min-width: 8rem;
+      }
     }
   }
 

@@ -60,6 +60,7 @@ async function syncSources(manifest) {
     const meta = await readOptionalYaml(path.join(docDir, "nthings.meta.yaml"));
     const slug = meta.slug ?? source.slug ?? source.repo;
     const exclude = meta.exclude ?? [];
+    const pageOrder = normalizePageOrder(meta.pageOrder, `${context} nthings.meta.yaml`);
 
     if (slugs.has(slug)) {
       throw new Error(`Duplicate slug "${slug}" from ${context}`);
@@ -68,7 +69,7 @@ async function syncSources(manifest) {
 
     if (meta.include?.project ?? true) {
       await ingestProject({ docDir, context, source, slug, order: meta.order ?? source.order });
-      await ingestProjectDocs({ docDir, context, slug, exclude });
+      await ingestProjectDocs({ docDir, context, slug, exclude, pageOrder });
     }
 
     await ingestPosts({
@@ -138,17 +139,25 @@ async function ingestProject({ docDir, context, source, slug, order }) {
   }
 }
 
-async function ingestProjectDocs({ docDir, context, slug, exclude }) {
+async function ingestProjectDocs({ docDir, context, slug, exclude, pageOrder }) {
   const allExcludes = [...DEFAULT_DOC_EXCLUDES, ...exclude];
-  const files = await collectMarkdownFiles(docDir);
+  const files = (await collectMarkdownFiles(docDir))
+    .map((file) => ({
+      file,
+      relative: path.relative(docDir, file).replace(/\\/g, "/"),
+    }))
+    .filter(({ relative }) => !allExcludes.some((pattern) => matchGlob(relative, pattern)))
+    .toSorted((a, b) => a.relative.localeCompare(b.relative));
   const pageSlugs = new Set();
+  const orderByPageSlug = new Map(pageOrder.map((pageSlug, index) => [pageSlug, index * 10]));
 
-  for (const file of files) {
-    const relative = path.relative(docDir, file).replace(/\\/g, "/");
-    if (allExcludes.some((pattern) => matchGlob(relative, pattern))) {
-      continue;
+  for (const pageSlug of pageOrder) {
+    if (!files.some(({ relative }) => relative.replace(/\.md$/i, "") === pageSlug)) {
+      throw new Error(`${context}: nthings.meta.yaml pageOrder references missing page "${pageSlug}"`);
     }
+  }
 
+  for (const [index, { file, relative }] of files.entries()) {
     const pageSlug = relative.replace(/\.md$/i, "");
     if (pageSlugs.has(pageSlug)) {
       throw new Error(`${context}: duplicate project doc slug "${pageSlug}"`);
@@ -156,10 +165,11 @@ async function ingestProjectDocs({ docDir, context, slug, exclude }) {
     pageSlugs.add(pageSlug);
 
     const markdown = await readMarkdown(file);
-    const title = markdown.data.title ?? inferTitle(markdown.body);
-    if (!title) {
+    const sourceTitle = markdown.data.title ?? inferTitle(markdown.body);
+    if (!sourceTitle) {
       throw new Error(`${context}: ${relative}: could not infer title`);
     }
+    const title = normalizeDocTitle(sourceTitle, slug);
 
     if (markdown.data.order !== undefined && typeof markdown.data.order !== "number") {
       throw new Error(`${context}: ${relative}: "order" must be a number`);
@@ -171,29 +181,22 @@ async function ingestProjectDocs({ docDir, context, slug, exclude }) {
         title,
         description: markdown.data.description ?? "",
         navTitle: markdown.data.navTitle,
-        order: markdown.data.order ?? inferDocOrder(pageSlug),
+        order: markdown.data.order ?? orderByPageSlug.get(pageSlug) ?? (pageOrder.length + index) * 10,
         sourcePath: relative,
       },
       ["slug"],
     );
 
-    const body = rewriteDocLinks(rewriteAssetPaths(markdown.body, slug), slug);
+    const body = rewriteDocLinks(
+      rewriteAssetPaths(stripLeadingH1(markdown.body), slug),
+      slug,
+    );
 
     if (!validateOnly) {
       const outFile = path.join(PROJECT_DOCS_DIR, slug, `${pageSlug}.md`);
       await writeMarkdown(outFile, data, body);
     }
   }
-}
-
-function inferDocOrder(pageSlug) {
-  const known = {
-    "getting-started": 10,
-    guide: 20,
-    reference: 30,
-    architecture: 40,
-  };
-  return known[pageSlug] ?? 100;
 }
 
 async function ingestPosts({ docDir, context, repo, slug, include, exclude }) {
@@ -305,6 +308,33 @@ function validateSharedFields(data, context) {
   return errors;
 }
 
+function normalizePageOrder(pageOrder, context) {
+  if (pageOrder === undefined) {
+    return [];
+  }
+  if (!Array.isArray(pageOrder)) {
+    throw new Error(`${context}: "pageOrder" must be an array`);
+  }
+
+  const slugs = [];
+  const seen = new Set();
+
+  for (const entry of pageOrder) {
+    if (typeof entry !== "string" || entry.trim() === "") {
+      throw new Error(`${context}: "pageOrder" entries must be non-empty strings`);
+    }
+
+    const pageSlug = entry.trim().replace(/\\/g, "/").replace(/^\.\//, "").replace(/\.md$/i, "");
+    if (seen.has(pageSlug)) {
+      throw new Error(`${context}: duplicate pageOrder entry "${pageSlug}"`);
+    }
+    seen.add(pageSlug);
+    slugs.push(pageSlug);
+  }
+
+  return slugs;
+}
+
 function included(file, base, include, exclude) {
   const relative = path.relative(base, file).replace(/\\/g, "/");
   return matchGlob(relative, include) && !exclude.some((pattern) => matchGlob(relative, pattern));
@@ -396,6 +426,20 @@ function rewriteDocLinks(body, projectSlug) {
 function inferTitle(body) {
   const match = body.match(/^#\s+(.+)$/m);
   return match ? match[1].trim() : null;
+}
+
+function normalizeDocTitle(title, projectSlug) {
+  const pattern = new RegExp(`^${escapeRegExp(projectSlug)}\\s*(?:[-—:|/])\\s*(.+)$`, "i");
+  const match = title.match(pattern);
+  return match?.[1]?.trim() || title;
+}
+
+function stripLeadingH1(body) {
+  return body.replace(/^#\s+.+(?:\r?\n|$)(?:\r?\n)?/, "").trimStart();
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
 function omit(data, keys) {

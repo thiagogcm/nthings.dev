@@ -12,6 +12,7 @@ const { project, pageTitle, pageDescription } = Astro.props;
 const heading = pageTitle ?? project.data.title;
 const lede =
   pageDescription ?? (pageTitle ? undefined : project.data.description);
+const eyebrow = pageTitle ? "Docs" : "Overview";
 ---
 
 <header class="grid gap-[0.85rem] pb-8 border-b border-border">
@@ -34,7 +35,7 @@ const lede =
     )
   }
 
-  <p class="eyebrow">{pageTitle ? "Documentation" : "Project"}</p>
+  <p class="eyebrow">{eyebrow}</p>
   <h1>{heading}</h1>
   {lede && <p class="lede">{lede}</p>}
 

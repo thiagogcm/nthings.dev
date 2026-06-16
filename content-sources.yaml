@@ -1,0 +1,11 @@
+version: 1
+
+defaults:
+  branch: main
+  docRoot: docs
+
+sources:
+  - owner: thiagogcm
+    repo: adf4j
+    slug: adf4j-docs
+    order: 0

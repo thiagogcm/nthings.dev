@@ -7,22 +7,16 @@ order: 1
 tags: ["astro", "cloudflare", "typescript"]
 ---
 
-This site is the reference implementation of its own thesis: a portfolio that treats each
-project as an engineering specification rather than a visual case study. It is intentionally
-small, monochromatic, and content-first.
+This site is the reference implementation of its own thesis: a portfolio that treats each project as an engineering specification rather than a visual case study. It is intentionally small, monochromatic, and content-first.
 
 ## Architecture
 
-The site is a fully static Astro build with no client framework. Pages are composed from a
-two-layer layout system:
+The site is a fully static Astro build with no client framework. Pages are composed from a two-layer layout system:
 
 - `BaseLayout` owns the document head and header.
-- `DocsLayout` wraps `BaseLayout` and adds the three-column documentation grid: a global
-  navigation sidebar, the longform content column, and an in-page table of contents.
+- `DocsLayout` wraps `BaseLayout` and adds the three-column documentation grid: a global navigation sidebar, the longform content column, and an in-page table of contents.
 
-Content lives in two Markdown collections — `projects` and `blog` — typed and validated through
-Astro content collections. Every project and post is pre-rendered at build time, so the deployed
-output is plain HTML and CSS with zero runtime JavaScript beyond view transitions.
+Content lives in two Markdown collections — `projects` and `blog` — typed and validated through Astro content collections. Every project and post is pre-rendered at build time, so the deployed output is plain HTML and CSS with zero runtime JavaScript beyond view transitions.
 
 ## Tech Stack
 
@@ -35,9 +29,7 @@ output is plain HTML and CSS with zero runtime JavaScript beyond view transition
 | Hosting   | Cloudflare Workers via Wrangler         |
 | Fonts     | Inter, JetBrains Mono                   |
 
-There is no CSS-in-JS and no CMS. Styling is Tailwind v4 in CSS-first mode: a single `@theme` token
-sheet drives a monochrome palette, with light and dark variants resolved through `light-dark()` and
-the user's system `prefers-color-scheme` preference.
+There is no CSS-in-JS and no CMS. Styling is Tailwind v4 in CSS-first mode: a single `@theme` token sheet drives a monochrome palette, with light and dark variants resolved through `light-dark()` and the user's system `prefers-color-scheme` preference.
 
 ## Code
 
@@ -57,12 +49,10 @@ const projects = defineCollection({
 });
 ```
 
-The in-page outline is derived directly from the rendered Markdown headings, so the right rail
-always matches the document without any manual bookkeeping:
+The in-page outline is derived directly from the rendered Markdown headings, so the right rail always matches the document without any manual bookkeeping:
 
 ```astro
 const { Content, headings } = await render(project);
 ```
 
-That single source of truth is what lets the blog and project specs share the exact same
-documentation layout.
+That single source of truth is what lets the blog and project specs share the exact same documentation layout.

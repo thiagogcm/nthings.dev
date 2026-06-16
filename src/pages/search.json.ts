@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
+import { getCollection } from "astro:content";
 import { NAV_LINKS } from "../consts";
-import { getSortedPosts, getSortedProjects } from "../lib/collections";
+import { getSortedPosts, getSortedProjects, projectDocUrl } from "../lib/collections";
 
 // Collection index routes — covered by their per-entry docs below.
 const COLLECTION_ROOTS = new Set(["/projects", "/blog"]);
@@ -32,10 +33,13 @@ interface SearchDoc {
 }
 
 export const GET: APIRoute = async () => {
-  const [posts, projects] = await Promise.all([
+  const [posts, projects, projectDocs] = await Promise.all([
     getSortedPosts(),
     getSortedProjects(),
+    getCollection("projectDocs"),
   ]);
+
+  const projectsById = new Map(projects.map((project) => [project.id, project]));
 
   // Static pages (Home, About) — sourced from the nav so they never drift.
   const pages: SearchDoc[] = NAV_LINKS.filter(
@@ -59,6 +63,19 @@ export const GET: APIRoute = async () => {
       tags: [...(project.data.tags ?? [])],
       text: stripMarkdown(project.body ?? "").slice(0, 1500),
     })),
+    ...projectDocs.map((doc) => {
+      const project = projectsById.get(doc.data.project);
+      return {
+        title: project
+          ? `${doc.data.title} · ${project.data.title}`
+          : doc.data.title,
+        url: projectDocUrl(doc.id),
+        section: "Projects",
+        description: doc.data.description || project?.data.description || "",
+        tags: [...(project?.data.tags ?? [])],
+        text: stripMarkdown(doc.body ?? "").slice(0, 1500),
+      };
+    }),
     ...posts.map((post) => ({
       title: post.data.title,
       url: `/blog/${post.id}`,

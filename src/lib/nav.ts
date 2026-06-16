@@ -17,3 +17,14 @@ export const tocHeadings = (headings: MarkdownHeading[]) => {
     return h.depth > 1 && h.depth < 4;
   });
 };
+
+export function isNavItemActive(
+  pathname: string,
+  href: string,
+  isOverview = false,
+): boolean {
+  if (isOverview) {
+    return pathname === href || pathname === `${href}/`;
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}

@@ -7,8 +7,10 @@ const ROOT = path.resolve(import.meta.dirname, "..");
 const CACHE_DIR = path.join(ROOT, ".cache/content-sources");
 const SOURCE_DIR = path.join(CACHE_DIR, "sources");
 const PROJECTS_DIR = path.join(CACHE_DIR, "projects");
+const PROJECT_DOCS_DIR = path.join(CACHE_DIR, "project-docs");
 const BLOG_DIR = path.join(CACHE_DIR, "blog");
 const PUBLIC_ASSETS_DIR = path.join(ROOT, "public/content-sources");
+const DEFAULT_DOC_EXCLUDES = ["project.md", "posts/**", "assets/**", "nthings.meta.yaml"];
 const validateOnly = process.argv.includes("--validate-only");
 
 async function main() {
@@ -38,6 +40,7 @@ async function resetOutput() {
   await rm(PUBLIC_ASSETS_DIR, { recursive: true, force: true });
   await mkdir(SOURCE_DIR, { recursive: true });
   await mkdir(PROJECTS_DIR, { recursive: true });
+  await mkdir(PROJECT_DOCS_DIR, { recursive: true });
   await mkdir(BLOG_DIR, { recursive: true });
 }
 
@@ -56,6 +59,7 @@ async function syncSources(manifest) {
     const docDir = await fetchDocRoot(source, branch, docRoot);
     const meta = await readOptionalYaml(path.join(docDir, "nthings.meta.yaml"));
     const slug = meta.slug ?? source.slug ?? source.repo;
+    const exclude = meta.exclude ?? [];
 
     if (slugs.has(slug)) {
       throw new Error(`Duplicate slug "${slug}" from ${context}`);
@@ -64,6 +68,7 @@ async function syncSources(manifest) {
 
     if (meta.include?.project ?? true) {
       await ingestProject({ docDir, context, source, slug, order: meta.order ?? source.order });
+      await ingestProjectDocs({ docDir, context, slug, exclude });
     }
 
     await ingestPosts({
@@ -72,7 +77,7 @@ async function syncSources(manifest) {
       repo: source.repo,
       slug,
       include: meta.include?.posts ?? "posts/**/*.md",
-      exclude: meta.exclude ?? [],
+      exclude,
     });
 
     lock.sources.push({ owner: source.owner, repo: source.repo, slug, branch, docRoot, local: !!source.local });
@@ -125,8 +130,70 @@ async function ingestProject({ docDir, context, source, slug, order }) {
 
   if (!validateOnly) {
     await copyAssets(docDir, slug);
-    await writeMarkdown(path.join(PROJECTS_DIR, `${slug}.md`), data, rewriteAssetPaths(markdown.body, slug));
+    await writeMarkdown(
+      path.join(PROJECTS_DIR, `${slug}.md`),
+      data,
+      rewriteDocLinks(rewriteAssetPaths(markdown.body, slug), slug),
+    );
   }
+}
+
+async function ingestProjectDocs({ docDir, context, slug, exclude }) {
+  const allExcludes = [...DEFAULT_DOC_EXCLUDES, ...exclude];
+  const files = await collectMarkdownFiles(docDir);
+  const pageSlugs = new Set();
+
+  for (const file of files) {
+    const relative = path.relative(docDir, file).replace(/\\/g, "/");
+    if (allExcludes.some((pattern) => matchGlob(relative, pattern))) {
+      continue;
+    }
+
+    const pageSlug = relative.replace(/\.md$/i, "");
+    if (pageSlugs.has(pageSlug)) {
+      throw new Error(`${context}: duplicate project doc slug "${pageSlug}"`);
+    }
+    pageSlugs.add(pageSlug);
+
+    const markdown = await readMarkdown(file);
+    const title = markdown.data.title ?? inferTitle(markdown.body);
+    if (!title) {
+      throw new Error(`${context}: ${relative}: could not infer title`);
+    }
+
+    if (markdown.data.order !== undefined && typeof markdown.data.order !== "number") {
+      throw new Error(`${context}: ${relative}: "order" must be a number`);
+    }
+
+    const data = omit(
+      {
+        project: slug,
+        title,
+        description: markdown.data.description ?? "",
+        navTitle: markdown.data.navTitle,
+        order: markdown.data.order ?? inferDocOrder(pageSlug),
+        sourcePath: relative,
+      },
+      ["slug"],
+    );
+
+    const body = rewriteDocLinks(rewriteAssetPaths(markdown.body, slug), slug);
+
+    if (!validateOnly) {
+      const outFile = path.join(PROJECT_DOCS_DIR, slug, `${pageSlug}.md`);
+      await writeMarkdown(outFile, data, body);
+    }
+  }
+}
+
+function inferDocOrder(pageSlug) {
+  const known = {
+    "getting-started": 10,
+    guide: 20,
+    reference: 30,
+    architecture: 40,
+  };
+  return known[pageSlug] ?? 100;
 }
 
 async function ingestPosts({ docDir, context, repo, slug, include, exclude }) {
@@ -149,7 +216,7 @@ async function ingestPosts({ docDir, context, repo, slug, include, exclude }) {
       await writeMarkdown(
         path.join(BLOG_DIR, `${postSlug}.md`),
         omit(markdown.data, ["slug", "project"]),
-        rewriteAssetPaths(markdown.body, slug),
+        rewriteDocLinks(rewriteAssetPaths(markdown.body, slug), slug),
       );
     }
   }
@@ -181,6 +248,7 @@ async function readMarkdown(file) {
 }
 
 async function writeMarkdown(file, data, body) {
+  await mkdir(path.dirname(file), { recursive: true });
   await writeFile(file, `---\n${stringifyYaml(data, { lineWidth: 0 }).trimEnd()}\n---\n\n${body.trimStart()}`, "utf8");
 }
 
@@ -296,6 +364,38 @@ async function assertDirectory(dir, label) {
 
 function rewriteAssetPaths(body, slug) {
   return body.replace(/(\]\()(\.\/)?assets\//g, `$1/content-sources/${slug}/`);
+}
+
+function rewriteDocLinks(body, projectSlug) {
+  return body.replace(/(\]\()([^)]+)(\))/g, (match, prefix, url, suffix) => {
+    if (/^(https?:|mailto:|tel:|#|\/)/.test(url)) {
+      return match;
+    }
+    if (url.includes("assets/")) {
+      return match;
+    }
+
+    const hashIndex = url.indexOf("#");
+    const pathPart = hashIndex >= 0 ? url.slice(0, hashIndex) : url;
+    const hash = hashIndex >= 0 ? url.slice(hashIndex) : "";
+
+    if (!/\.md$/i.test(pathPart)) {
+      return match;
+    }
+
+    const normalized = pathPart.replace(/^\.\//, "");
+    if (normalized === "project.md") {
+      return `${prefix}/projects/${projectSlug}${hash}${suffix}`;
+    }
+
+    const pageSlug = normalized.replace(/\.md$/i, "");
+    return `${prefix}/projects/${projectSlug}/${pageSlug}${hash}${suffix}`;
+  });
+}
+
+function inferTitle(body) {
+  const match = body.match(/^#\s+(.+)$/m);
+  return match ? match[1].trim() : null;
 }
 
 function omit(data, keys) {

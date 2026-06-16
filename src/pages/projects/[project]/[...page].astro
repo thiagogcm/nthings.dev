@@ -1,0 +1,55 @@
+---
+import { getCollection, render } from "astro:content";
+import DocsLayout from "../../../layouts/DocsLayout.astro";
+import ProjectPageHeader from "../../../components/ProjectPageHeader.astro";
+import { getProjectNav, projectDocPageSlug } from "../../../lib/collections";
+
+export async function getStaticPaths() {
+  const [docs, projects] = await Promise.all([
+    getCollection("projectDocs"),
+    getCollection("projects"),
+  ]);
+  const projectsById = new Map(
+    projects.map((project) => [project.id, project]),
+  );
+
+  return docs.flatMap((doc) => {
+    const project = projectsById.get(doc.data.project);
+    if (!project) {
+      return [];
+    }
+
+    const page = projectDocPageSlug(doc.id);
+    return [
+      {
+        params: { project: doc.data.project, page },
+        props: { doc, project },
+      },
+    ];
+  });
+}
+
+const { doc, project } = Astro.props;
+const { Content, headings } = await render(doc);
+const pageNav = await getProjectNav(project.id);
+---
+
+<DocsLayout
+  title={`${doc.data.title} · ${project.data.title}`}
+  description={doc.data.description || project.data.description}
+  headings={headings}
+  showToc={true}
+  pageNav={pageNav}
+>
+  <article class="grid grid-cols-[minmax(0,1fr)] gap-10">
+    <ProjectPageHeader
+      project={project}
+      pageTitle={doc.data.title}
+      pageDescription={doc.data.description || undefined}
+    />
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</DocsLayout>

@@ -1,0 +1,47 @@
+---
+import type { ProjectNavItem } from "../lib/collections";
+import { isNavItemActive } from "../lib/nav";
+
+interface Props {
+  items: ProjectNavItem[];
+}
+
+const { items } = Astro.props;
+const pathname = Astro.url.pathname;
+---
+
+{
+  items.length > 1 && (
+    <aside class="project-docs-nav" aria-label="In this project">
+      <p class="project-docs-nav__heading">In this project</p>
+      <nav aria-label="In this project">
+        <ul class="project-docs-nav__list">
+          {items.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={[
+                  "project-docs-nav__link",
+                  {
+                    "is-active": isNavItemActive(
+                      pathname,
+                      item.href,
+                      item.isOverview,
+                    ),
+                  },
+                ]}
+                aria-current={
+                  isNavItemActive(pathname, item.href, item.isOverview)
+                    ? "page"
+                    : undefined
+                }
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </aside>
+  )
+}

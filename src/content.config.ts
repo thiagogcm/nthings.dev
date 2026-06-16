@@ -7,6 +7,14 @@ function idFromFilename({ entry }: { entry: string }) {
   return name.replace(/\.md$/i, '');
 }
 
+function projectDocIdFromEntry({ entry }: { entry: string }) {
+  const normalized = entry.replace(/\\/g, '/');
+  const marker = 'project-docs/';
+  const idx = normalized.indexOf(marker);
+  const rel = idx >= 0 ? normalized.slice(idx + marker.length) : normalized;
+  return rel.replace(/\.md$/i, '');
+}
+
 const blog = defineCollection({
   loader: glob({
     pattern: [
@@ -45,4 +53,20 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { blog, projects };
+const projectDocs = defineCollection({
+  loader: glob({
+    pattern: ['.cache/content-sources/project-docs/**/*.md'],
+    base: './',
+    generateId: projectDocIdFromEntry,
+  }),
+  schema: z.object({
+    project: z.string(),
+    title: z.string(),
+    description: z.string().default(''),
+    navTitle: z.string().optional(),
+    order: z.number().default(0),
+    sourcePath: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, projects, projectDocs };

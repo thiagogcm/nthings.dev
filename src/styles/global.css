@@ -88,7 +88,7 @@
     font-size: 16px;
     line-height: 1.7;
     scroll-behavior: smooth;
-    scrollbar-gutter: stable;
+    scrollbar-gutter: stable both-edges;
     scrollbar-color: var(--color-border) var(--color-bg);
     scrollbar-width: thin;
     /* Sole anchor offset — don't add scroll-margin-top to targets; they stack. */
@@ -523,8 +523,7 @@
     min-width: 0;
     width: 100%;
     max-width: var(--reading-width);
-    justify-self: center;
-    padding-inline: clamp(1.25rem, 2.5vw, 2.5rem);
+    justify-self: start;
   }
 
   /* Sticky lives on the grid item itself so its containing block is the
@@ -836,6 +835,23 @@
     }
 
     .search-trigger__label {
+      display: none;
+    }
+
+    /* Phone tab strip: drop the icons and tighten spacing so all four
+       destinations fit without horizontal scroll (otherwise the last tab
+       clips off-screen with no scroll affordance). */
+    .tabs--bar {
+      gap: 0.25rem;
+      padding: 0.3rem;
+    }
+
+    .tabs--bar .tabs__link {
+      padding: 0.42rem 0.7rem;
+      font-size: 0.82rem;
+    }
+
+    .tabs--bar .tabs__icon {
       display: none;
     }
 

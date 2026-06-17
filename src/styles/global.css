@@ -815,6 +815,11 @@
     .docs-layout--with-nav.docs-layout--with-toc .site-toc {
       display: block;
     }
+
+    /* Let the article fill the middle column so gaps match the nav rail. */
+    .docs-layout--with-nav.docs-layout--with-toc .docs-content {
+      max-width: none;
+    }
   }
 
   @media (max-width: 30rem) {
@@ -1205,7 +1210,6 @@
     }
 
     .mermaid-diagram {
-      overflow: hidden;
       max-width: 100%;
       margin-block: 1.5rem;
       border: 1px solid var(--color-border);
@@ -1255,24 +1259,30 @@
       position: relative;
       display: grid;
       min-height: 14rem;
-      overflow: auto;
+      overflow: visible;
       padding: clamp(0.85rem, 2vw, 1.25rem);
       place-items: center;
     }
 
     .mermaid-diagram__canvas {
-      display: grid;
+      display: block;
       width: 100%;
       min-width: 0;
-      place-items: center;
+      overflow-x: auto;
     }
 
     .mermaid-diagram__canvas svg {
       display: block;
-      width: min(100%, 48rem);
       max-width: 100%;
       height: auto;
-      font-family: var(--font-sans);
+    }
+
+    .mermaid-diagram__canvas svg foreignObject {
+      overflow: visible;
+    }
+
+    .mermaid-diagram__canvas svg foreignObject div {
+      font-size-adjust: none;
     }
 
     .mermaid-diagram__status {

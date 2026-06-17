@@ -10,6 +10,7 @@
     "check": "astro check",
     "sync:content": "node scripts/sync-content-sources.mjs",
     "validate:sources": "node scripts/sync-content-sources.mjs --validate-only",
+    "test:content-sync": "node --test \"scripts/content-sources/**/*.test.mjs\"",
     "prebuild": "npm run sync:content",
     "predev": "npm run sync:content",
     "build": "astro build",

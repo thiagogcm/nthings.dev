@@ -88,7 +88,7 @@
     font-size: 16px;
     line-height: 1.7;
     scroll-behavior: smooth;
-    scrollbar-gutter: stable;
+    scrollbar-gutter: stable both-edges;
     scrollbar-color: var(--color-border) var(--color-bg);
     scrollbar-width: thin;
     /* Sole anchor offset — don't add scroll-margin-top to targets; they stack. */
@@ -523,8 +523,7 @@
     min-width: 0;
     width: 100%;
     max-width: var(--reading-width);
-    justify-self: center;
-    padding-inline: clamp(1.25rem, 2.5vw, 2.5rem);
+    justify-self: start;
   }
 
   /* Sticky lives on the grid item itself so its containing block is the
@@ -816,6 +815,11 @@
     .docs-layout--with-nav.docs-layout--with-toc .site-toc {
       display: block;
     }
+
+    /* Let the article fill the middle column so gaps match the nav rail. */
+    .docs-layout--with-nav.docs-layout--with-toc .docs-content {
+      max-width: none;
+    }
   }
 
   @media (max-width: 30rem) {
@@ -836,6 +840,23 @@
     }
 
     .search-trigger__label {
+      display: none;
+    }
+
+    /* Phone tab strip: drop the icons and tighten spacing so all four
+       destinations fit without horizontal scroll (otherwise the last tab
+       clips off-screen with no scroll affordance). */
+    .tabs--bar {
+      gap: 0.25rem;
+      padding: 0.3rem;
+    }
+
+    .tabs--bar .tabs__link {
+      padding: 0.42rem 0.7rem;
+      font-size: 0.82rem;
+    }
+
+    .tabs--bar .tabs__icon {
       display: none;
     }
 
@@ -1189,7 +1210,6 @@
     }
 
     .mermaid-diagram {
-      overflow: hidden;
       max-width: 100%;
       margin-block: 1.5rem;
       border: 1px solid var(--color-border);
@@ -1239,24 +1259,30 @@
       position: relative;
       display: grid;
       min-height: 14rem;
-      overflow: auto;
+      overflow: visible;
       padding: clamp(0.85rem, 2vw, 1.25rem);
       place-items: center;
     }
 
     .mermaid-diagram__canvas {
-      display: grid;
+      display: block;
       width: 100%;
       min-width: 0;
-      place-items: center;
+      overflow-x: auto;
     }
 
     .mermaid-diagram__canvas svg {
       display: block;
-      width: min(100%, 48rem);
       max-width: 100%;
       height: auto;
-      font-family: var(--font-sans);
+    }
+
+    .mermaid-diagram__canvas svg foreignObject {
+      overflow: visible;
+    }
+
+    .mermaid-diagram__canvas svg foreignObject div {
+      font-size-adjust: none;
     }
 
     .mermaid-diagram__status {

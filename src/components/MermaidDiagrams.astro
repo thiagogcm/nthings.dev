@@ -21,7 +21,8 @@
   function loadPrism() {
     prismPromise ??= import("prismjs").then(async (module) => {
       await import("prismjs/components/prism-mermaid");
-      return ((module as unknown as { default?: PrismApi }).default ?? module) as PrismApi;
+      return ((module as unknown as { default?: PrismApi }).default ??
+        module) as PrismApi;
     });
     return prismPromise;
   }
@@ -45,7 +46,10 @@
     const surface = resolvedColor("--color-surface", "#f2f4f7");
     const foreground = resolvedColor("--color-fg", "#0c0e13");
     const muted = resolvedColor("--color-fg-muted", "#4d5460");
-    const border = resolvedColor("--color-border-strong", "rgba(15, 23, 36, 0.2)");
+    const border = resolvedColor(
+      "--color-border-strong",
+      "rgba(15, 23, 36, 0.2)",
+    );
     const accent = resolvedColor("--color-accent", "#3f6f9c");
 
     return {
@@ -55,9 +59,7 @@
       fontFamily: bodyStyle.fontFamily,
       htmlLabels: true,
       flowchart: {
-        diagramPadding: 16,
-        nodeSpacing: 56,
-        rankSpacing: 64,
+        useMaxWidth: true,
       },
       themeVariables: {
         background,
@@ -89,6 +91,44 @@
     } satisfies MermaidConfig;
   }
 
+  function adjustForeignObjectLabels(container: HTMLElement) {
+    container.querySelectorAll("foreignObject").forEach((fo) => {
+      const wrapper = fo.firstElementChild as HTMLElement | null;
+      if (!wrapper) {
+        return;
+      }
+
+      const neededHeight = Math.ceil(wrapper.getBoundingClientRect().height);
+      const neededWidth = Math.ceil(wrapper.getBoundingClientRect().width);
+      const currentHeight = Math.ceil(
+        Number.parseFloat(fo.getAttribute("height") || "0"),
+      );
+      const currentWidth = Math.ceil(
+        Number.parseFloat(fo.getAttribute("width") || "0"),
+      );
+
+      if (neededHeight > currentHeight) {
+        fo.setAttribute("height", String(neededHeight));
+      }
+
+      if (neededWidth > currentWidth) {
+        fo.setAttribute("width", String(neededWidth));
+      }
+
+      fo.setAttribute("overflow", "visible");
+    });
+  }
+
+  async function waitForDiagramLayout() {
+    if (document.fonts?.ready) {
+      await document.fonts.ready;
+    }
+
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+    });
+  }
+
   function escapeHtml(value: string) {
     return value
       .replace(/&/g, "&amp;")
@@ -98,10 +138,18 @@
   }
 
   function setView(card: HTMLElement, view: "diagram" | "code") {
-    const diagramPanel = card.querySelector<HTMLElement>("[data-mermaid-panel='diagram']");
-    const codePanel = card.querySelector<HTMLElement>("[data-mermaid-panel='code']");
-    const diagramButton = card.querySelector<HTMLButtonElement>("[data-mermaid-view='diagram']");
-    const codeButton = card.querySelector<HTMLButtonElement>("[data-mermaid-view='code']");
+    const diagramPanel = card.querySelector<HTMLElement>(
+      "[data-mermaid-panel='diagram']",
+    );
+    const codePanel = card.querySelector<HTMLElement>(
+      "[data-mermaid-panel='code']",
+    );
+    const diagramButton = card.querySelector<HTMLButtonElement>(
+      "[data-mermaid-view='diagram']",
+    );
+    const codeButton = card.querySelector<HTMLButtonElement>(
+      "[data-mermaid-view='code']",
+    );
 
     card.dataset.view = view;
     if (diagramPanel) diagramPanel.hidden = view !== "diagram";
@@ -119,7 +167,9 @@
     pre.removeAttribute("style");
     pre.setAttribute("tabindex", "0");
     code.className = "language-mermaid";
-    code.innerHTML = grammar ? Prism.highlight(source, grammar, "mermaid") : escapeHtml(source);
+    code.innerHTML = grammar
+      ? Prism.highlight(source, grammar, "mermaid")
+      : escapeHtml(source);
 
     if (!code.parentElement) {
       pre.appendChild(code);
@@ -134,8 +184,12 @@
 
     const render = (async () => {
       const source = card.querySelector("pre code")?.textContent ?? "";
-      const diagram = card.querySelector<HTMLElement>(".mermaid-diagram__canvas");
-      const status = card.querySelector<HTMLElement>(".mermaid-diagram__status");
+      const diagram = card.querySelector<HTMLElement>(
+        ".mermaid-diagram__canvas",
+      );
+      const status = card.querySelector<HTMLElement>(
+        ".mermaid-diagram__status",
+      );
 
       if (!diagram || !source.trim()) {
         return;
@@ -147,6 +201,9 @@
         status.textContent = "Rendering diagram";
       }
 
+      // Wait for fonts and layout so Mermaid measures labels against final metrics.
+      await waitForDiagramLayout();
+
       try {
         const mermaid = await loadMermaid();
         mermaid.initialize(mermaidConfig());
@@ -154,13 +211,17 @@
         const { svg, bindFunctions } = await mermaid.render(id, source);
         diagram.innerHTML = svg;
         bindFunctions?.(diagram);
+        requestAnimationFrame(() => {
+          adjustForeignObjectLabels(diagram);
+        });
         if (status) {
           status.textContent = "";
         }
       } catch (error) {
         card.setAttribute("data-render-error", "true");
         if (status) {
-          status.textContent = "Diagram could not be rendered. Source is available in the code tab.";
+          status.textContent =
+            "Diagram could not be rendered. Source is available in the code tab.";
         }
         console.error("Mermaid render failed", error);
       }
@@ -197,7 +258,8 @@
     `;
 
     const diagramPanel = document.createElement("div");
-    diagramPanel.className = "mermaid-diagram__panel mermaid-diagram__panel--diagram";
+    diagramPanel.className =
+      "mermaid-diagram__panel mermaid-diagram__panel--diagram";
     diagramPanel.dataset.mermaidPanel = "diagram";
     diagramPanel.setAttribute("role", "tabpanel");
     diagramPanel.innerHTML = `
@@ -219,7 +281,9 @@
     card.__nthingsRenderMermaid = () => renderCard(card);
 
     toolbar.addEventListener("click", (event) => {
-      const button = (event.target as Element).closest<HTMLButtonElement>("[data-mermaid-view]");
+      const button = (event.target as Element).closest<HTMLButtonElement>(
+        "[data-mermaid-view]",
+      );
       if (!button) {
         return;
       }
@@ -231,7 +295,9 @@
 
   function enhanceMermaidBlocks() {
     document
-      .querySelectorAll<HTMLPreElement>(".prose pre[data-language='mermaid']:not([data-mermaid-enhanced])")
+      .querySelectorAll<HTMLPreElement>(
+        ".prose pre[data-language='mermaid']:not([data-mermaid-enhanced])",
+      )
       .forEach((pre) => {
         void enhanceBlock(pre);
       });
@@ -251,7 +317,9 @@
     themeMedia.addEventListener("change", rerenderMermaidBlocks);
 
     new MutationObserver((mutations) => {
-      if (mutations.some((mutation) => mutation.attributeName === "data-theme")) {
+      if (
+        mutations.some((mutation) => mutation.attributeName === "data-theme")
+      ) {
         rerenderMermaidBlocks();
       }
     }).observe(document.documentElement, { attributes: true });

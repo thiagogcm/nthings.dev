@@ -60,8 +60,8 @@
     --header-height: 3.75rem;
     --tabs-height: 3.25rem;
     --header-stack: calc(var(--header-height) + var(--tabs-height));
-    --reading-width: 46rem;
-    --page-max: 90rem;
+    --reading-width: 54rem;
+    --page-max: 100rem;
     --page-pad: clamp(1.1rem, 2.5vw, 2rem);
     --color-scrim: rgb(0 0 0 / 0.5);
     /* Sticky offset + height shared by the sidebar and ToC rails. */
@@ -520,6 +520,9 @@
 
   .docs-content {
     min-width: 0;
+    width: 100%;
+    max-width: var(--reading-width);
+    justify-self: center;
   }
 
   /* Sticky lives on the grid item itself so its containing block is the
@@ -1020,7 +1023,8 @@
   /* Rendered markdown (project specs, posts). */
   @scope (.prose) {
     :scope {
-      max-width: var(--reading-width);
+      width: 100%;
+      max-width: none;
       min-width: 0;
     }
 
@@ -1034,7 +1038,8 @@
       font-size: 1rem;
       line-height: 1.8;
       text-wrap: pretty;
-      hyphens: auto;
+      overflow-wrap: break-word;
+      hyphens: none;
     }
 
     /* Highlight deep-linked text fragments (e.g. #:~:text=…) shared from a post. */
@@ -1233,7 +1238,7 @@
       display: grid;
       min-height: 14rem;
       overflow: auto;
-      padding: 1rem;
+      padding: clamp(0.85rem, 2vw, 1.25rem);
       place-items: center;
     }
 
@@ -1246,7 +1251,7 @@
 
     .mermaid-diagram__canvas svg {
       display: block;
-      width: 100%;
+      width: min(100%, 48rem);
       max-width: 100%;
       height: auto;
       font-family: var(--font-sans);

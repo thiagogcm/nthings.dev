@@ -1,0 +1,258 @@
+<script>
+  import type { MermaidConfig } from "mermaid";
+
+  type MermaidCard = HTMLElement & {
+    __nthingsRenderMermaid?: () => Promise<void>;
+  };
+  type MermaidApi = typeof import("mermaid").default;
+  type PrismApi = typeof import("prismjs");
+
+  const PROCESSED_ATTR = "data-mermaid-enhanced";
+  const pendingRenders = new WeakMap<Element, Promise<void>>();
+  let mermaidPromise: Promise<MermaidApi> | undefined;
+  let prismPromise: Promise<PrismApi> | undefined;
+  let renderIndex = 0;
+
+  function loadMermaid() {
+    mermaidPromise ??= import("mermaid").then((module) => module.default);
+    return mermaidPromise;
+  }
+
+  function loadPrism() {
+    prismPromise ??= import("prismjs").then(async (module) => {
+      await import("prismjs/components/prism-mermaid");
+      return ((module as unknown as { default?: PrismApi }).default ?? module) as PrismApi;
+    });
+    return prismPromise;
+  }
+
+  function resolvedColor(variable: string, fallback: string) {
+    const probe = document.createElement("span");
+    probe.style.color = `var(${variable})`;
+    probe.style.position = "absolute";
+    probe.style.pointerEvents = "none";
+    probe.style.visibility = "hidden";
+    document.body.appendChild(probe);
+
+    const value = getComputedStyle(probe).color || fallback;
+    probe.remove();
+    return value;
+  }
+
+  function mermaidConfig() {
+    const bodyStyle = getComputedStyle(document.body);
+    const background = resolvedColor("--color-bg", "#fcfcfd");
+    const surface = resolvedColor("--color-surface", "#f2f4f7");
+    const foreground = resolvedColor("--color-fg", "#0c0e13");
+    const muted = resolvedColor("--color-fg-muted", "#4d5460");
+    const border = resolvedColor("--color-border-strong", "rgba(15, 23, 36, 0.2)");
+    const accent = resolvedColor("--color-accent", "#3f6f9c");
+
+    return {
+      startOnLoad: false,
+      securityLevel: "strict",
+      theme: "base",
+      fontFamily: bodyStyle.fontFamily,
+      flowchart: {
+        htmlLabels: true,
+      },
+      themeVariables: {
+        background,
+        mainBkg: surface,
+        primaryColor: surface,
+        primaryTextColor: foreground,
+        primaryBorderColor: border,
+        secondaryColor: background,
+        secondaryTextColor: foreground,
+        secondaryBorderColor: border,
+        tertiaryColor: background,
+        tertiaryTextColor: foreground,
+        tertiaryBorderColor: border,
+        lineColor: muted,
+        textColor: foreground,
+        nodeTextColor: foreground,
+        edgeLabelBackground: background,
+        clusterBkg: background,
+        clusterBorder: border,
+        noteBkgColor: surface,
+        noteTextColor: foreground,
+        noteBorderColor: border,
+        actorBkg: surface,
+        actorTextColor: foreground,
+        actorBorder: border,
+        activationBkgColor: accent,
+        activationBorderColor: accent,
+      },
+    } satisfies MermaidConfig;
+  }
+
+  function escapeHtml(value: string) {
+    return value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function setView(card: HTMLElement, view: "diagram" | "code") {
+    const diagramPanel = card.querySelector<HTMLElement>("[data-mermaid-panel='diagram']");
+    const codePanel = card.querySelector<HTMLElement>("[data-mermaid-panel='code']");
+    const diagramButton = card.querySelector<HTMLButtonElement>("[data-mermaid-view='diagram']");
+    const codeButton = card.querySelector<HTMLButtonElement>("[data-mermaid-view='code']");
+
+    card.dataset.view = view;
+    if (diagramPanel) diagramPanel.hidden = view !== "diagram";
+    if (codePanel) codePanel.hidden = view !== "code";
+    diagramButton?.setAttribute("aria-selected", String(view === "diagram"));
+    codeButton?.setAttribute("aria-selected", String(view === "code"));
+  }
+
+  async function highlightSource(pre: HTMLPreElement, source: string) {
+    const Prism = await loadPrism();
+    const code = pre.querySelector("code") ?? document.createElement("code");
+    const grammar = Prism.languages.mermaid;
+
+    pre.className = "mermaid-source-code language-mermaid";
+    pre.removeAttribute("style");
+    pre.setAttribute("tabindex", "0");
+    code.className = "language-mermaid";
+    code.innerHTML = grammar ? Prism.highlight(source, grammar, "mermaid") : escapeHtml(source);
+
+    if (!code.parentElement) {
+      pre.appendChild(code);
+    }
+  }
+
+  async function renderCard(card: MermaidCard) {
+    const existing = pendingRenders.get(card);
+    if (existing) {
+      return existing;
+    }
+
+    const render = (async () => {
+      const source = card.querySelector("pre code")?.textContent ?? "";
+      const diagram = card.querySelector<HTMLElement>(".mermaid-diagram__canvas");
+      const status = card.querySelector<HTMLElement>(".mermaid-diagram__status");
+
+      if (!diagram || !source.trim()) {
+        return;
+      }
+
+      card.removeAttribute("data-render-error");
+      diagram.innerHTML = "";
+      if (status) {
+        status.textContent = "Rendering diagram";
+      }
+
+      try {
+        const mermaid = await loadMermaid();
+        mermaid.initialize(mermaidConfig());
+        const id = `nthings-mermaid-${Date.now()}-${renderIndex++}`;
+        const { svg, bindFunctions } = await mermaid.render(id, source);
+        diagram.innerHTML = svg;
+        bindFunctions?.(diagram);
+        if (status) {
+          status.textContent = "";
+        }
+      } catch (error) {
+        card.setAttribute("data-render-error", "true");
+        if (status) {
+          status.textContent = "Diagram could not be rendered. Source is available in the code tab.";
+        }
+        console.error("Mermaid render failed", error);
+      }
+    })();
+
+    pendingRenders.set(card, render);
+    try {
+      await render;
+    } finally {
+      pendingRenders.delete(card);
+    }
+  }
+
+  async function enhanceBlock(pre: HTMLPreElement) {
+    if (pre.hasAttribute(PROCESSED_ATTR)) {
+      return;
+    }
+
+    const source = pre.textContent ?? "";
+    pre.setAttribute(PROCESSED_ATTR, "true");
+    await highlightSource(pre, source);
+
+    const card = document.createElement("figure") as MermaidCard;
+    card.className = "mermaid-diagram";
+    card.dataset.view = "diagram";
+
+    const toolbar = document.createElement("figcaption");
+    toolbar.className = "mermaid-diagram__toolbar";
+    toolbar.setAttribute("role", "tablist");
+    toolbar.setAttribute("aria-label", "Mermaid diagram view");
+    toolbar.innerHTML = `
+      <button class="mermaid-diagram__tab" type="button" role="tab" data-mermaid-view="diagram" aria-selected="true">Diagram</button>
+      <button class="mermaid-diagram__tab" type="button" role="tab" data-mermaid-view="code" aria-selected="false">Code</button>
+    `;
+
+    const diagramPanel = document.createElement("div");
+    diagramPanel.className = "mermaid-diagram__panel mermaid-diagram__panel--diagram";
+    diagramPanel.dataset.mermaidPanel = "diagram";
+    diagramPanel.setAttribute("role", "tabpanel");
+    diagramPanel.innerHTML = `
+      <div class="mermaid-diagram__canvas" aria-label="Rendered Mermaid diagram"></div>
+      <p class="mermaid-diagram__status" role="status">Rendering diagram</p>
+    `;
+
+    const codePanel = document.createElement("div");
+    codePanel.className = "mermaid-diagram__panel mermaid-diagram__panel--code";
+    codePanel.dataset.mermaidPanel = "code";
+    codePanel.setAttribute("role", "tabpanel");
+    codePanel.hidden = true;
+
+    card.appendChild(toolbar);
+    card.appendChild(diagramPanel);
+    card.appendChild(codePanel);
+    pre.replaceWith(card);
+    codePanel.appendChild(pre);
+    card.__nthingsRenderMermaid = () => renderCard(card);
+
+    toolbar.addEventListener("click", (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>("[data-mermaid-view]");
+      if (!button) {
+        return;
+      }
+      setView(card, button.dataset.mermaidView === "code" ? "code" : "diagram");
+    });
+
+    renderCard(card);
+  }
+
+  function enhanceMermaidBlocks() {
+    document
+      .querySelectorAll<HTMLPreElement>(".prose pre[data-language='mermaid']:not([data-mermaid-enhanced])")
+      .forEach((pre) => {
+        void enhanceBlock(pre);
+      });
+  }
+
+  function rerenderMermaidBlocks() {
+    document
+      .querySelectorAll<MermaidCard>(".mermaid-diagram")
+      .forEach((card) => card.__nthingsRenderMermaid?.());
+  }
+
+  if (!(window as any).__nthingsMermaidBound) {
+    (window as any).__nthingsMermaidBound = true;
+    document.addEventListener("astro:page-load", enhanceMermaidBlocks);
+
+    const themeMedia = window.matchMedia("(prefers-color-scheme: dark)");
+    themeMedia.addEventListener("change", rerenderMermaidBlocks);
+
+    new MutationObserver((mutations) => {
+      if (mutations.some((mutation) => mutation.attributeName === "data-theme")) {
+        rerenderMermaidBlocks();
+      }
+    }).observe(document.documentElement, { attributes: true });
+  }
+
+  enhanceMermaidBlocks();
+</script>

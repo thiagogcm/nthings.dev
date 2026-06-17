@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "./BaseLayout.astro";
+import MermaidDiagrams from "../components/MermaidDiagrams.astro";
 import MobileDocsNav from "../components/MobileDocsNav.astro";
 import ProjectDocsNav from "../components/ProjectDocsNav.astro";
 import TableOfContents from "../components/TableOfContents.astro";
@@ -52,6 +53,8 @@ const withPageNav = pageNav.length > 1;
     {withToc && <TableOfContents headings={headings} />}
   </div>
 </BaseLayout>
+
+<MermaidDiagrams />
 
 <script>
   // Add a copy-to-clipboard permalink to every in-content heading.

@@ -134,7 +134,7 @@ async function ingestProject({ docDir, context, source, slug, order }) {
     await writeMarkdown(
       path.join(PROJECTS_DIR, `${slug}.md`),
       data,
-      rewriteDocLinks(rewriteAssetPaths(markdown.body, slug), slug),
+      normalizeImportedBody(markdown.body, slug),
     );
   }
 }
@@ -187,10 +187,7 @@ async function ingestProjectDocs({ docDir, context, slug, exclude, pageOrder }) 
       ["slug"],
     );
 
-    const body = rewriteDocLinks(
-      rewriteAssetPaths(stripLeadingH1(markdown.body), slug),
-      slug,
-    );
+    const body = normalizeImportedBody(stripLeadingH1(markdown.body), slug);
 
     if (!validateOnly) {
       const outFile = path.join(PROJECT_DOCS_DIR, slug, `${pageSlug}.md`);
@@ -219,7 +216,7 @@ async function ingestPosts({ docDir, context, repo, slug, include, exclude }) {
       await writeMarkdown(
         path.join(BLOG_DIR, `${postSlug}.md`),
         omit(markdown.data, ["slug", "project"]),
-        rewriteDocLinks(rewriteAssetPaths(markdown.body, slug), slug),
+        normalizeImportedBody(markdown.body, slug),
       );
     }
   }
@@ -436,6 +433,68 @@ function normalizeDocTitle(title, projectSlug) {
 
 function stripLeadingH1(body) {
   return body.replace(/^#\s+.+(?:\r?\n|$)(?:\r?\n)?/, "").trimStart();
+}
+
+function normalizeImportedBody(body, slug) {
+  return rewriteDocLinks(
+    rewriteAssetPaths(stripTableOfContents(body), slug),
+    slug,
+  );
+}
+
+function stripTableOfContents(body) {
+  const lines = body.split(/\r?\n/);
+  const ranges = [];
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const heading = parseAtxHeading(lines[index]);
+    if (!heading || !isTableOfContentsHeading(heading.text)) {
+      continue;
+    }
+
+    let end = lines.length;
+    for (let next = index + 1; next < lines.length; next += 1) {
+      const nextHeading = parseAtxHeading(lines[next]);
+      if (nextHeading && nextHeading.depth <= heading.depth) {
+        end = next;
+        break;
+      }
+    }
+
+    ranges.push([index, end]);
+    index = end - 1;
+  }
+
+  if (ranges.length === 0) {
+    return body;
+  }
+
+  return lines
+    .filter((_, index) => !ranges.some(([start, end]) => index >= start && index < end))
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trimStart();
+}
+
+function parseAtxHeading(line) {
+  const match = line.match(/^(#{1,6})\s+(.+?)\s*#*\s*$/);
+  if (!match) {
+    return null;
+  }
+  return {
+    depth: match[1].length,
+    text: match[2].trim(),
+  };
+}
+
+function isTableOfContentsHeading(text) {
+  const normalized = text
+    .toLowerCase()
+    .replace(/[`*_~[\]()]/g, "")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+
+  return normalized === "table of contents" || normalized === "contents" || normalized === "toc";
 }
 
 function escapeRegExp(value) {

@@ -14,7 +14,6 @@ const recentPosts = (await getSortedPosts()).slice(0, 4);
 <BaseLayout title={SITE.title} contained>
   <div class="grid gap-[clamp(2.5rem,5vw,4rem)]">
     <header class="max-w-3xl">
-      <p class="eyebrow">{SITE.role}</p>
       <h1>Public journal</h1>
       <p class="lede mt-4">Experiments, thoughts, and anything in between.</p>
       <div class="mt-6">

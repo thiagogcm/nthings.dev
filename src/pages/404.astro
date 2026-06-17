@@ -8,9 +8,10 @@ import { NAV_LINKS } from "../consts";
   description="Nothing is documented at this address."
   contained
 >
-  <article class="grid grid-cols-[minmax(0,1fr)] gap-10 max-w-(--reading-width)">
-    <header class="grid gap-[0.85rem] pb-8 border-b border-border">
-      <p class="eyebrow">404 — Not found</p>
+  <article
+    class="grid grid-cols-[minmax(0,1fr)] gap-10 max-w-(--reading-width)"
+  >
+    <header class="grid gap-[0.85rem]">
       <h1>Page not found</h1>
       <p class="lede">
         Nothing is documented at this address — the link may be stale, or the
@@ -31,7 +32,10 @@ import { NAV_LINKS } from "../consts";
               <a href={link.href} class="text-link">
                 {link.label}
               </a>
-              <span class="text-fg-muted text-[0.9rem]"> — {link.description}</span>
+              <span class="text-fg-muted text-[0.9rem]">
+                {" "}
+                — {link.description}
+              </span>
             </li>
           ))
         }

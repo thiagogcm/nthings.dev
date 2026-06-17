@@ -24,13 +24,15 @@ const { Content, headings } = await render(post);
   showToc={true}
 >
   <article class="grid grid-cols-[minmax(0,1fr)] gap-10">
-    <header class="grid gap-[0.85rem] pb-8 border-b border-border">
-      <a class="text-link text-link--muted w-fit mb-2 text-[0.85rem]" href="/blog">
+    <header class="grid gap-[0.85rem]">
+      <a
+        class="text-link text-link--muted w-fit mb-2 text-[0.85rem]"
+        href="/blog"
+      >
         <Icon name="lucide:arrow-right" class="rotate-180" aria-hidden="true" />
         <span>Blog</span>
       </a>
 
-      <p class="eyebrow">Blog</p>
       <h1>{post.data.title}</h1>
       <p class="lede">{post.data.description}</p>
 

@@ -1,6 +1,7 @@
 import { defineConfig, fontProviders } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import { unified } from '@astrojs/markdown-remark';
+import adf4jWasm from '@nthings.dev/adf4j-wasm/vite';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
@@ -9,7 +10,7 @@ export default defineConfig({
     platformProxy: { enabled: true },
   }),
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), adf4jWasm()],
   },
   markdown: {
     syntaxHighlight: 'shiki',

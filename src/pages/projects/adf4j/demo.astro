@@ -1,0 +1,37 @@
+---
+import { getEntry } from "astro:content";
+import DocsLayout from "../../../layouts/DocsLayout.astro";
+import ProjectPageHeader from "../../../components/ProjectPageHeader.astro";
+import Adf4jDemo from "../../../components/Adf4jDemo.astro";
+import { getProjectNav } from "../../../lib/collections";
+
+const project = await getEntry("projects", "adf4j");
+
+if (!project) {
+  throw new Error(
+    'Project "adf4j" not found. Run `npm run sync:content` before building.',
+  );
+}
+
+const pageNav = await getProjectNav(project.id);
+const pageTitle = "Demo";
+const pageDescription =
+  "Convert a public Confluence Cloud page to Markdown in the browser with adf4j WASM.";
+---
+
+<DocsLayout
+  title={`${pageTitle} · ${project.data.title}`}
+  description={pageDescription}
+  showToc={false}
+  pageNav={pageNav}
+>
+  <article class="grid grid-cols-[minmax(0,1fr)] gap-10">
+    <ProjectPageHeader
+      project={project}
+      pageTitle={pageTitle}
+      pageDescription={pageDescription}
+    />
+
+    <Adf4jDemo />
+  </article>
+</DocsLayout>

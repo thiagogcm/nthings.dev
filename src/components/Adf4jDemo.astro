@@ -1,0 +1,115 @@
+---
+const EXAMPLE_URL =
+  "https://openfinancebrasil.atlassian.net/wiki/spaces/OF/pages/37945368/Reporte+Processamento+e+Diverg+ncias";
+---
+
+<div class="adf4j-demo-root" data-adf4j-root>
+  <section class="adf4j-demo" aria-labelledby="adf4j-demo-heading">
+    <h2 id="adf4j-demo-heading" class="adf4j-demo__heading">Try it</h2>
+    <p class="adf4j-demo__lede">
+      Paste a public Confluence Cloud page URL. The site fetches its ADF body,
+      converts it in the browser with <code>@nthings.dev/adf4j-wasm</code>, and
+      shows a rendered Markdown preview.
+    </p>
+
+    <form class="adf4j-demo__form" data-adf4j-form autocomplete="off">
+      <label class="adf4j-demo__label" for="adf4j-url"
+        >Confluence Cloud page URL</label
+      >
+      <div class="adf4j-demo__controls">
+        <input
+          type="url"
+          id="adf4j-url"
+          class="adf4j-demo__input"
+          name="url"
+          placeholder={EXAMPLE_URL}
+          spellcheck="false"
+          required
+        />
+        <button type="submit" class="adf4j-demo__submit" data-adf4j-submit>
+          Render
+        </button>
+      </div>
+      <p class="adf4j-demo__hint">Public pages only — OAuth is not used.</p>
+      <p class="adf4j-demo__error" data-adf4j-error hidden role="alert"></p>
+      <div
+        class="adf4j-demo__progress"
+        data-adf4j-progress
+        hidden
+        role="status"
+        aria-live="polite"
+      >
+        <span class="adf4j-demo__spinner" aria-hidden="true"></span>
+        <span data-adf4j-status></span>
+      </div>
+    </form>
+  </section>
+
+  <dialog class="adf4j-dialog" data-adf4j-dialog aria-label="Conversion result">
+    <div class="adf4j-dialog__panel">
+      <header class="adf4j-dialog__header">
+        <h2 class="adf4j-dialog__title" data-adf4j-dialog-title></h2>
+        <button
+          type="button"
+          class="adf4j-dialog__close"
+          data-adf4j-close
+          aria-label="Close"
+        >
+          <kbd>Esc</kbd>
+        </button>
+      </header>
+
+      <div class="adf4j-dialog__diagnostics" data-adf4j-diagnostics hidden>
+      </div>
+
+      <div
+        class="adf4j-dialog__toolbar"
+        data-adf4j-toolbar
+        role="tablist"
+        aria-label="Conversion output"
+      >
+        <button
+          class="adf4j-dialog__tab"
+          type="button"
+          role="tab"
+          data-adf4j-view="preview"
+          aria-selected="true"
+        >
+          Preview
+        </button>
+        <button
+          class="adf4j-dialog__tab"
+          type="button"
+          role="tab"
+          data-adf4j-view="markdown"
+          aria-selected="false"
+        >
+          Markdown
+        </button>
+      </div>
+
+      <div class="adf4j-dialog__body">
+        <div
+          class="adf4j-dialog__panel-preview prose"
+          role="tabpanel"
+          data-adf4j-panel="preview"
+        >
+        </div>
+        <div
+          class="adf4j-dialog__panel-markdown"
+          role="tabpanel"
+          data-adf4j-panel="markdown"
+          hidden
+        >
+          <pre
+            class="adf4j-dialog__source"
+            tabindex="0"><code data-adf4j-raw /></pre>
+        </div>
+      </div>
+    </div>
+  </dialog>
+</div>
+
+<script>
+  import "../scripts/adf4j-demo";
+</script>

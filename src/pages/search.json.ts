@@ -2,9 +2,29 @@ import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
 import { NAV_LINKS } from "../consts";
 import { getSortedPosts, getSortedProjects, projectDocUrl } from "../lib/collections";
+import { SITE_OWNED_PAGES } from "../lib/site-owned-pages";
 
 // Collection index routes — covered by their per-entry docs below.
 const COLLECTION_ROOTS = new Set(["/projects", "/blog"]);
+
+interface SearchDoc {
+  title: string;
+  url: string;
+  section: string;
+  description: string;
+  tags: string[];
+  text: string;
+}
+
+/** Site-owned project pages not backed by synced markdown collections. */
+const SITE_OWNED_PROJECT_PAGES: SearchDoc[] = SITE_OWNED_PAGES.map((page) => ({
+  title: page.search.title,
+  url: page.href,
+  section: "Projects",
+  description: page.search.description,
+  tags: [...page.search.tags],
+  text: page.search.text,
+}));
 
 // Prebuilt static index: one JSON file the client fetches once and searches in memory.
 export const prerender = true;
@@ -21,15 +41,6 @@ function stripMarkdown(md: string): string {
     .replace(/[*_~#>|]/g, " ") // residual emphasis/table punctuation
     .replace(/\s+/g, " ")
     .trim();
-}
-
-interface SearchDoc {
-  title: string;
-  url: string;
-  section: string;
-  description: string;
-  tags: string[];
-  text: string;
 }
 
 export const GET: APIRoute = async () => {
@@ -55,6 +66,7 @@ export const GET: APIRoute = async () => {
 
   const docs: SearchDoc[] = [
     ...pages,
+    ...SITE_OWNED_PROJECT_PAGES,
     ...projects.map((project) => ({
       title: project.data.title,
       url: `/projects/${project.id}`,

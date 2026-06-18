@@ -1,4 +1,5 @@
 import { getCollection } from 'astro:content';
+import { siteOwnedNavFor } from './site-owned-pages';
 
 export interface ProjectNavItem {
   href: string;
@@ -54,11 +55,13 @@ export async function getProjectNav(
   overviewLabel = 'Overview',
 ): Promise<ProjectNavItem[]> {
   const pages = await getProjectDocPages(projectId);
-  if (pages.length === 0) {
+  const siteOwned = siteOwnedNavFor(projectId);
+
+  if (pages.length === 0 && siteOwned.length === 0) {
     return [];
   }
 
-  return [
+  const navItems: ProjectNavItem[] = [
     {
       href: `/projects/${projectId}`,
       label: overviewLabel,
@@ -69,4 +72,15 @@ export async function getProjectNav(
       label: page.data.navTitle ?? page.data.title,
     })),
   ];
+
+  const existingHrefs = new Set(navItems.map((item) => item.href));
+  const extras = siteOwned
+    .filter((item) => !existingHrefs.has(item.href))
+    .toSorted((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .map((item) => ({
+      href: item.href,
+      label: item.label,
+    }));
+
+  return [...navItems, ...extras];
 }

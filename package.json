@@ -19,16 +19,19 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "13.7.0",
-    "astro": "6.4.7",
-    "mermaid": "^11.15.0",
-    "prismjs": "^1.30.0",
+    "@nthings.dev/adf4j-wasm": "1.0.1",
+    "astro": "6.4.8",
+    "dompurify": "3.4.11",
+    "markdown-it": "14.2.0",
+    "mermaid": "11.15.0",
+    "prismjs": "1.30.0",
     "wrangler": "4.101.0"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.9",
     "@astrojs/markdown-remark": "7.2.0",
     "@tailwindcss/vite": "4.3.1",
-    "@types/prismjs": "^1.26.6",
+    "@types/prismjs": "1.26.6",
     "degit": "3.4.7",
     "tailwindcss": "4.3.1",
     "typescript": "6.0.3",

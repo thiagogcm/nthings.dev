@@ -29,9 +29,7 @@ const postCount = new Intl.NumberFormat("en-US").format(recentPosts.length);
       <div class="home-hero__copy">
         <p class="eyebrow">nthings.dev</p>
         <h1>Thiago Moura | Stuff Engineer</h1>
-        <p class="lede mt-4">
-          Experiments, thoughts, and anything in between.
-        </p>
+        <p class="lede mt-4">Experiments, thoughts, and anything in between.</p>
 
         <div class="home-hero__actions">
           <a class="button-link button-link--primary" href="/projects">
@@ -58,17 +56,6 @@ const postCount = new Intl.NumberFormat("en-US").format(recentPosts.length);
               ))
             }
           </ul>
-        </div>
-
-        <div class="home-signal__stats" aria-label="Site inventory">
-          <div>
-            <strong>{projectCount}</strong>
-            <span>Project refs</span>
-          </div>
-          <div>
-            <strong>{postCount}</strong>
-            <span>Recent notes</span>
-          </div>
         </div>
 
         <StatusIsland server:defer>

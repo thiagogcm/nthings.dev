@@ -25,27 +25,6 @@ const projectTags = [
         Each entry is a technical specification — architecture, stack, and the
         implementation decisions behind the build.
       </p>
-
-      <div class="project-index__summary" aria-label="Project index summary">
-        <div>
-          <strong>{projects.length}</strong>
-          <span>Documented builds</span>
-        </div>
-        <div>
-          <strong>{projectTags.length}</strong>
-          <span>Visible stack tags</span>
-        </div>
-      </div>
-
-      {
-        projectTags.length > 0 && (
-          <ul class="tag-list" aria-label="Project technology tags">
-            {projectTags.map((tag) => (
-              <li class="tag">{tag}</li>
-            ))}
-          </ul>
-        )
-      }
     </header>
 
     <div class="directory-list directory-list--rich">

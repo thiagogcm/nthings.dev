@@ -15,7 +15,7 @@ export const NAV_LINKS = [
     href: '/',
     label: 'Home',
     icon: 'lucide:home',
-    description: 'Public journal',
+    description: 'void main()',
   },
   {
     href: '/projects',
@@ -27,7 +27,7 @@ export const NAV_LINKS = [
     href: '/blog',
     label: 'Blog',
     icon: 'lucide:notebook-tabs',
-    description: 'Logs, stack traces, and few diagrams',
+    description: 'Snippets, stack traces, and a few diagrams',
   },
   {
     href: '/about',
@@ -42,4 +42,4 @@ export const SOCIAL_LINKS = [
   { href: 'https://linkedin.com/in/thiago-moura-77a30030', label: 'LinkedIn', icon: 'lucide:linkedin' },
 ] as const;
 
-export const CURRENT_FOCUS = ['AI agents', 'Observability', 'Product systems'] as const;
+export const CURRENT_FOCUS = ['Agentic AI', 'Observability', 'Cloud-native Applications'] as const;

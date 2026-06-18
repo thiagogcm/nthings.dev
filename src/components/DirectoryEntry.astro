@@ -1,49 +1,240 @@
 ---
+import Icon from "./Icon.astro";
+import type { EntryAction } from "../lib/project-actions";
+
 interface Props {
   title: string;
   href: string;
   description?: string;
   meta?: string;
   tags?: readonly string[];
+  actions?: readonly EntryAction[];
+  eyebrow?: string;
+  variant?: "default" | "rich";
 }
 
-const { title, href, description, meta, tags } = Astro.props;
+const {
+  title,
+  href,
+  description,
+  meta,
+  tags,
+  actions = [],
+  eyebrow,
+  variant = "default",
+} = Astro.props;
 ---
 
 <article
-  class="directory-entry grid gap-1.5 py-[1.4rem] border-t border-border"
->
-  <div
-    class="directory-entry__header flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2"
-  >
-    <h2 class="text-[1.15rem] font-semibold tracking-[-0.01em]">
-      <a
-        class="text-fg transition-colors duration-150 hover:text-accent focus-visible:text-accent"
-        href={href}>{title}</a
-      >
-    </h2>
+  class:list={[
+    "directory-entry",
     {
-      meta && (
-        <span class="directory-entry__meta text-fg-soft font-mono text-[0.8rem] whitespace-nowrap">
-          {meta}
+      "directory-entry--rich": variant === "rich",
+    },
+  ]}
+>
+  <div class="directory-entry__body">
+    {
+      eyebrow && (
+        <span class="directory-entry__eyebrow">
+          {eyebrow}
         </span>
+      )
+    }
+
+    <div class="directory-entry__header">
+      <h2 class="directory-entry__title">
+        <a href={href}>{title}</a>
+      </h2>
+      {
+        meta && (
+          <span class="directory-entry__meta">
+            {meta}
+          </span>
+        )
+      }
+    </div>
+
+    {
+      description && (
+        <p class="directory-entry__description">{description}</p>
+      )
+    }
+
+    {
+      tags && tags.length > 0 && (
+        <ul class="tag-list">
+          {tags.map((tag) => (
+            <li class="tag">{tag}</li>
+          ))}
+        </ul>
       )
     }
   </div>
 
   {
-    description && (
-      <p class="max-w-208 text-fg-muted leading-[1.6]">{description}</p>
-    )
-  }
-
-  {
-    tags && tags.length > 0 && (
-      <ul class="tag-list">
-        {tags.map((tag) => (
-          <li class="tag">{tag}</li>
+    actions.length > 0 && (
+      <div class="directory-entry__actions" aria-label={`${title} links`}>
+        {actions.map((action) => (
+          <a
+            class="directory-entry__action"
+            href={action.href}
+            target={action.external ? "_blank" : undefined}
+            rel={action.external ? "noopener noreferrer" : undefined}
+          >
+            <span>{action.label}</span>
+            <Icon
+              name={
+                action.external
+                  ? "lucide:arrow-up-right"
+                  : "lucide:chevron-right"
+              }
+              size={14}
+              aria-hidden="true"
+            />
+          </a>
         ))}
-      </ul>
+      </div>
     )
   }
 </article>
+
+<style>
+  .directory-entry {
+    container-type: inline-size;
+    container-name: entry;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 6rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: start;
+    padding-block: 1.35rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .directory-entry__body {
+    display: grid;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .directory-entry__eyebrow {
+    color: var(--color-fg-soft);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  .directory-entry__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    min-width: 0;
+  }
+
+  .directory-entry__title {
+    font-size: 1.12rem;
+    line-height: 1.25;
+  }
+
+  .directory-entry__title a {
+    color: var(--color-fg);
+    transition: color 140ms ease;
+  }
+
+  .directory-entry__title a:hover,
+  .directory-entry__title a:focus-visible {
+    color: var(--color-accent);
+  }
+
+  .directory-entry__meta {
+    color: var(--color-fg-soft);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .directory-entry__description {
+    max-width: 52rem;
+    color: var(--color-fg-muted);
+    line-height: 1.6;
+  }
+
+  .directory-entry__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.4rem;
+  }
+
+  .directory-entry__action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 1.85rem;
+    padding-inline: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.4rem;
+    color: var(--color-fg-muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    transition:
+      border-color 140ms ease,
+      background-color 140ms ease,
+      color 140ms ease;
+  }
+
+  .directory-entry__action:hover,
+  .directory-entry__action:focus-visible {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface);
+    color: var(--color-fg);
+  }
+
+  .directory-entry--rich {
+    border: 1px solid var(--color-border);
+    border-radius: 0.65rem;
+    padding: 1rem;
+    background:
+      linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-surface) 62%, transparent),
+        transparent
+      ),
+      var(--color-bg);
+    transition:
+      border-color 140ms ease,
+      box-shadow 140ms ease,
+      transform 140ms ease;
+  }
+
+  .directory-entry--rich:hover {
+    border-color: var(--color-border-strong);
+    box-shadow: 0 12px 28px -24px color-mix(in srgb, var(--color-fg) 40%, transparent);
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 44rem) {
+    .directory-entry {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.75rem;
+    }
+
+    .directory-entry__actions {
+      justify-content: flex-start;
+    }
+  }
+
+  @container entry (max-width: 28rem) {
+    .directory-entry__header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .directory-entry__meta {
+      white-space: normal;
+    }
+  }
+</style>

@@ -135,26 +135,36 @@
   h4 {
     color: var(--color-fg);
     font-weight: 600;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     line-height: 1.15;
     text-wrap: balance;
   }
 
   h1 {
-    font-size: clamp(1.9rem, 3.6vw, 2.75rem);
-    letter-spacing: -0.03em;
+    font-size: 2.6rem;
+    letter-spacing: 0;
   }
 
   h2 {
-    font-size: clamp(1.4rem, 2.2vw, 1.75rem);
+    font-size: 1.65rem;
   }
 
   h3 {
-    font-size: clamp(1.1rem, 1.5vw, 1.3rem);
+    font-size: 1.25rem;
   }
 
   h4 {
     font-size: 1rem;
+  }
+
+  @media (max-width: 36rem) {
+    h1 {
+      font-size: 2rem;
+    }
+
+    h2 {
+      font-size: 1.45rem;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -1795,7 +1805,7 @@
     color: var(--shiki-dark) !important;
   }
 
-  /* Container-query targets: status widget, directory rows. */
+  /* Container-query targets: status widget. */
   .status-widget__detail {
     display: flex;
     align-items: center;
@@ -1814,24 +1824,6 @@
   @container status (max-width: 28rem) {
     .status-widget__detail {
       display: none;
-    }
-  }
-
-  .directory-entry {
-    container-type: inline-size;
-    container-name: entry;
-    content-visibility: auto;
-    contain-intrinsic-size: auto 6rem;
-  }
-
-  @container entry (max-width: 28rem) {
-    .directory-entry__header {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .directory-entry__meta {
-      white-space: normal;
     }
   }
 }

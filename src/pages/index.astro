@@ -1,79 +1,329 @@
 ---
 import DirectoryEntry from "../components/DirectoryEntry.astro";
+import Icon from "../components/Icon.astro";
 import { formatDate } from "../lib/format-date";
-import { SITE } from "../consts";
+import { CURRENT_FOCUS, SITE } from "../consts";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import StatusIsland from "../components/StatusIsland.astro";
 import StatusFallback from "../components/StatusFallback.astro";
 import { getSortedPosts, getSortedProjects } from "../lib/collections";
+import { projectActions } from "../lib/project-actions";
 
-const projects = await getSortedProjects();
-const recentPosts = (await getSortedPosts()).slice(0, 4);
+const [projects, posts] = await Promise.all([
+  getSortedProjects(),
+  getSortedPosts(),
+]);
+const projectCards = projects.map((project) => ({
+  project,
+  actions: projectActions(project),
+}));
+const recentPosts = posts.slice(0, 4);
+const featuredProject = projectCards[0];
+const projectCount = new Intl.NumberFormat("en-US").format(projects.length);
+const postCount = new Intl.NumberFormat("en-US").format(recentPosts.length);
 ---
 
 <BaseLayout title={SITE.title} contained>
-  <div class="grid gap-[clamp(2.5rem,5vw,4rem)] max-w-(--reading-width)">
-    <header class="max-w-3xl">
-      <h1>Public journal</h1>
-      <p class="lede mt-4">Experiments, thoughts, and anything in between.</p>
-      <div class="mt-6">
+  <div class="home-shell">
+    <header class="home-hero">
+      <div class="home-hero__copy">
+        <p class="eyebrow">nthings.dev</p>
+        <h1>Thiago Moura | Stuff Engineer</h1>
+        <p class="lede mt-4">
+          Experiments, thoughts, and anything in between.
+        </p>
+
+        <div class="home-hero__actions">
+          <a class="button-link button-link--primary" href="/projects">
+            <Icon name="lucide:folder-kanban" size={16} aria-hidden="true" />
+            <span>Browse projects</span>
+          </a>
+          <a class="button-link" href="/blog">
+            <Icon name="lucide:notebook-tabs" size={16} aria-hidden="true" />
+            <span>Read notes</span>
+          </a>
+        </div>
+      </div>
+
+      <aside class="home-signal" aria-label="Current signal">
+        <div>
+          <p class="home-signal__label">Current focus</p>
+          <ul class="home-signal__list">
+            {
+              CURRENT_FOCUS.map((focus) => (
+                <li>
+                  <span class="home-signal__dot" />
+                  <span>{focus}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="home-signal__stats" aria-label="Site inventory">
+          <div>
+            <strong>{projectCount}</strong>
+            <span>Project refs</span>
+          </div>
+          <div>
+            <strong>{postCount}</strong>
+            <span>Recent notes</span>
+          </div>
+        </div>
+
         <StatusIsland server:defer>
           <StatusFallback slot="fallback" />
         </StatusIsland>
-      </div>
+      </aside>
     </header>
 
-    <section class="grid gap-2" aria-labelledby="projects-heading">
-      <div class="flex items-baseline justify-between gap-4 pb-1">
-        <h2
-          id="projects-heading"
-          class="text-[0.78rem] font-semibold tracking-[0.16em] uppercase text-fg-soft"
-        >
-          Projects
-        </h2>
-        <a class="text-link text-link--muted" href="/projects">All projects</a>
-      </div>
-
-      <div class="flex flex-col">
-        {
-          projects.map((project) => (
-            <DirectoryEntry
-              title={project.data.title}
-              href={`/projects/${project.id}`}
-              description={project.data.description}
-            />
-          ))
-        }
-      </div>
-    </section>
-
     {
-      recentPosts.length > 0 && (
-        <section class="grid gap-2" aria-labelledby="writing-heading">
-          <div class="flex items-baseline justify-between gap-4 pb-1">
-            <h2
-              id="writing-heading"
-              class="text-[0.78rem] font-semibold tracking-[0.16em] uppercase text-fg-soft"
-            >
-              Blog
-            </h2>
-            <a class="text-link text-link--muted" href="/blog">
-              All posts
+      featuredProject && (
+        <section class="home-feature" aria-labelledby="featured-heading">
+          <div class="section-kicker">
+            <h2 id="featured-heading">Featured reference</h2>
+            <a class="text-link text-link--muted" href="/projects">
+              All projects
             </a>
           </div>
 
-          <div class="flex flex-col">
-            {recentPosts.map((post) => (
-              <DirectoryEntry
-                title={post.data.title}
-                href={`/blog/${post.id}`}
-                description={post.data.description}
-                meta={formatDate(post.data.pubDate)}
-              />
-            ))}
-          </div>
+          <DirectoryEntry
+            title={featuredProject.project.data.title}
+            href={`/projects/${featuredProject.project.id}`}
+            description={featuredProject.project.data.description}
+            tags={featuredProject.project.data.tags}
+            actions={featuredProject.actions}
+            variant="rich"
+            eyebrow="Documented build"
+          />
         </section>
       )
     }
+
+    <div class="home-index">
+      <section class="home-section" aria-labelledby="projects-heading">
+        <div class="section-kicker">
+          <h2 id="projects-heading">Projects</h2>
+          <a class="text-link text-link--muted" href="/projects">All projects</a
+          >
+        </div>
+
+        <div class="directory-list">
+          {
+            projectCards.map(({ project, actions }) => (
+              <DirectoryEntry
+                title={project.data.title}
+                href={`/projects/${project.id}`}
+                description={project.data.description}
+                tags={project.data.tags}
+                actions={actions.slice(0, 2)}
+              />
+            ))
+          }
+        </div>
+      </section>
+
+      {
+        recentPosts.length > 0 && (
+          <section class="home-section" aria-labelledby="writing-heading">
+            <div class="section-kicker">
+              <h2 id="writing-heading">Blog</h2>
+              <a class="text-link text-link--muted" href="/blog">
+                All posts
+              </a>
+            </div>
+
+            <div class="directory-list">
+              {recentPosts.map((post) => (
+                <DirectoryEntry
+                  title={post.data.title}
+                  href={`/blog/${post.id}`}
+                  description={post.data.description}
+                  meta={formatDate(post.data.pubDate)}
+                  tags={post.data.tags}
+                />
+              ))}
+            </div>
+          </section>
+        )
+      }
+    </div>
   </div>
 </BaseLayout>
+
+<style>
+  .button-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    min-height: 2.35rem;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.55rem;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-size: 0.88rem;
+    font-weight: 600;
+    line-height: 1;
+    transition:
+      border-color 140ms ease,
+      background-color 140ms ease,
+      color 140ms ease,
+      transform 140ms ease;
+  }
+
+  .button-link:hover,
+  .button-link:focus-visible {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface);
+    transform: translateY(-1px);
+  }
+
+  .button-link--primary {
+    border-color: var(--color-accent);
+    color: var(--color-bg);
+    background: var(--color-fg);
+  }
+
+  .button-link--primary:hover,
+  .button-link--primary:focus-visible {
+    color: var(--color-bg);
+    background: color-mix(in srgb, var(--color-fg) 88%, var(--color-accent));
+  }
+
+  .section-kicker {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .section-kicker h2 {
+    color: var(--color-fg-soft);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .directory-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .home-shell {
+    display: grid;
+    gap: clamp(2.25rem, 5vw, 4.25rem);
+    max-width: 76rem;
+  }
+
+  .home-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.45fr);
+    gap: clamp(1.75rem, 4vw, 3.5rem);
+    align-items: stretch;
+  }
+
+  .home-hero__copy {
+    align-self: center;
+    max-width: 44rem;
+  }
+
+  .home-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 1.35rem;
+  }
+
+  .home-signal {
+    display: grid;
+    align-content: start;
+    gap: 1.1rem;
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    background: var(--color-surface);
+  }
+
+  .home-signal :global(.status-widget) {
+    width: 100%;
+    background: var(--color-bg);
+  }
+
+  .home-signal__label {
+    margin-bottom: 0.55rem;
+    color: var(--color-fg-soft);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .home-signal__list {
+    display: grid;
+    gap: 0.35rem;
+    list-style: none;
+  }
+
+  .home-signal__list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-fg-muted);
+    font-size: 0.9rem;
+  }
+
+  .home-signal__dot {
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+  }
+
+  .home-signal__stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .home-signal__stats div {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.65rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-bg);
+  }
+
+  .home-signal__stats strong {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+  }
+
+  .home-signal__stats span {
+    color: var(--color-fg-soft);
+    font-size: 0.78rem;
+  }
+
+  .home-feature,
+  .home-section {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .home-index {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.78fr);
+    gap: clamp(1.75rem, 4vw, 3rem);
+    align-items: start;
+  }
+
+  @media (max-width: 56rem) {
+    .home-hero,
+    .home-index {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

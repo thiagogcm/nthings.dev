@@ -2,34 +2,116 @@
 import DirectoryEntry from "../../components/DirectoryEntry.astro";
 import DocsLayout from "../../layouts/DocsLayout.astro";
 import { getSortedProjects } from "../../lib/collections";
+import { projectActions } from "../../lib/project-actions";
 
 const projects = await getSortedProjects();
+const projectCards = projects.map((project) => ({
+  project,
+  actions: projectActions(project),
+}));
+const projectTags = [
+  ...new Set(projects.flatMap((project) => project.data.tags ?? [])),
+].slice(0, 8);
 ---
 
 <DocsLayout
   title="Projects"
   description="Selected builds, documented as engineering references by Thiago Moura."
 >
-  <div>
-    <header class="max-w-176 mb-10">
+  <div class="project-index">
+    <header class="project-index__hero">
       <h1>Engineering references.</h1>
       <p class="lede mt-4">
         Each entry is a technical specification — architecture, stack, and the
         implementation decisions behind the build.
       </p>
+
+      <div class="project-index__summary" aria-label="Project index summary">
+        <div>
+          <strong>{projects.length}</strong>
+          <span>Documented builds</span>
+        </div>
+        <div>
+          <strong>{projectTags.length}</strong>
+          <span>Visible stack tags</span>
+        </div>
+      </div>
+
+      {
+        projectTags.length > 0 && (
+          <ul class="tag-list" aria-label="Project technology tags">
+            {projectTags.map((tag) => (
+              <li class="tag">{tag}</li>
+            ))}
+          </ul>
+        )
+      }
     </header>
 
-    <div class="flex flex-col">
+    <div class="directory-list directory-list--rich">
       {
-        projects.map((project) => (
+        projectCards.map(({ project, actions }) => (
           <DirectoryEntry
             title={project.data.title}
             href={`/projects/${project.id}`}
             description={project.data.description}
             tags={project.data.tags}
+            actions={actions}
+            variant="rich"
+            eyebrow="Reference"
           />
         ))
       }
     </div>
   </div>
 </DocsLayout>
+
+<style>
+  .directory-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .directory-list--rich {
+    gap: 0.75rem;
+  }
+
+  .project-index {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .project-index__hero {
+    display: grid;
+    gap: 1rem;
+    max-width: 54rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .project-index__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .project-index__summary div {
+    display: inline-grid;
+    gap: 0.15rem;
+    min-width: 8.5rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-surface);
+  }
+
+  .project-index__summary strong {
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+  }
+
+  .project-index__summary span {
+    color: var(--color-fg-soft);
+    font-size: 0.78rem;
+  }
+</style>

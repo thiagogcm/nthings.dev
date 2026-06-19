@@ -7,5 +7,11 @@ defaults:
 sources:
   - owner: thiagogcm
     repo: adf4j
-    slug: adf4j-docs
     order: 0
+  - owner: thiagogcm
+    repo: otlp4j
+    order: 1
+  - owner: thiagogcm
+    repo: helm4j
+    order: 2
+

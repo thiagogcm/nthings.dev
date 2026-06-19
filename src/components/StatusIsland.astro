@@ -1,54 +1,43 @@
 ---
 import { env } from "cloudflare:workers";
-import { getGitHubStats, refreshGitHubStats } from "../lib/github-stats";
-import { formatDate } from "../lib/format-date";
+import {
+  ACTIVITY_DAYS,
+  activityMetricQuery,
+  getGitHubStats,
+  refreshGitHubStats,
+} from "../lib/github-stats";
+import MetricPanel from "./MetricPanel.astro";
 
-// On a cold cache, kick off a non-blocking refresh so the next render is populated.
 const stats = await getGitHubStats(env);
-if (!stats) {
+// Entries cached before the activity chart shipped lack `dailyActivity`; treat a
+// missing/empty series as a cold cache and kick a non-blocking refresh.
+const hasChart =
+  !!stats && Array.isArray(stats.dailyActivity) && stats.dailyActivity.length > 0;
+
+if (!hasChart) {
   Astro.locals.cfContext?.waitUntil(
     refreshGitHubStats(env).catch(() => undefined),
   );
 }
 
-const numberFormatter = new Intl.NumberFormat("en-US");
-
-const row = "flex items-center gap-1.5";
-const dot = "size-1.5 rounded-full";
+const promql = activityMetricQuery(env.GITHUB_USERNAME);
 ---
 
-<div class="status-widget">
-  {
-    stats ? (
-      <>
-        <div class={row}>
-          <span class={`${dot} bg-ok animate-[status-pulse_2s_infinite]`} />
-          <span class="text-fg-soft font-medium">GitHub:</span>
-          <span class="text-fg">{stats.repoCount} repos</span>
-        </div>
-        <div class={row}>
-          <span class={`${dot} bg-ok`} />
-          <span class="text-fg-soft font-medium">Commits:</span>
-          <span class="text-fg">
-            {numberFormatter.format(stats.commitCount)}
-          </span>
-        </div>
-        <div class={`${row} status-widget__detail`}>
-          <span class={`${dot} bg-accent`} />
-          <span class="text-fg-soft font-medium">Last update:</span>
-          <span class="text-fg">{formatDate(new Date(stats.lastUpdate))}</span>
-        </div>
-      </>
-    ) : (
-      <div class={row}>
-        <span
-          class={`${dot} bg-border-strong animate-[status-fade_1.5s_infinite_ease-in-out]`}
-        />
-        <span class="text-fg-soft font-medium">GitHub:</span>
+{
+  hasChart && stats ? (
+    <MetricPanel stats={stats} username={env.GITHUB_USERNAME} />
+  ) : (
+    <div class="metric-panel border-dashed opacity-70">
+      <div class="metric-panel__header">
+        <span class="metric-panel__query">{promql}</span>
+        <span class="metric-panel__range">last {ACTIVITY_DAYS}d</span>
+      </div>
+      <div class="metric-panel__chart metric-panel__chart--empty">
+        <span class="size-1.5 rounded-full bg-border-strong animate-[status-fade_1.5s_infinite_ease-in-out]" />
         <span class="text-fg-soft animate-[status-fade_1.5s_infinite_ease-in-out]">
-          syncing stats...
+          syncing activity…
         </span>
       </div>
-    )
-  }
-</div>
+    </div>
+  )
+}

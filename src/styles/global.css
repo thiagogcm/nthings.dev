@@ -36,17 +36,18 @@
   padding-inline: var(--page-pad);
 }
 
-@utility status-widget {
+@utility metric-panel {
   container-type: inline-size;
-  container-name: status;
+  container-name: metric;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
-  align-items: center;
-  gap: 0.8rem 1.25rem;
+  /* minmax(0, 1fr) lets the column shrink below content width so the canvas
+     and the nowrap query string can never push the panel wider than its box. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.6rem;
   width: min(100%, 42rem);
-  padding: 0.5rem 0.85rem;
+  padding: 0.7rem 0.85rem;
   border: 1px solid var(--color-border);
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
   background: var(--color-surface);
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -1805,26 +1806,109 @@
     color: var(--shiki-dark) !important;
   }
 
-  /* Container-query targets: status widget. */
-  .status-widget__detail {
+  /* GitHub activity metric panel (Grafana-style). */
+  /* Stacked so the metric query gets the full width and the range reads as a
+     subtitle beneath it. */
+  .metric-panel__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .metric-panel__query {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-fg-muted);
+  }
+
+  .metric-panel__range {
+    color: var(--color-fg-soft);
+  }
+
+  /* Fixed-size relative box; the canvas host fills it absolutely so the canvas
+     never feeds its own size back into layout (Chart.js responsive container). */
+  .metric-panel__chart {
+    position: relative;
+    width: 100%;
+    height: 5rem;
+  }
+
+  .metric-panel__canvas-host {
+    position: absolute;
+    inset: 0;
+    /* Read via getComputedStyle for the chart's line/grid colors; nothing is
+       painted from these (no border width, canvas covers the host). */
+    color: var(--color-accent);
+    border-top-color: var(--color-border);
+  }
+
+  .metric-panel__chart--empty {
     display: flex;
     align-items: center;
-    gap: 0.375rem;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 5rem;
+    border: 1px dashed var(--color-border);
+    border-radius: 0.375rem;
+    color: var(--color-fg-soft);
   }
 
-  .status-widget>* {
+  .metric-panel__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(4.5rem, 1fr));
+    gap: 0.4rem 1rem;
+  }
+
+  .metric-panel__stats div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
     min-width: 0;
-    white-space: nowrap;
   }
 
-  .status-widget span {
-    flex: none;
+  .metric-panel__stats dt {
+    color: var(--color-fg-soft);
   }
 
-  @container status (max-width: 28rem) {
-    .status-widget__detail {
-      display: none;
-    }
+  .metric-panel__stats dd {
+    margin: 0;
+    color: var(--color-fg);
+    font-size: 0.92rem;
+  }
+
+  /* Deferred-render skeleton for the metric panel. */
+  .skeleton-bar {
+    display: inline-block;
+    height: 0.7rem;
+    border-radius: 0.25rem;
+    background: var(--color-border);
+    animation: status-fade 1.5s infinite ease-in-out;
+  }
+
+  .skeleton-bar--query {
+    width: 70%;
+  }
+
+  .skeleton-bar--range {
+    width: 2.5rem;
+  }
+
+  .skeleton-bar--chart {
+    width: 100%;
+    height: 5rem;
+    border-radius: 0.375rem;
+  }
+
+  .skeleton-bar--label {
+    width: 3rem;
+  }
+
+  .skeleton-bar--value {
+    width: 2rem;
+    height: 0.95rem;
+    margin-top: 0.15rem;
   }
 }
 
@@ -1841,24 +1925,7 @@
   }
 }
 
-/* Status island animations. */
-@keyframes status-pulse {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-ok) 70%, transparent);
-  }
-
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-ok) 0%, transparent);
-  }
-
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-ok) 0%, transparent);
-  }
-}
-
+/* Metric panel loading animation. */
 @keyframes status-fade {
   0% {
     opacity: 0.4;

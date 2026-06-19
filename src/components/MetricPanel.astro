@@ -1,0 +1,50 @@
+---
+import { activityMetricQuery, type GitHubStats } from "../lib/github-stats";
+
+interface Props {
+  stats: GitHubStats;
+  username: string;
+}
+
+const { stats, username } = Astro.props;
+const series = stats.dailyActivity;
+const n = series.length;
+
+const numberFormatter = new Intl.NumberFormat("en-US");
+
+const promql = activityMetricQuery(username);
+const ariaLabel = `GitHub contributions, last ${n} days: ${numberFormatter.format(stats.activityTotal)} total, peak ${numberFormatter.format(stats.activityMax)} in a single day.`;
+
+const legend = [
+  { label: "total", value: stats.activityTotal },
+  { label: "max", value: stats.activityMax },
+  { label: "avg", value: stats.activityAvg },
+];
+---
+
+<figure class="metric-panel">
+  <figcaption class="metric-panel__header">
+    <span class="metric-panel__query">{promql}</span>
+    <span class="metric-panel__range">last {n}d</span>
+  </figcaption>
+
+  <div class="metric-panel__chart">
+    <github-activity-chart
+      class="metric-panel__canvas-host"
+      data-series={JSON.stringify(series)}
+    >
+      <canvas role="img" aria-label={ariaLabel}></canvas>
+    </github-activity-chart>
+  </div>
+
+  <dl class="metric-panel__stats">
+    {
+      legend.map((item) => (
+        <div>
+          <dt>{item.label}</dt>
+          <dd>{numberFormatter.format(item.value)}</dd>
+        </div>
+      ))
+    }
+  </dl>
+</figure>

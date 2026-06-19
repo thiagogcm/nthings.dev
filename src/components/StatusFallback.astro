@@ -1,14 +1,22 @@
 ---
 ---
 
-<div class="status-widget border-dashed opacity-70">
-  <div class="flex items-center gap-1.5">
-    <span
-      class="size-1.5 rounded-full bg-border-strong animate-[status-fade_1.5s_infinite_ease-in-out]"
-    ></span>
-    <span class="text-fg-soft font-medium">GitHub:</span>
-    <span class="text-fg-soft animate-[status-fade_1.5s_infinite_ease-in-out]"
-      >loading stats...</span
-    >
+<div class="metric-panel metric-panel--skeleton border-dashed opacity-70" aria-hidden="true">
+  <div class="metric-panel__header">
+    <span class="skeleton-bar skeleton-bar--query"></span>
+    <span class="skeleton-bar skeleton-bar--range"></span>
   </div>
+  <div class="metric-panel__chart">
+    <span class="skeleton-bar skeleton-bar--chart"></span>
+  </div>
+  <dl class="metric-panel__stats">
+    {
+      Array.from({ length: 4 }).map(() => (
+        <div>
+          <dt><span class="skeleton-bar skeleton-bar--label"></span></dt>
+          <dd><span class="skeleton-bar skeleton-bar--value"></span></dd>
+        </div>
+      ))
+    }
+  </dl>
 </div>

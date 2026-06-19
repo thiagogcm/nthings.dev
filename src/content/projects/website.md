@@ -1,10 +1,10 @@
 ---
 title: "nthings.dev"
-description: "A personal portfolio built as a technical documentation site — work is read as engineering reference, not browsed as a gallery."
+description: "A gateway to the things I'm building or exploring."
 repository: "https://github.com/thiagomoura/nthings.dev"
 website: "https://nthings.dev"
 order: 1
-tags: ["astro", "cloudflare", "typescript"]
+tags: [ "astro", "cloudflare", "typescript" ]
 ---
 
 This site is the reference implementation of its own thesis: a portfolio that treats each project as an engineering specification rather than a visual case study. It is intentionally small, monochromatic, and content-first.

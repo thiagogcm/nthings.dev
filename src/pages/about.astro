@@ -9,43 +9,51 @@ import { SITE, CURRENT_FOCUS } from "../consts";
   >
     <header class="grid gap-[0.85rem]">
       <h1>{SITE.author}</h1>
-      <p class="lede">Software Engineer</p>
+      <p class="lede">Software <del>Stuff</del> Engineer</p>
     </header>
 
     <div class="prose">
       <p>
-        I build AI-native products and the systems that keep them legible. My
-        work sits at the point where architecture, tooling, and interface
-        decisions start to determine real product quality — and I prefer to
-        document that work the way I think about it: as engineering reference,
-        not marketing.
+        Hi! I'm Thiago Moura. I'm a software engineer based in Belo Horizonte, Brazil. Most of my recent work has been related to platform engineering, product thinking, and practical AI.
       </p>
 
-      <h2>Philosophy</h2>
+      <h2>Latest professional experiences</h2>
       <p>
-        Good software stays understandable under pressure. Product surfaces
-        should remain calm when the systems beneath them grow complex,
-        asynchronous, or operationally noisy. I favor interfaces and
-        architectures that a new engineer can reason about, and AI features that
-        meaningfully improve decisions rather than decorate the product with
-        novelty.
-      </p>
-      <p>
-        Writing things down is part of the method. If I cannot explain the shape
-        of a problem or the tradeoffs behind a solution, I usually do not
-        understand it well enough yet. This site is where that thinking is made
-        visible — one specification and one post-mortem at a time.
+        Over the last few years, I've worked on Cloud-native applications, product-critical platform capabilities, and internal AI tools meant to support engineering and product teams in their work. Some highlights include:
       </p>
 
-      <h2>Technical focus</h2>
       <ul>
-        {CURRENT_FOCUS.map((item) => <li>{item}</li>)}
+        <li>
+          Wrote Kubernetes operators and tooling to streamline development and operations workflows.
+        </li>
+        <li>
+          Deployed and maintained Istio Service Mesh in production for a large retail environment, where operational clarity and resilience mattered.
+        </li>
+        <li>
+          Worked on a custom API gateway built on top of Envoy Gateway, with an extensibility model that allowed users to write their own plugins in Java without fighting the platform.
+        </li>
+        <li>
+          Led the design and implementation of an authorization server (on top of Keycloak) tailored to the emerging Chilean Open Finance ecosystem.
+        </li>
+        <li>
+          Built an internal AI tool to help engineering teams understand how errors propagated through a complex microservices architecture.
+        </li>
+        <li>
+          Built an internal AI tool to help product managers keep up with the evolution of Brazilian Open Finance regulation and understand its impact on the product roadmap.
+        </li>
       </ul>
-      <p>
-        Most of the work lands between engineering and product: AI-native
-        workflows and agents, frontend systems and performance, observability,
-        and practical architecture choices made under real constraints.
-      </p>
+
+      <h2>How I work | Tenets</h2>
+
+      <ul>
+        <li>Critical thinking: always question assumptions and seek evidence.</li>
+        <li>There is no silver bullet, and there is no free lunch. Fundamentals still rule, even in the AI era.</li>
+        <li>Optimize when it matters. Not before, not after.</li>
+        <li>Prevent accidental (or intentional) complexity. Simplicity pays off.</li>
+        <li>Be an enabler: understand the product, stay empathetic, and help others move.</li>
+        <li>Get close to the customer's pain points and fix them as they were your own.</li>
+        <li>Abstract repetition and remove friction where it meaningfully improves the work.</li>
+      </ul>
     </div>
   </article>
 </BaseLayout>

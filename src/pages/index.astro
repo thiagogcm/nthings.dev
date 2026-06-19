@@ -19,8 +19,6 @@ const projectCards = projects.map((project) => ({
 }));
 const recentPosts = posts.slice(0, 4);
 const featuredProject = projectCards[0];
-const projectCount = new Intl.NumberFormat("en-US").format(projects.length);
-const postCount = new Intl.NumberFormat("en-US").format(recentPosts.length);
 ---
 
 <BaseLayout title={SITE.title} contained>
@@ -45,7 +43,7 @@ const postCount = new Intl.NumberFormat("en-US").format(recentPosts.length);
 
       <aside class="home-signal" aria-label="Current signal">
         <div>
-          <p class="home-signal__label">Current focus</p>
+          <p class="home-signal__label">Current interests</p>
           <ul class="home-signal__list">
             {
               CURRENT_FOCUS.map((focus) => (

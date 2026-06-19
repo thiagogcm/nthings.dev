@@ -1,46 +1,59 @@
 # nthings.dev
 
-Personal site of Thiago Moura, built as a technical documentation site — projects and writing are *read* as engineering reference, not browsed as a gallery. Fully static output, no client framework, deployed to Cloudflare Workers.
+This site is built around two architectural choices:
 
-## Stack
+- Project documentation stays in the repository that owns the project. The site pulls and prepares that content before every development or production build.
+- Cloudflare handles the small amount of backend work that cannot be prebuilt: scheduled GitHub data refreshes, KV-backed reads, and a narrow proxy for public Confluence pages.
 
-| Layer     | Choice                                                      |
-| --------- | ----------------------------------------------------------- |
-| Framework | [Astro 6](https://astro.build) (static output)              |
-| Language  | TypeScript (strict)                                         |
-| Styling   | Tailwind v4, CSS-first `@theme` tokens + `light-dark()`     |
-| Content   | Markdown content collections (`blog`, `projects`)           |
-| External  | `docs/` trees synced from GitHub via `content-sources.yaml` |
-| Search    | Prebuilt static JSON index, searched client-side            |
-| Hosting   | Cloudflare Workers via Wrangler                             |
-| Fonts     | Inter + JetBrains Mono via the Astro Fonts API              |
+The rest of the site is pre-rendered content and static assets.
 
-The only runtime JavaScript is Astro view transitions plus small progressive-enhancement scripts (theme toggle, command-palette search, ToC scroll-spy, heading permalinks). Code blocks are highlighted at build time with Shiki (dual light/dark themes, no shipped CSS).
+## Build-time content federation
 
-A Cloudflare cron Worker refreshes GitHub stats every 6h into KV; the homepage reads that cache through a deferred server island (`StatusIsland`).
+[`content-sources.yaml`](content-sources.yaml) lists the repositories that contribute content. Each source owns its documentation, metadata, ordering, and assets; this repository owns how those inputs are validated, normalized, and presented.
 
-## Project structure
+```mermaid
+sequenceDiagram
+    participant Build as Development or production build
+    participant Manifest as content-sources.yaml
+    participant Repos as Project repositories
+    participant Sync as Content sync
+    participant Cache as Generated collections
+    participant Renderer as Site renderer
 
-```text
-src/
-├── components/      UI: header, drawer, search, nav, ToC, icons, status island
-├── content/         Markdown collections — blog/ and projects/
-├── layouts/         BaseLayout (head + chrome) → DocsLayout (3-column docs grid)
-├── lib/             collections, nav helpers, date format, github-stats
-├── pages/           routes + search.json.ts
-├── styles/          global.css — design tokens and component CSS
-└── worker.ts        Cloudflare entrypoint (fetch + scheduled cron)
-doc/                 Pilot content synced at build time
-content-sources.yaml Registry of public GitHub repos to pull doc/ from
-scripts/             sync-content-sources.mjs and validation helpers
-.cache/              Generated synced Markdown (gitignored)
+    Build->>Manifest: Read registered sources
+    loop Each source
+        Build->>Repos: Clone branch and documentation root
+        Repos-->>Sync: Markdown, metadata, and assets
+        Sync->>Sync: Validate and normalize content
+        Sync->>Cache: Write projects, pages, posts, and assets
+    end
+    Build->>Renderer: Load local and generated collections
+    Renderer-->>Build: Emit the deployable site
 ```
 
-## External content
+The sync runs automatically before `npm run dev` and `npm run build`. Generated Markdown lives under `.cache/content-sources/`; copied assets live under `public/content-sources/`. Neither is an authoring location.
 
-Other repositories can publish project pages and blog posts by adopting a specific `docs/` layout. Register each repo in [`content-sources.yaml`](content-sources.yaml); the sync script fetches each configured repo with `degit`, reads its `docRoot`, then writes generated collection entries into `.cache/content-sources/` before Astro builds.
+### Source contract
 
-External docs can include `docs/nthings.meta.yaml` for site-specific sync options:
+A registered repository exposes a documentation root, `docs/` by default, containing:
+
+- `project.md`: required project landing page.
+- regular Markdown files: optional project documentation pages.
+- `posts/**/*.md`: optional blog posts.
+- `assets/`: optional files copied into the public site.
+- `nthings.meta.yaml`: optional site-specific inclusion, exclusion, slug, and page-order settings.
+
+Register the repository in `content-sources.yaml`:
+
+```yaml
+sources:
+  - owner: thiagogcm
+    repo: adf4j
+    slug: adf4j-docs
+    order: 0
+```
+
+The source can refine its published surface without moving content into this repository:
 
 ```yaml
 slug: adf4j
@@ -55,19 +68,34 @@ pageOrder:
   - reference.md
 ```
 
-`pageOrder` accepts page paths relative to the configured `docRoot`, with or without the `.md` extension. Pages not listed are appended after the listed pages in filename order. A page's own frontmatter `order` still takes precedence for one-off overrides, and validation fails if `pageOrder` references a missing page.
+During sync, the site validates frontmatter and page order, removes source-owned page chrome such as duplicate titles and tables of contents, rewrites internal document and asset links, and converts the result into the site's content collections. A bad source fails the build rather than publishing a partial documentation tree.
 
-## Commands
+## Cloudflare as the backend
 
-| Command                    | Action                                         |
-| :------------------------- | :--------------------------------------------- |
-| `npm run dev`              | Start the local dev server                     |
-| `npm run sync:content`     | Pull registered `doc/` trees into `.cache/`    |
-| `npm run validate:sources` | Validate manifest and remote/local doc/ layout |
-| `npm run build`            | Sync content, then build the static site       |
-| `npm run preview`          | Preview the production build locally           |
-| `npm run check`            | Type-check `.astro`/`.ts` with `astro check`   |
+Cloudflare Workers is both the request entrypoint and the runtime for the few features that need server-side behavior:
+
+| Runtime path | Cloudflare responsibility | Result |
+| --- | --- | --- |
+| Normal page request | Serve the built site and run server-rendered fragments | Most content remains pre-rendered; dynamic work stays isolated. |
+| Scheduled event | Query GitHub every six hours and write the aggregate to KV | Page requests read cached activity data instead of calling GitHub. |
+| Cold stats cache | Start a background refresh with the request context | The response can show a fallback without waiting on GitHub. |
+| `/api/confluence-adf.json` | Validate a public Confluence Cloud URL and fetch its ADF body | The browser receives a narrow JSON response, then performs the Markdown conversion locally. |
+
+The Worker delegates regular requests to the site runtime. Its scheduled handler refreshes GitHub statistics. The status island reads those statistics from the `GITHUB_STATS` KV namespace, while the Confluence route accepts only HTTPS `*.atlassian.net` wiki page URLs containing a numeric page ID.
+
+This boundary is intentional: content assembly belongs to the build, presentation belongs in generated pages, and network or scheduled work belongs at the edge.
+
+## Working locally
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Sync external content, then start the development server. |
+| `npm run sync:content` | Rebuild generated content from registered sources. |
+| `npm run validate:sources` | Validate sources without writing generated output. |
+| `npm run test:content-sync` | Test content normalization and link rewriting. |
+| `npm run check` | Type-check the site and Worker integration. |
+| `npm run build` | Sync content and produce the deployment build. |
 
 ## Deployment
 
-Pushed to Cloudflare Workers via Wrangler (see `wrangler.jsonc`). The GitHub stats Worker needs a `GITHUB_STATS` KV namespace and an optional `GITHUB_TOKEN` secret for higher rate limits.
+[`wrangler.jsonc`](wrangler.jsonc) defines the Worker, static asset binding, custom domains, six-hour cron trigger, observability, and `GITHUB_STATS` KV binding. `GITHUB_TOKEN` is an optional Worker secret used to raise GitHub API limits and access the contribution data required by the activity panel.

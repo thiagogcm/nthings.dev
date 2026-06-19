@@ -27,7 +27,7 @@ const DAY_MS = 86_400_000;
 
 // PromQL-style label for the activity panel; shared by the chart and its loading state.
 export const activityMetricQuery = (user: string) => {
-  return `sum(increase(github_contributions_total{user="${user}"}[1d]))`;
+  return `sum(increase(gh_contrib_total{user="${user}"}[1d]))`;
 };
 
 const REPOS_QUERY = `

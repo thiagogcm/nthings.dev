@@ -13,6 +13,7 @@ const pendingRenders = new WeakMap<Element, Promise<void>>();
 let mermaidPromise: Promise<MermaidApi> | undefined;
 let prismPromise: Promise<PrismApi> | undefined;
 let renderIndex = 0;
+let cardIndex = 0;
 
 function loadMermaid() {
   mermaidPromise ??= import("mermaid").then((module) => module.default);
@@ -240,20 +241,30 @@ async function enhanceBlock(pre: HTMLPreElement) {
   card.className = "mermaid-diagram";
   card.dataset.view = "diagram";
 
+  // Unique per card so multiple diagrams on a page don't share ids when wiring
+  // each tab to the panel it controls (and vice versa) for assistive tech.
+  const base = `nthings-mermaid-${cardIndex++}`;
+  const diagramTabId = `${base}-tab-diagram`;
+  const codeTabId = `${base}-tab-code`;
+  const diagramPanelId = `${base}-panel-diagram`;
+  const codePanelId = `${base}-panel-code`;
+
   const toolbar = document.createElement("figcaption");
   toolbar.className = "mermaid-diagram__toolbar";
   toolbar.setAttribute("role", "tablist");
   toolbar.setAttribute("aria-label", "Mermaid diagram view");
   toolbar.innerHTML = `
-    <button class="mermaid-diagram__tab" type="button" role="tab" data-mermaid-view="diagram" aria-selected="true">Diagram</button>
-    <button class="mermaid-diagram__tab" type="button" role="tab" data-mermaid-view="code" aria-selected="false">Code</button>
+    <button class="mermaid-diagram__tab" type="button" role="tab" id="${diagramTabId}" aria-controls="${diagramPanelId}" data-mermaid-view="diagram" aria-selected="true">Diagram</button>
+    <button class="mermaid-diagram__tab" type="button" role="tab" id="${codeTabId}" aria-controls="${codePanelId}" data-mermaid-view="code" aria-selected="false">Code</button>
   `;
 
   const diagramPanel = document.createElement("div");
   diagramPanel.className =
     "mermaid-diagram__panel mermaid-diagram__panel--diagram";
   diagramPanel.dataset.mermaidPanel = "diagram";
+  diagramPanel.id = diagramPanelId;
   diagramPanel.setAttribute("role", "tabpanel");
+  diagramPanel.setAttribute("aria-labelledby", diagramTabId);
   diagramPanel.innerHTML = `
     <div class="mermaid-diagram__canvas" aria-label="Rendered Mermaid diagram"></div>
     <p class="mermaid-diagram__status" role="status">Rendering diagram</p>
@@ -262,7 +273,9 @@ async function enhanceBlock(pre: HTMLPreElement) {
   const codePanel = document.createElement("div");
   codePanel.className = "mermaid-diagram__panel mermaid-diagram__panel--code";
   codePanel.dataset.mermaidPanel = "code";
+  codePanel.id = codePanelId;
   codePanel.setAttribute("role", "tabpanel");
+  codePanel.setAttribute("aria-labelledby", codeTabId);
   codePanel.hidden = true;
 
   card.appendChild(toolbar);

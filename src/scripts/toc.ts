@@ -34,15 +34,19 @@ const measure = () => {
 
   // Trailing headings on a short page can't reach the line; pull out-of-reach
   // thresholds back into range (from the end), kept ordered so each gets a turn.
+  // A non-scrollable page keeps its natural thresholds so the first heading
+  // stays active at the top instead of every threshold collapsing toward 0.
   const n = natural.length;
-  const gap = Math.max(
-    1,
-    Math.min(0.25 * window.innerHeight, maxScrollTop / n),
-  );
   const out = natural.slice();
-  out[n - 1] = Math.min(out[n - 1], maxScrollTop);
-  for (let i = n - 2; i >= 0; i--) {
-    out[i] = Math.min(out[i], out[i + 1] - gap);
+  if (maxScrollTop > 0) {
+    // Sub-pixel gaps are intentional: a 1px minimum on very short pages (or many
+    // headings vs. little scroll range) drives earlier thresholds negative, which
+    // would mark a later heading active at the top.
+    const gap = Math.min(0.25 * window.innerHeight, maxScrollTop / n);
+    out[n - 1] = Math.min(out[n - 1], maxScrollTop);
+    for (let i = n - 2; i >= 0; i--) {
+      out[i] = Math.min(out[i], out[i + 1] - gap);
+    }
   }
   thresholds = out;
 };

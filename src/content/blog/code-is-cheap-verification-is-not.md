@@ -23,13 +23,13 @@ This was a greenfield project, and the regulator's specifications were authorita
 
 Reading the Authorization Server source was not enough. A locally correct implementation could still fail when a participant registered, a customer completed a consent journey, a token reached a resource server, or a grant was revoked.
 
-So I developed the ecosystem around the Authorization Server as actual simulators. These running components exercised participant registration, consent journeys, protected resource access, and trust relationships. They were not static mocks with canned responses.
+So I built a simulated Open Finance ecosystem around the Authorization Server, with running components representing the other participants. These components exercised participant registration, consent journeys, protected resource access, and trust relationships. They were not static mocks with canned responses.
 
 Every component was fully instrumented and emitted telemetry, making behavior observable across service boundaries.
 
 The biggest leverage was Atacama, a command-line tool that runs ecosystem flows through protocols and APIs, or through Playwright for browser interactions.
 
-I gave Atacama to the agents as a form of chaos engineering. They could execute valid and invalid flows, vary inputs, probe boundaries, interrupt journeys, and look for behavior that contradicted the specifications. Every experiment produced evidence they could inspect.
+I gave Atacama to the agents as an adversarial testing interface for the ecosystem. They could execute valid and invalid flows, vary inputs, probe boundaries, interrupt journeys, and look for behavior that contradicted the specifications. Every experiment produced evidence they could inspect.
 
 ## Closing the Loop with Atacama and Telemetry
 
@@ -37,7 +37,7 @@ The workflow connected Atacama agents, monitoring agents, and coding agents with
 
 ```mermaid
 flowchart TD
-    A[Atacama agents run API and UI flows] --> B[Instrumented ecosystem emits telemetry]
+    A[Agents use Atacama to run API and UI flows] --> B[Instrumented ecosystem emits telemetry]
     B --> C[Monitoring agents collect runtime evidence]
     C --> D[Coding agents compare evidence with the regulatory corpus]
     D --> E[Implement and verify relevant changes]

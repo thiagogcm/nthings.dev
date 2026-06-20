@@ -49,7 +49,7 @@ Register the repository in `content-sources.yaml`:
 sources:
   - owner: thiagogcm
     repo: adf4j
-    slug: adf4j-docs
+    slug: adf4j
     order: 0
 ```
 
@@ -74,11 +74,11 @@ During sync, the site validates frontmatter and page order, removes source-owned
 
 Cloudflare Workers is both the request entrypoint and the runtime for the few features that need server-side behavior:
 
-| Runtime path | Cloudflare responsibility | Result |
-| --- | --- | --- |
-| Normal page request | Serve the built site and run server-rendered fragments | Most content remains pre-rendered; dynamic work stays isolated. |
-| Scheduled event | Query GitHub every six hours and write the aggregate to KV | Page requests read cached activity data instead of calling GitHub. |
-| Cold stats cache | Start a background refresh with the request context | The response can show a fallback without waiting on GitHub. |
+| Runtime path               | Cloudflare responsibility                                     | Result                                                                                      |
+| -------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Normal page request        | Serve the built site and run server-rendered fragments        | Most content remains pre-rendered; dynamic work stays isolated.                             |
+| Scheduled event            | Query GitHub every six hours and write the aggregate to KV    | Page requests read cached activity data instead of calling GitHub.                          |
+| Cold stats cache           | Start a background refresh with the request context           | The response can show a fallback without waiting on GitHub.                                 |
 | `/api/confluence-adf.json` | Validate a public Confluence Cloud URL and fetch its ADF body | The browser receives a narrow JSON response, then performs the Markdown conversion locally. |
 
 The Worker delegates regular requests to the site runtime. Its scheduled handler refreshes GitHub statistics. The status island reads those statistics from the `GITHUB_STATS` KV namespace, while the Confluence route accepts only HTTPS `*.atlassian.net` wiki page URLs containing a numeric page ID.
@@ -87,14 +87,14 @@ This boundary is intentional: content assembly belongs to the build, presentatio
 
 ## Working locally
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Sync external content, then start the development server. |
-| `npm run sync:content` | Rebuild generated content from registered sources. |
-| `npm run validate:sources` | Validate sources without writing generated output. |
-| `npm run test:content-sync` | Test content normalization and link rewriting. |
-| `npm run check` | Type-check the site and Worker integration. |
-| `npm run build` | Sync content and produce the deployment build. |
+| Command                     | Purpose                                                   |
+| --------------------------- | --------------------------------------------------------- |
+| `npm run dev`               | Sync external content, then start the development server. |
+| `npm run sync:content`      | Rebuild generated content from registered sources.        |
+| `npm run validate:sources`  | Validate sources without writing generated output.        |
+| `npm run test:content-sync` | Test content normalization and link rewriting.            |
+| `npm run check`             | Type-check the site and Worker integration.               |
+| `npm run build`             | Sync content and produce the deployment build.            |
 
 ## Deployment
 

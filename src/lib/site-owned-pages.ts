@@ -13,16 +13,16 @@ export interface SiteOwnedPage {
 
 export const SITE_OWNED_PAGES = [
   {
-    project: 'adf4j',
-    href: '/projects/adf4j/demo',
-    label: 'Demo',
+    project: "adf4j",
+    href: "/projects/adf4j/demo",
+    label: "Demo",
     order: 1000,
     search: {
-      title: 'Demo · adf4j',
+      title: "Demo · adf4j",
       description:
-        'Try adf4j WASM with a public Confluence Cloud page URL and preview the Markdown output.',
-      tags: ['adf4j', 'wasm', 'confluence', 'markdown'],
-      text: 'Confluence Cloud ADF to Markdown browser demo adf4j-wasm convertJson',
+        "Try adf4j WASM with a public Confluence Cloud page URL and preview the Markdown output.",
+      tags: ["adf4j", "wasm", "confluence", "markdown"],
+      text: "Confluence Cloud ADF to Markdown browser demo adf4j-wasm convertJson",
     },
   },
 ] as const satisfies readonly SiteOwnedPage[];

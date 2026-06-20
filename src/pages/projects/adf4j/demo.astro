@@ -1,9 +1,9 @@
 ---
 import { getEntry } from "astro:content";
-import DocsLayout from "../../../layouts/DocsLayout.astro";
-import ProjectPageHeader from "../../../components/ProjectPageHeader.astro";
-import Adf4jDemo from "../../../components/Adf4jDemo.astro";
-import { getProjectNav } from "../../../lib/collections";
+import Adf4jDemo from "@/components/Adf4jDemo.astro";
+import ProjectPageHeader from "@/components/ProjectPageHeader.astro";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+import { getProjectNav } from "@/lib/collections";
 
 const project = await getEntry("projects", "adf4j");
 

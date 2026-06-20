@@ -6,8 +6,7 @@
 // Chart.js is dynamically imported so it ships as a lazy chunk, loaded only once
 // an actual chart appears.
 import type { Chart as ChartInstance } from "chart.js";
-
-type ActivityPoint = { date: string; count: number };
+import type { DailyActivity } from "@/lib/github-stats";
 
 let chartLib: Promise<typeof import("chart.js")> | null = null;
 function loadChartLib() {
@@ -56,7 +55,7 @@ class GithubActivityChart extends HTMLElement {
     const canvas = this.querySelector("canvas");
     if (!canvas) return;
 
-    let series: ActivityPoint[];
+    let series: DailyActivity[];
     try {
       series = JSON.parse(this.dataset.series ?? "[]");
     } catch {
@@ -149,7 +148,9 @@ class GithubActivityChart extends HTMLElement {
     if (!this.#chart) return;
     const colors = this.#readColors();
     Object.assign(this.#chart.data.datasets[0], datasetColors(colors));
-    const yGrid = (this.#chart.options.scales?.y as { grid?: { color?: string } } | undefined)?.grid;
+    const yGrid = (
+      this.#chart.options.scales?.y as { grid?: { color?: string } } | undefined
+    )?.grid;
     if (yGrid) yGrid.color = colors.grid;
     this.#chart.update("none");
   }

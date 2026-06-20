@@ -1,13 +1,13 @@
 ---
-import DirectoryEntry from "../components/DirectoryEntry.astro";
-import Icon from "../components/Icon.astro";
-import { formatDate } from "../lib/format-date";
-import { CURRENT_FOCUS, SITE } from "../consts";
-import BaseLayout from "../layouts/BaseLayout.astro";
-import StatusIsland from "../components/StatusIsland.astro";
-import StatusFallback from "../components/StatusFallback.astro";
-import { getSortedPosts, getSortedProjects } from "../lib/collections";
-import { projectActions } from "../lib/project-actions";
+import DirectoryEntry from "@/components/DirectoryEntry.astro";
+import Icon from "@/components/Icon.astro";
+import StatusFallback from "@/components/StatusFallback.astro";
+import StatusIsland from "@/components/StatusIsland.astro";
+import { CURRENT_FOCUS, SITE } from "@/consts";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getSortedPosts, getSortedProjects } from "@/lib/collections";
+import { formatDate } from "@/lib/format-date";
+import { projectActions } from "@/lib/project-actions";
 
 const [projects, posts] = await Promise.all([
   getSortedProjects(),
@@ -142,7 +142,7 @@ const featuredProject = projectCards[0];
 <script>
   // Registers the <github-activity-chart> custom element used by the GitHub
   // panel; the element itself is injected later by the StatusIsland server island.
-  import "../scripts/activity-chart";
+  import "@/scripts/activity-chart";
 </script>
 
 <style>

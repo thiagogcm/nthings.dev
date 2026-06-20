@@ -1,6 +1,6 @@
-import MarkdownIt from 'markdown-it';
-import MarkdownItGitHubAlerts from 'markdown-it-github-alerts';
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
+import MarkdownIt from "markdown-it";
+import MarkdownItGitHubAlerts from "markdown-it-github-alerts";
 
 const md = new MarkdownIt({
   html: true,
@@ -9,19 +9,19 @@ const md = new MarkdownIt({
 }).use(MarkdownItGitHubAlerts);
 
 const PURIFY_CONFIG = {
-  ADD_TAGS: ['svg', 'path'],
+  ADD_TAGS: ["svg", "path"],
   ADD_ATTR: [
-    'viewBox',
-    'version',
-    'aria-hidden',
-    'd',
-    'fill',
-    'width',
-    'height',
-    'class',
-    'rel',
-    'colspan',
-    'rowspan',
+    "viewBox",
+    "version",
+    "aria-hidden",
+    "d",
+    "fill",
+    "width",
+    "height",
+    "class",
+    "rel",
+    "colspan",
+    "rowspan",
   ],
 };
 

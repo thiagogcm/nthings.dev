@@ -19,7 +19,7 @@ type GitHubStatsEnv = {
   GITHUB_TOKEN?: string;
 };
 
-const KV_PREFIX = 'github:';
+const KV_PREFIX = "github:";
 const CACHE_TTL_SECONDS = 86_400;
 const GITHUB_FETCH_TIMEOUT_MS = 15_000;
 export const ACTIVITY_DAYS = 90;
@@ -119,19 +119,30 @@ const kvKey = (username: string) => {
   return `${KV_PREFIX}${username}`;
 };
 
-export async function getGitHubStats(env: GitHubStatsEnv): Promise<GitHubStats | null> {
+export async function getGitHubStats(
+  env: GitHubStatsEnv,
+): Promise<GitHubStats | null> {
   try {
-    return await env.GITHUB_STATS.get<GitHubStats>(kvKey(env.GITHUB_USERNAME), 'json');
+    return await env.GITHUB_STATS.get<GitHubStats>(
+      kvKey(env.GITHUB_USERNAME),
+      "json",
+    );
   } catch {
     return null;
   }
 }
 
-export async function refreshGitHubStats(env: GitHubStatsEnv): Promise<GitHubStats> {
+export async function refreshGitHubStats(
+  env: GitHubStatsEnv,
+): Promise<GitHubStats> {
   const stats = await fetchGitHubStats(env.GITHUB_USERNAME, env.GITHUB_TOKEN);
-  await env.GITHUB_STATS.put(kvKey(env.GITHUB_USERNAME), JSON.stringify(stats), {
-    expirationTtl: CACHE_TTL_SECONDS,
-  });
+  await env.GITHUB_STATS.put(
+    kvKey(env.GITHUB_USERNAME),
+    JSON.stringify(stats),
+    {
+      expirationTtl: CACHE_TTL_SECONDS,
+    },
+  );
   return stats;
 }
 
@@ -154,7 +165,11 @@ export function buildDailySeries(
   }
 
   // UTC midnight of the end date, so day arithmetic ignores wall-clock time.
-  const end = Date.UTC(endUtc.getUTCFullYear(), endUtc.getUTCMonth(), endUtc.getUTCDate());
+  const end = Date.UTC(
+    endUtc.getUTCFullYear(),
+    endUtc.getUTCMonth(),
+    endUtc.getUTCDate(),
+  );
 
   const series: DailyActivity[] = [];
   let max = 0;
@@ -170,15 +185,27 @@ export function buildDailySeries(
   return { series, max, current };
 }
 
-async function fetchGitHubStats(username: string, token?: string): Promise<GitHubStats> {
+async function fetchGitHubStats(
+  username: string,
+  token?: string,
+): Promise<GitHubStats> {
   const to = new Date();
   const from = new Date(
-    Date.UTC(to.getUTCFullYear(), to.getUTCMonth(), to.getUTCDate() - (ACTIVITY_DAYS - 1)),
+    Date.UTC(
+      to.getUTCFullYear(),
+      to.getUTCMonth(),
+      to.getUTCDate() - (ACTIVITY_DAYS - 1),
+    ),
   );
 
   const [repos, calendar] = await Promise.all([
     fetchAllRepos(username, token),
-    fetchContributionsCalendar(username, from.toISOString(), to.toISOString(), token),
+    fetchContributionsCalendar(
+      username,
+      from.toISOString(),
+      to.toISOString(),
+      token,
+    ),
   ]);
 
   const { series, max } = buildDailySeries(calendar.weeks, to, ACTIVITY_DAYS);
@@ -200,7 +227,7 @@ async function fetchGitHubStats(username: string, token?: string): Promise<GitHu
 async function fetchAllRepos(username: string, token?: string) {
   let repoCount = 0;
   let commitCount = 0;
-  let lastUpdate = '';
+  let lastUpdate = "";
   let cursor: string | null = null;
 
   do {
@@ -220,12 +247,22 @@ async function fetchAllRepos(username: string, token?: string) {
   return { repoCount, commitCount, lastUpdate };
 }
 
-async function fetchReposPage(username: string, cursor: string | null, token?: string) {
-  const data = await githubGraphQL<ReposData>(REPOS_QUERY, { login: username, cursor }, token);
+async function fetchReposPage(
+  username: string,
+  cursor: string | null,
+  token?: string,
+) {
+  const data = await githubGraphQL<ReposData>(
+    REPOS_QUERY,
+    { login: username, cursor },
+    token,
+  );
 
   const repositories = data.user?.repositories;
   if (!repositories) {
-    throw new Error(`GitHub user "${username}" not found or has no public repositories`);
+    throw new Error(
+      `GitHub user "${username}" not found or has no public repositories`,
+    );
   }
 
   return repositories;
@@ -245,7 +282,9 @@ async function fetchContributionsCalendar(
 
   const calendar = data.user?.contributionsCollection?.contributionCalendar;
   if (!calendar) {
-    throw new Error(`GitHub user "${username}" not found or has no contribution calendar`);
+    throw new Error(
+      `GitHub user "${username}" not found or has no contribution calendar`,
+    );
   }
 
   return calendar;
@@ -257,15 +296,15 @@ async function githubGraphQL<T>(
   token?: string,
 ): Promise<T> {
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    'User-Agent': 'nthings.dev-stats-worker',
+    "Content-Type": "application/json",
+    "User-Agent": "nthings.dev-stats-worker",
   };
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch('https://api.github.com/graphql', {
-    method: 'POST',
+  const response = await fetch("https://api.github.com/graphql", {
+    method: "POST",
     headers,
     body: JSON.stringify({ query, variables }),
     signal: AbortSignal.timeout(GITHUB_FETCH_TIMEOUT_MS),
@@ -275,14 +314,21 @@ async function githubGraphQL<T>(
     throw new Error(`GitHub GraphQL request failed: ${response.status}`);
   }
 
-  const payload = (await response.json()) as { data?: T; errors?: { message: string }[] };
+  const payload = (await response.json()) as {
+    data?: T;
+    errors?: { message: string }[];
+  };
   if (payload.errors?.length) {
-    throw new Error(`GitHub GraphQL errors: ${payload.errors.map((e) => {
-      return e.message;
-    }).join(', ')}`);
+    throw new Error(
+      `GitHub GraphQL errors: ${payload.errors
+        .map((e) => {
+          return e.message;
+        })
+        .join(", ")}`,
+    );
   }
   if (!payload.data) {
-    throw new Error('GitHub GraphQL response missing data');
+    throw new Error("GitHub GraphQL response missing data");
   }
 
   return payload.data;

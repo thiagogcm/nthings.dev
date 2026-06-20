@@ -1,5 +1,5 @@
 import type { CollectionEntry } from "astro:content";
-import { siteOwnedNavFor } from "./site-owned-pages";
+import { siteOwnedNavFor } from "@/lib/site-owned-pages";
 
 export interface EntryAction {
   href: string;

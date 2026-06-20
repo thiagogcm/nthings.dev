@@ -1,8 +1,8 @@
 ---
-import Icon from "../../components/Icon.astro";
 import { getCollection, render } from "astro:content";
-import { formatDate } from "../../lib/format-date";
-import DocsLayout from "../../layouts/DocsLayout.astro";
+import Icon from "@/components/Icon.astro";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+import { formatDate } from "@/lib/format-date";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");

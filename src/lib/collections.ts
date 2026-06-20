@@ -1,5 +1,5 @@
-import { getCollection } from 'astro:content';
-import { siteOwnedNavFor } from './site-owned-pages';
+import { getCollection } from "astro:content";
+import { siteOwnedNavFor } from "@/lib/site-owned-pages";
 
 export interface ProjectNavItem {
   href: string;
@@ -8,37 +8,33 @@ export interface ProjectNavItem {
 }
 
 export const getSortedPosts = async () => {
-  return (await getCollection('blog')).toSorted(
-    (a, b) => {
-      return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
-    },
-  );
+  return (await getCollection("blog")).toSorted((a, b) => {
+    return b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+  });
 };
 
 export const getSortedProjects = async () => {
-  return (await getCollection('projects')).toSorted(
-    (a, b) => {
-      return a.data.order - b.data.order;
-    },
-  );
+  return (await getCollection("projects")).toSorted((a, b) => {
+    return a.data.order - b.data.order;
+  });
 };
 
 export function projectDocUrl(docId: string): string {
-  const [projectId, ...pageParts] = docId.split('/');
+  const [projectId, ...pageParts] = docId.split("/");
   if (pageParts.length === 0) {
     return `/projects/${projectId}`;
   }
-  return `/projects/${projectId}/${pageParts.join('/')}`;
+  return `/projects/${projectId}/${pageParts.join("/")}`;
 }
 
 export function projectDocPageSlug(docId: string): string {
-  const parts = docId.split('/');
-  return parts.slice(1).join('/');
+  const parts = docId.split("/");
+  return parts.slice(1).join("/");
 }
 
 export async function getProjectDocPages(projectId: string) {
   const docs = await getCollection(
-    'projectDocs',
+    "projectDocs",
     ({ data }) => data.project === projectId,
   );
 
@@ -52,7 +48,7 @@ export async function getProjectDocPages(projectId: string) {
 
 export async function getProjectNav(
   projectId: string,
-  overviewLabel = 'Overview',
+  overviewLabel = "Overview",
 ): Promise<ProjectNavItem[]> {
   const pages = await getProjectDocPages(projectId);
   const siteOwned = siteOwnedNavFor(projectId);

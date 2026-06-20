@@ -15,18 +15,29 @@
   --color-fg-muted: light-dark(#4d5460, #9aa3af);
   --color-fg-soft: light-dark(#868d99, #69717d);
   --color-border: light-dark(rgba(15, 23, 36, 0.1), rgba(216, 228, 245, 0.12));
-  --color-border-strong: light-dark(rgba(15, 23, 36, 0.2), rgba(216, 228, 245, 0.24));
-  --color-selection: light-dark(rgba(63, 111, 156, 0.16), rgba(138, 180, 216, 0.22));
+  --color-border-strong: light-dark(
+    rgba(15, 23, 36, 0.2),
+    rgba(216, 228, 245, 0.24)
+  );
+  --color-selection: light-dark(
+    rgba(63, 111, 156, 0.16),
+    rgba(138, 180, 216, 0.22)
+  );
 
   --color-accent: light-dark(#3f6f9c, #8ab4d8);
   --color-accent-strong: light-dark(#33608a, #a6c8e6);
-  --color-accent-soft: light-dark(oklch(from var(--color-accent) l c h / 0.12),
-      oklch(from var(--color-accent) l c h / 0.18));
+  --color-accent-soft: light-dark(
+    oklch(from var(--color-accent) l c h / 0.12),
+    oklch(from var(--color-accent) l c h / 0.18)
+  );
 
   --color-ok: light-dark(#0f9d76, #2dd4a7);
 
-  --font-sans: var(--font-body), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: var(--font-code), ui-monospace, "SFMono-Regular", Consolas, monospace;
+  --font-sans:
+    var(--font-body), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-mono:
+    var(--font-code), ui-monospace, "SFMono-Regular", Consolas, monospace;
 }
 
 @utility shell {
@@ -71,7 +82,10 @@
     --docs-col-gap: clamp(2.2rem, 3.8vw, 3.5rem);
     --shadow-elevated:
       light-dark(0 1px 2px rgba(15, 23, 36, 0.06), 0 1px 2px rgba(0, 0, 0, 0.4)),
-      light-dark(0 8px 30px rgba(15, 23, 36, 0.12), 0 8px 30px rgba(0, 0, 0, 0.5));
+      light-dark(
+        0 8px 30px rgba(15, 23, 36, 0.12),
+        0 8px 30px rgba(0, 0, 0, 0.5)
+      );
   }
 
   /* Manual theme override: force the color-scheme so light-dark() tokens resolve. */
@@ -103,7 +117,6 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
     min-height: 100dvh;
     isolation: isolate;
     /* Match fallback x-height to the web font to limit load-time shift. */
@@ -277,7 +290,9 @@
     border-radius: 0.45rem;
     color: var(--color-fg-muted);
     cursor: pointer;
-    transition: color 140ms ease, background-color 140ms ease;
+    transition:
+      color 140ms ease,
+      background-color 140ms ease;
   }
 
   .icon-button:hover,
@@ -312,7 +327,8 @@
   html[data-scrolled] .site-header {
     background: var(--color-bg);
     border-bottom-color: var(--color-border);
-    box-shadow: 0 6px 24px -14px color-mix(in srgb, var(--color-fg) 38%, transparent);
+    box-shadow: 0 6px 24px -14px
+      color-mix(in srgb, var(--color-fg) 38%, transparent);
   }
 
   .site-header__bar {
@@ -376,7 +392,10 @@
     color: var(--color-fg-soft);
     font-size: 0.85rem;
     cursor: pointer;
-    transition: border-color 140ms ease, color 140ms ease, background-color 140ms ease;
+    transition:
+      border-color 140ms ease,
+      color 140ms ease,
+      background-color 140ms ease;
   }
 
   .search-trigger:hover,
@@ -539,65 +558,9 @@
 
   /* Sticky lives on the grid item itself so its containing block is the
      full-height grid area, giving it room to travel as the page scrolls. */
-  .site-toc {
-    display: none;
-    position: sticky;
-    top: var(--rail-top);
-    max-height: var(--rail-max-h);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-border) transparent;
-    scroll-behavior: smooth;
-    padding-left: 1rem;
-    border-left: 1px solid var(--color-border);
-  }
-
-  .site-toc__heading {
-    margin-bottom: 0.75rem;
-    color: var(--color-fg-soft);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
-  .site-toc__list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-    list-style: none;
-  }
-
-  .site-toc__link {
-    display: block;
-    padding: 0.2rem 0.5rem;
-    border-radius: 0.3rem;
-    border-left: 2px solid transparent;
-    margin-left: -2px;
-    color: var(--color-fg-muted);
-    font-size: 0.85rem;
-    line-height: 1.4;
-    transition:
-      color 200ms ease,
-      border-color 200ms ease;
-  }
-
-  .site-toc__link:hover,
-  .site-toc__link:focus-visible {
-    color: var(--color-fg);
-  }
-
-  .site-toc__link.is-active {
-    color: var(--color-accent);
-    border-left-color: var(--color-accent);
-    font-weight: 600;
-  }
-
-  .site-toc__item.depth-3 .site-toc__link {
-    padding-left: 1.25rem;
-    font-size: 0.82rem;
-  }
-
+  /* Doc rails: the ToC (right rail) and project page-nav (left rail) share
+     styling and differ only in which side the divider sits on. */
+  .site-toc,
   .project-docs-nav {
     display: none;
     position: sticky;
@@ -607,10 +570,19 @@
     scrollbar-width: thin;
     scrollbar-color: var(--color-border) transparent;
     scroll-behavior: smooth;
+  }
+
+  .site-toc {
+    padding-left: 1rem;
+    border-left: 1px solid var(--color-border);
+  }
+
+  .project-docs-nav {
     padding-right: 1rem;
     border-right: 1px solid var(--color-border);
   }
 
+  .site-toc__heading,
   .project-docs-nav__heading {
     margin-bottom: 0.75rem;
     color: var(--color-fg-soft);
@@ -620,6 +592,7 @@
     text-transform: uppercase;
   }
 
+  .site-toc__list,
   .project-docs-nav__list {
     display: flex;
     flex-direction: column;
@@ -627,6 +600,7 @@
     list-style: none;
   }
 
+  .site-toc__link,
   .project-docs-nav__link {
     display: block;
     padding: 0.2rem 0.5rem;
@@ -641,15 +615,23 @@
       border-color 200ms ease;
   }
 
+  .site-toc__link:hover,
+  .site-toc__link:focus-visible,
   .project-docs-nav__link:hover,
   .project-docs-nav__link:focus-visible {
     color: var(--color-fg);
   }
 
+  .site-toc__link.is-active,
   .project-docs-nav__link.is-active {
     color: var(--color-accent);
     border-left-color: var(--color-accent);
     font-weight: 600;
+  }
+
+  .site-toc__item.depth-3 .site-toc__link {
+    padding-left: 1.25rem;
+    font-size: 0.82rem;
   }
 
   /* Mobile document navigation: on-page outline below header tabs. */
@@ -666,7 +648,8 @@
     border: 1px solid var(--color-border);
     border-radius: 0.55rem;
     background: var(--color-bg);
-    box-shadow: 0 10px 28px -24px color-mix(in srgb, var(--color-fg) 45%, transparent);
+    box-shadow: 0 10px 28px -24px
+      color-mix(in srgb, var(--color-fg) 45%, transparent);
     backdrop-filter: blur(10px) saturate(150%);
     -webkit-backdrop-filter: blur(10px) saturate(150%);
   }
@@ -723,14 +706,16 @@
     scrollbar-color: var(--color-border) transparent;
   }
 
-  .mobile-doc-nav__toc {
+  .mobile-doc-nav__toc,
+  .mobile-doc-nav__page-list {
     display: flex;
     flex-direction: column;
     gap: 0.1rem;
     list-style: none;
   }
 
-  .mobile-doc-nav__toc-link {
+  .mobile-doc-nav__toc-link,
+  .mobile-doc-nav__page-link {
     display: block;
     padding: 0.32rem 0.55rem;
     border-radius: 0.4rem;
@@ -738,16 +723,22 @@
     color: var(--color-fg-muted);
     font-size: 0.85rem;
     line-height: 1.45;
-    transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease;
+    transition:
+      color 140ms ease,
+      background-color 140ms ease,
+      border-color 140ms ease;
   }
 
   .mobile-doc-nav__toc-link:hover,
-  .mobile-doc-nav__toc-link:focus-visible {
+  .mobile-doc-nav__toc-link:focus-visible,
+  .mobile-doc-nav__page-link:hover,
+  .mobile-doc-nav__page-link:focus-visible {
     color: var(--color-fg);
     background: var(--color-surface);
   }
 
-  .mobile-doc-nav__toc-link.is-active {
+  .mobile-doc-nav__toc-link.is-active,
+  .mobile-doc-nav__page-link.is-active {
     color: var(--color-accent);
     font-weight: 600;
     background: var(--color-accent-soft);
@@ -757,37 +748,6 @@
   .mobile-doc-nav__toc-item.depth-3 .mobile-doc-nav__toc-link {
     padding-left: 1.2rem;
     font-size: 0.82rem;
-  }
-
-  .mobile-doc-nav__page-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-    list-style: none;
-  }
-
-  .mobile-doc-nav__page-link {
-    display: block;
-    padding: 0.32rem 0.55rem;
-    border-radius: 0.4rem;
-    border-left: 2px solid transparent;
-    color: var(--color-fg-muted);
-    font-size: 0.85rem;
-    line-height: 1.45;
-    transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease;
-  }
-
-  .mobile-doc-nav__page-link:hover,
-  .mobile-doc-nav__page-link:focus-visible {
-    color: var(--color-fg);
-    background: var(--color-surface);
-  }
-
-  .mobile-doc-nav__page-link.is-active {
-    color: var(--color-accent);
-    font-weight: 600;
-    background: var(--color-accent-soft);
-    border-left-color: var(--color-accent);
   }
 
   @media (min-width: 64rem) {
@@ -883,7 +843,10 @@
 
   /* Search modal */
 
-  .search-dialog {
+  /* Fullscreen-dialog scaffolding shared by the search modal and the adf4j
+     demo dialog; only the inner __panel sizing differs between them. */
+  .search-dialog,
+  .adf4j-dialog {
     position: fixed;
     inset: 0;
     width: 100%;
@@ -897,7 +860,8 @@
     overflow: hidden;
   }
 
-  .search-dialog::backdrop {
+  .search-dialog::backdrop,
+  .adf4j-dialog::backdrop {
     background: var(--color-scrim);
     backdrop-filter: blur(3px);
   }
@@ -915,7 +879,8 @@
     overflow: hidden;
   }
 
-  .search-dialog[open] .search-dialog__panel {
+  .search-dialog[open] .search-dialog__panel,
+  .adf4j-dialog[open] .adf4j-dialog__panel {
     animation: search-pop 160ms cubic-bezier(0.2, 0, 0.2, 1);
   }
 
@@ -955,9 +920,11 @@
     cursor: pointer;
   }
 
+  /* Shared keyboard-shortcut chip used across the search trigger and both dialogs. */
   .search-trigger__kbd,
   .search-dialog__close kbd,
-  .search-dialog__hint kbd {
+  .search-dialog__hint kbd,
+  .adf4j-dialog__close kbd {
     display: inline-flex;
     align-items: center;
     padding: 0.1rem 0.4rem;
@@ -1170,25 +1137,6 @@
     font-size: 0.85rem;
   }
 
-  .adf4j-dialog {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    max-width: none;
-    height: 100dvh;
-    max-height: none;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    overflow: hidden;
-  }
-
-  .adf4j-dialog::backdrop {
-    background: var(--color-scrim);
-    backdrop-filter: blur(3px);
-  }
-
   .adf4j-dialog__panel {
     display: flex;
     flex-direction: column;
@@ -1200,10 +1148,6 @@
     border-radius: 0.85rem;
     box-shadow: var(--shadow-elevated);
     overflow: hidden;
-  }
-
-  .adf4j-dialog[open] .adf4j-dialog__panel {
-    animation: search-pop 160ms cubic-bezier(0.2, 0, 0.2, 1);
   }
 
   .adf4j-dialog__header {
@@ -1224,19 +1168,6 @@
   .adf4j-dialog__close {
     flex: none;
     cursor: pointer;
-  }
-
-  .adf4j-dialog__close kbd {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.1rem 0.4rem;
-    border: 1px solid var(--color-border);
-    border-radius: 0.3rem;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    line-height: 1;
-    color: var(--color-fg-soft);
-    background: var(--color-surface);
   }
 
   .adf4j-dialog__diagnostics {
@@ -1330,7 +1261,7 @@
       min-width: 0;
     }
 
-    :scope>*+* {
+    :scope > * + * {
       margin-top: 1.25rem;
     }
 
@@ -1379,7 +1310,9 @@
       opacity: 0;
       border-radius: 0.25rem;
       text-decoration: none;
-      transition: opacity 140ms ease, color 140ms ease;
+      transition:
+        opacity 140ms ease,
+        color 140ms ease;
     }
 
     .heading-anchor svg {
@@ -1387,9 +1320,9 @@
       height: 0.85em;
     }
 
-    h2:hover>.heading-anchor,
-    h3:hover>.heading-anchor,
-    h4:hover>.heading-anchor,
+    h2:hover > .heading-anchor,
+    h3:hover > .heading-anchor,
+    h4:hover > .heading-anchor,
     .heading-anchor:focus-visible {
       opacity: 1;
     }
@@ -1436,7 +1369,9 @@
       text-decoration-thickness: 1px;
       text-decoration-color: var(--color-accent-soft);
       text-underline-offset: 0.2em;
-      transition: text-decoration-color 140ms ease, color 140ms ease;
+      transition:
+        text-decoration-color 140ms ease,
+        color 140ms ease;
     }
 
     a:hover,
@@ -1455,7 +1390,7 @@
       list-style: decimal;
     }
 
-    li+li {
+    li + li {
       margin-top: 0.5rem;
     }
 
@@ -1483,11 +1418,11 @@
       font-style: normal;
     }
 
-    .markdown-alert> :first-child {
+    .markdown-alert > :first-child {
       margin-top: 0;
     }
 
-    .markdown-alert> :last-child {
+    .markdown-alert > :last-child {
       margin-bottom: 0;
     }
 
@@ -1595,7 +1530,9 @@
       font-size: 0.72rem;
       line-height: 1;
       cursor: pointer;
-      transition: color 140ms ease, background-color 140ms ease;
+      transition:
+        color 140ms ease,
+        background-color 140ms ease;
     }
 
     .mermaid-diagram__tab:hover,
@@ -1652,7 +1589,7 @@
       text-align: center;
     }
 
-    .mermaid-diagram__canvas:not(:empty)+.mermaid-diagram__status {
+    .mermaid-diagram__canvas:not(:empty) + .mermaid-diagram__status {
       position: absolute;
       width: 1px;
       height: 1px;
@@ -1705,7 +1642,7 @@
       color: var(--color-fg-muted);
     }
 
-    :not(pre)>code {
+    :not(pre) > code {
       padding: 0.12rem 0.38rem;
       border: 1px solid var(--color-border);
       border-radius: 0.25rem;
@@ -1794,7 +1731,6 @@
   /* Shiki dual-theme: swap inline light token colors for `--shiki-dark` when the
      resolved scheme is dark. Outside `@scope (.prose)` to key off `html` state. */
   @media (prefers-color-scheme: dark) {
-
     html:not([data-theme="light"]) .astro-code,
     html:not([data-theme="light"]) .astro-code span {
       color: var(--shiki-dark) !important;

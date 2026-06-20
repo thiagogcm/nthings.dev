@@ -4,6 +4,14 @@ initOnce("mobile-docs-nav", () => {
   // `toggle` doesn't bubble, so listen in the capture phase.
   let openPanel: HTMLDetailsElement | null = null;
   let openedAtY = 0;
+
+  // A view-transition swap detaches the previous page's <details>; drop the
+  // cached reference so the handlers don't operate on (or pin) stale DOM.
+  document.addEventListener("astro:after-swap", () => {
+    openPanel = null;
+    openedAtY = 0;
+  });
+
   document.addEventListener(
     "toggle",
     (event) => {

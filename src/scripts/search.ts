@@ -28,13 +28,21 @@ const input = () =>
   document.getElementById("search-input") as HTMLInputElement | null;
 const list = () => document.getElementById("search-results");
 
-// Prebuilt per-term regexes (built once per render) wrap matches in <mark>.
-const highlight = (text: string, regexes: RegExp[]) => {
-  let out = escapeHtml(text);
-  for (const re of regexes) {
-    out = out.replace(re, "<mark>$1</mark>");
+// Wrap query matches in <mark>, matching against the raw text and escaping only
+// around each match. Escaping after matching keeps inserted markup (and HTML
+// entities) from being re-matched, which produced broken HTML for queries whose
+// terms overlapped the tags an earlier term inserted (e.g. "code a").
+const highlight = (text: string, matcher: RegExp | null) => {
+  if (!matcher) {
+    return escapeHtml(text);
   }
-  return out;
+  let out = "";
+  let last = 0;
+  for (const match of text.matchAll(matcher)) {
+    out += `${escapeHtml(text.slice(last, match.index))}<mark>${escapeHtml(match[0])}</mark>`;
+    last = match.index + match[0].length;
+  }
+  return out + escapeHtml(text.slice(last));
 };
 
 const render = async (query: string) => {
@@ -66,9 +74,12 @@ const render = async (query: string) => {
   }
 
   const terms = q.split(/\s+/).filter(Boolean);
-  const regexes = terms.map(
-    (t) => new RegExp(`(${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi"),
-  );
+  // One combined matcher; longest term first so it wins over a shorter prefix.
+  const pattern = [...terms]
+    .sort((a, b) => b.length - a.length)
+    .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
+  const matcher = pattern ? new RegExp(pattern, "gi") : null;
   const docs = await loadIndex();
   const ranked = docs
     .map((doc) => ({ doc, s: scoreDoc(doc, terms) }))
@@ -97,8 +108,8 @@ const render = async (query: string) => {
           class="search-result${i === 0 ? " is-active" : ""}"
           data-search-result data-url="${escapeHtml(doc.url)}" data-index="${i}">
         <span class="search-result__section">${escapeHtml(doc.section)}</span>
-        <span class="search-result__title">${highlight(doc.title, regexes)}</span>
-        <span class="search-result__snippet">${highlight(buildSnippet(doc, terms), regexes)}</span>
+        <span class="search-result__title">${highlight(doc.title, matcher)}</span>
+        <span class="search-result__snippet">${highlight(buildSnippet(doc, terms), matcher)}</span>
       </li>`,
     )
     .join("");

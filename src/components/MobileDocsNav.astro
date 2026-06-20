@@ -1,8 +1,8 @@
 ---
 import type { MarkdownHeading } from "astro";
-import Icon from "./Icon.astro";
-import type { ProjectNavItem } from "../lib/collections";
-import { isNavItemActive, tocHeadings } from "../lib/nav";
+import Icon from "@/components/Icon.astro";
+import type { ProjectNavItem } from "@/lib/collections";
+import { isActive, tocHeadings } from "@/lib/nav";
 
 interface Props {
   headings?: MarkdownHeading[];
@@ -44,7 +44,7 @@ const hasToc = toc.length > 0;
                       class:list={[
                         "mobile-doc-nav__page-link",
                         {
-                          "is-active": isNavItemActive(
+                          "is-active": isActive(
                             pathname,
                             item.href,
                             item.isOverview,
@@ -101,50 +101,5 @@ const hasToc = toc.length > 0;
 }
 
 <script>
-  (function () {
-    if ((window as any).__nthingsMobileDocsNav) {
-      return;
-    }
-    (window as any).__nthingsMobileDocsNav = true;
-
-    // `toggle` doesn't bubble, so listen in the capture phase.
-    let openPanel: HTMLDetailsElement | null = null;
-    let openedAtY = 0;
-    document.addEventListener(
-      "toggle",
-      (event) => {
-        const details = event.target;
-        if (
-          details instanceof HTMLDetailsElement &&
-          details.closest(".mobile-doc-nav")
-        ) {
-          openPanel = details.open ? details : null;
-          openedAtY = window.scrollY;
-        }
-      },
-      true,
-    );
-
-    document.addEventListener("click", (event) => {
-      const target = event.target;
-      if (!openPanel || !(target instanceof Element)) {
-        return;
-      }
-      if (target.closest(".mobile-doc-nav a") || !openPanel.contains(target)) {
-        openPanel.open = false;
-      }
-    });
-
-    // The open panel is sticky and covers content; close it once the page
-    // scrolls away beneath it.
-    window.addEventListener(
-      "scroll",
-      () => {
-        if (openPanel && Math.abs(window.scrollY - openedAtY) > 24) {
-          openPanel.open = false;
-        }
-      },
-      { passive: true },
-    );
-  })();
+  import "@/scripts/mobile-docs-nav";
 </script>

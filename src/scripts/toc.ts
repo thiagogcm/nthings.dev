@@ -1,0 +1,174 @@
+import { initOnce } from "@/scripts/init-once";
+
+let links: HTMLAnchorElement[] = [];
+let headings: HTMLElement[] = [];
+let activeId: string | null = null;
+let lastHash: string | null = null;
+let ticking = false;
+
+// Cached once per setup/resize so the per-frame scroll handler avoids reflows.
+// `thresholds[i]` is the scrollY at which heading i becomes active.
+let thresholds: number[] = [];
+let firstActivate = 0;
+
+const measure = () => {
+  const header = document.querySelector(".site-header");
+  const mobileNav = document.querySelector(".mobile-doc-nav");
+  const mobileNavVisible =
+    mobileNav && getComputedStyle(mobileNav).display !== "none";
+  const baseHeaderOffset =
+    (header ? header.getBoundingClientRect().height : 0) + 28;
+  const headerOffset = mobileNavVisible
+    ? Math.max(baseHeaderOffset, window.innerHeight * 0.32)
+    : baseHeaderOffset;
+  const sy = window.scrollY;
+  const tops = headings.map((h) => h.getBoundingClientRect().top + sy);
+  const maxScrollTop = Math.max(
+    0,
+    document.documentElement.scrollHeight - window.innerHeight,
+  );
+
+  // scrollY at which each heading reaches the line just below the header.
+  const natural = tops.map((t) => Math.max(0, t - headerOffset));
+  firstActivate = natural[0] ?? 0;
+
+  // Trailing headings on a short page can't reach the line; pull out-of-reach
+  // thresholds back into range (from the end), kept ordered so each gets a turn.
+  // A non-scrollable page keeps its natural thresholds so the first heading
+  // stays active at the top instead of every threshold collapsing toward 0.
+  const n = natural.length;
+  const out = natural.slice();
+  if (maxScrollTop > 0) {
+    // Sub-pixel gaps are intentional: a 1px minimum on very short pages (or many
+    // headings vs. little scroll range) drives earlier thresholds negative, which
+    // would mark a later heading active at the top.
+    const gap = Math.min(0.25 * window.innerHeight, maxScrollTop / n);
+    out[n - 1] = Math.min(out[n - 1], maxScrollTop);
+    for (let i = n - 2; i >= 0; i--) {
+      out[i] = Math.min(out[i], out[i + 1] - gap);
+    }
+  }
+  thresholds = out;
+};
+
+// Reflect the current section in the URL, except above the first heading.
+const syncHash = (id: string, sy: number) => {
+  const hash = sy + 1 >= firstActivate ? `#${id}` : "";
+  if (hash === lastHash) {
+    return;
+  }
+  lastHash = hash;
+  history.replaceState(
+    history.state,
+    "",
+    location.pathname + location.search + hash,
+  );
+};
+
+const mark = (id: string | null) => {
+  if (id === activeId) {
+    return;
+  }
+  activeId = id;
+  const activeLinks: HTMLAnchorElement[] = [];
+  for (const l of links) {
+    const on = l.getAttribute("data-toc-link") === id;
+    l.classList.toggle("is-active", on);
+    if (on) {
+      l.setAttribute("aria-current", "true");
+      activeLinks.push(l);
+    } else {
+      l.removeAttribute("aria-current");
+    }
+  }
+  const active =
+    activeLinks.find((l) => l.getClientRects().length > 0) ??
+    activeLinks[0] ??
+    null;
+  const rail = active?.closest<HTMLElement>(".site-toc, .mobile-doc-nav__body");
+  // Keep the active link in view inside its independently scrollable rail.
+  if (active && rail && rail.scrollHeight > rail.clientHeight + 4) {
+    const lr = active.getBoundingClientRect();
+    const rr = rail.getBoundingClientRect();
+    if (lr.top < rr.top + 8) {
+      rail.scrollTop -= rr.top + 8 - lr.top;
+    } else if (lr.bottom > rr.bottom - 8) {
+      rail.scrollTop += lr.bottom - (rr.bottom - 8);
+    }
+  }
+};
+
+const update = () => {
+  ticking = false;
+  if (headings.length === 0) {
+    return;
+  }
+  // Last heading whose (remapped) activation point has been scrolled past.
+  const sy = window.scrollY;
+  let idx = 0;
+  for (let i = 0; i < thresholds.length; i++) {
+    if (sy + 1 >= thresholds[i]) {
+      idx = i;
+    } else {
+      break;
+    }
+  }
+  const id = headings[idx].id;
+  mark(id);
+  syncHash(id, sy);
+};
+
+const onScroll = () => {
+  if (ticking) {
+    return;
+  }
+  ticking = true;
+  requestAnimationFrame(update);
+};
+
+const remeasure = () => {
+  if (headings.length === 0) {
+    return;
+  }
+  measure();
+  update();
+};
+
+const setup = () => {
+  links = Array.from(
+    document.querySelectorAll<HTMLAnchorElement>("[data-toc-link]"),
+  );
+  const seen = new Set<string>();
+  const ids = links
+    .map((l) => l.getAttribute("data-toc-link"))
+    .filter((id): id is string => {
+      if (!id || seen.has(id)) {
+        return false;
+      }
+      seen.add(id);
+      return true;
+    });
+  headings = ids
+    .map((id) => document.getElementById(id))
+    .filter((el): el is HTMLElement => !!el);
+  activeId = null;
+  lastHash = null;
+  if (headings.length === 0) {
+    return;
+  }
+  measure();
+  update();
+};
+
+initOnce("toc", () => {
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", remeasure, { passive: true });
+  // Late image/asset loads can shift heading positions after first paint.
+  window.addEventListener("load", remeasure);
+  // Web-font swaps shift heading positions; re-measure once they settle.
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(remeasure);
+  }
+  document.addEventListener("astro:page-load", setup);
+  setup();
+});

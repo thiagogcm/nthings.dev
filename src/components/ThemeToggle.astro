@@ -1,5 +1,5 @@
 ---
-import Icon from "./Icon.astro";
+import Icon from "@/components/Icon.astro";
 ---
 
 <button
@@ -21,55 +21,5 @@ import Icon from "./Icon.astro";
 </button>
 
 <script>
-  (function () {
-    if ((window as any).__nthingsThemeBound) {
-      return;
-    }
-    (window as any).__nthingsThemeBound = true;
-
-    const order = ["system", "light", "dark"] as const;
-    const labels = {
-      system: "Theme: system. Activate to use light theme",
-      light: "Theme: light. Activate to use dark theme",
-      dark: "Theme: dark. Activate to use system theme",
-    } as const;
-
-    const apply = (theme: string) => {
-      const root = document.documentElement;
-      if (theme === "light" || theme === "dark") {
-        root.dataset.theme = theme;
-      } else {
-        delete root.dataset.theme;
-      }
-      document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]").forEach((btn) => {
-        const label = labels[(theme as keyof typeof labels) || "system"] ?? labels.system;
-        btn.setAttribute("aria-label", label);
-        btn.setAttribute("title", label);
-      });
-    };
-
-    const sync = () => {
-      apply(document.documentElement.dataset.theme || "system");
-    };
-
-    document.addEventListener("click", (e) => {
-      const btn = (e.target as HTMLElement).closest("[data-theme-toggle]");
-      if (!btn) {
-        return;
-      }
-      const cur = document.documentElement.dataset.theme || "system";
-      const next = order[(order.indexOf(cur as any) + 1) % order.length];
-      try {
-        if (next === "system") {
-          localStorage.removeItem("theme");
-        } else {
-          localStorage.setItem("theme", next);
-        }
-      } catch (err) {}
-      apply(next);
-    });
-    document.addEventListener("astro:page-load", sync);
-    document.addEventListener("astro:after-swap", sync);
-    sync();
-  })();
+  import "@/scripts/theme-toggle";
 </script>

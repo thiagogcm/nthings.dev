@@ -1,8 +1,8 @@
 ---
-import DirectoryEntry from "../../components/DirectoryEntry.astro";
-import { formatDate } from "../../lib/format-date";
-import DocsLayout from "../../layouts/DocsLayout.astro";
-import { getSortedPosts } from "../../lib/collections";
+import DirectoryEntry from "@/components/DirectoryEntry.astro";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+import { getSortedPosts } from "@/lib/collections";
+import { formatDate } from "@/lib/format-date";
 
 const posts = await getSortedPosts();
 ---

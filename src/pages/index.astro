@@ -1,13 +1,13 @@
 ---
-import DirectoryEntry from "../components/DirectoryEntry.astro";
-import Icon from "../components/Icon.astro";
-import { formatDate } from "../lib/format-date";
-import { CURRENT_FOCUS, SITE } from "../consts";
-import BaseLayout from "../layouts/BaseLayout.astro";
-import StatusIsland from "../components/StatusIsland.astro";
-import StatusFallback from "../components/StatusFallback.astro";
-import { getSortedPosts, getSortedProjects } from "../lib/collections";
-import { projectActions } from "../lib/project-actions";
+import DirectoryEntry from "@/components/DirectoryEntry.astro";
+import Icon from "@/components/Icon.astro";
+import StatusFallback from "@/components/StatusFallback.astro";
+import StatusIsland from "@/components/StatusIsland.astro";
+import { CURRENT_FOCUS, SITE } from "@/consts";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { getSortedPosts, getSortedProjects } from "@/lib/collections";
+import { formatDate } from "@/lib/format-date";
+import { projectActions } from "@/lib/project-actions";
 
 const [projects, posts] = await Promise.all([
   getSortedProjects(),
@@ -26,8 +26,11 @@ const featuredProject = projectCards[0];
     <header class="home-hero">
       <div class="home-hero__copy">
         <p class="eyebrow">nthings.dev</p>
-        <h1>Thiago Moura | Stuff Engineer</h1>
-        <p class="lede mt-4">Experiments, thoughts, and anything in between.</p>
+        <h1>Thiago Moura</h1>
+        <p class="lede mt-4">Stuff Engineer</p>
+        <p class="home-hero__description">
+          Experiments, thoughts, and anything in between.
+        </p>
 
         <div class="home-hero__actions">
           <a class="button-link button-link--primary" href="/projects">
@@ -139,7 +142,7 @@ const featuredProject = projectCards[0];
 <script>
   // Registers the <github-activity-chart> custom element used by the GitHub
   // panel; the element itself is injected later by the StatusIsland server island.
-  import "../scripts/activity-chart";
+  import "@/scripts/activity-chart";
 </script>
 
 <style>
@@ -212,7 +215,7 @@ const featuredProject = projectCards[0];
 
   .home-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.45fr);
+    grid-template-columns: minmax(0, 1fr) minmax(28rem, 0.65fr);
     gap: clamp(1.75rem, 4vw, 3.5rem);
     align-items: stretch;
   }
@@ -220,6 +223,11 @@ const featuredProject = projectCards[0];
   .home-hero__copy {
     align-self: center;
     max-width: 44rem;
+  }
+
+  .home-hero__description {
+    margin-top: 0.35rem;
+    color: var(--color-fg-muted);
   }
 
   .home-hero__actions {

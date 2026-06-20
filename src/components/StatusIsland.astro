@@ -1,18 +1,20 @@
 ---
 import { env } from "cloudflare:workers";
+import MetricPanel from "@/components/MetricPanel.astro";
 import {
   ACTIVITY_DAYS,
   activityMetricQuery,
   getGitHubStats,
   refreshGitHubStats,
-} from "../lib/github-stats";
-import MetricPanel from "./MetricPanel.astro";
+} from "@/lib/github-stats";
 
 const stats = await getGitHubStats(env);
 // Entries cached before the activity chart shipped lack `dailyActivity`; treat a
 // missing/empty series as a cold cache and kick a non-blocking refresh.
 const hasChart =
-  !!stats && Array.isArray(stats.dailyActivity) && stats.dailyActivity.length > 0;
+  !!stats &&
+  Array.isArray(stats.dailyActivity) &&
+  stats.dailyActivity.length > 0;
 
 if (!hasChart) {
   Astro.locals.cfContext?.waitUntil(

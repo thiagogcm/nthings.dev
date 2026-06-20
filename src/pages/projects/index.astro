@@ -1,17 +1,14 @@
 ---
-import DirectoryEntry from "../../components/DirectoryEntry.astro";
-import DocsLayout from "../../layouts/DocsLayout.astro";
-import { getSortedProjects } from "../../lib/collections";
-import { projectActions } from "../../lib/project-actions";
+import DirectoryEntry from "@/components/DirectoryEntry.astro";
+import DocsLayout from "@/layouts/DocsLayout.astro";
+import { getSortedProjects } from "@/lib/collections";
+import { projectActions } from "@/lib/project-actions";
 
 const projects = await getSortedProjects();
 const projectCards = projects.map((project) => ({
   project,
   actions: projectActions(project),
 }));
-const projectTags = [
-  ...new Set(projects.flatMap((project) => project.data.tags ?? [])),
-].slice(0, 8);
 ---
 
 <DocsLayout
@@ -64,32 +61,5 @@ const projectTags = [
     gap: 1rem;
     max-width: 54rem;
     margin-bottom: 0.5rem;
-  }
-
-  .project-index__summary {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-top: 0.25rem;
-  }
-
-  .project-index__summary div {
-    display: inline-grid;
-    gap: 0.15rem;
-    min-width: 8.5rem;
-    padding: 0.65rem 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: 0.5rem;
-    background: var(--color-surface);
-  }
-
-  .project-index__summary strong {
-    font-family: var(--font-mono);
-    font-size: 1.05rem;
-  }
-
-  .project-index__summary span {
-    color: var(--color-fg-soft);
-    font-size: 0.78rem;
   }
 </style>

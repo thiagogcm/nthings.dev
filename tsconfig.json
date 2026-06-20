@@ -1,11 +1,21 @@
 {
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
+    "types": [
+      "markdown-it",
+      "node",
+      "prismjs"
+    ],
     "lib": [
       "ESNext",
       "DOM",
       "DOM.Iterable"
-    ]
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
   "include": [
     ".astro/types.d.ts",

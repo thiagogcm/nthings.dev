@@ -1,6 +1,6 @@
 ---
-import type { ProjectNavItem } from "../lib/collections";
-import { isNavItemActive } from "../lib/nav";
+import type { ProjectNavItem } from "@/lib/collections";
+import { isActive } from "@/lib/nav";
 
 interface Props {
   items: ProjectNavItem[];
@@ -23,15 +23,11 @@ const pathname = Astro.url.pathname;
                 class:list={[
                   "project-docs-nav__link",
                   {
-                    "is-active": isNavItemActive(
-                      pathname,
-                      item.href,
-                      item.isOverview,
-                    ),
+                    "is-active": isActive(pathname, item.href, item.isOverview),
                   },
                 ]}
                 aria-current={
-                  isNavItemActive(pathname, item.href, item.isOverview)
+                  isActive(pathname, item.href, item.isOverview)
                     ? "page"
                     : undefined
                 }

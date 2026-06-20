@@ -1,20 +1,16 @@
-import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
-import { NAV_LINKS } from "../consts";
-import { getSortedPosts, getSortedProjects, projectDocUrl } from "../lib/collections";
-import { SITE_OWNED_PAGES } from "../lib/site-owned-pages";
+import type { APIRoute } from "astro";
+import { NAV_LINKS } from "@/consts";
+import {
+  getSortedPosts,
+  getSortedProjects,
+  projectDocUrl,
+} from "@/lib/collections";
+import { SEARCH_TEXT_MAX, type SearchDoc, stripMarkdown } from "@/lib/search";
+import { SITE_OWNED_PAGES } from "@/lib/site-owned-pages";
 
 // Collection index routes — covered by their per-entry docs below.
 const COLLECTION_ROOTS = new Set(["/projects", "/blog"]);
-
-interface SearchDoc {
-  title: string;
-  url: string;
-  section: string;
-  description: string;
-  tags: string[];
-  text: string;
-}
 
 /** Site-owned project pages not backed by synced markdown collections. */
 const SITE_OWNED_PROJECT_PAGES: SearchDoc[] = SITE_OWNED_PAGES.map((page) => ({
@@ -29,20 +25,6 @@ const SITE_OWNED_PROJECT_PAGES: SearchDoc[] = SITE_OWNED_PAGES.map((page) => ({
 // Prebuilt static index: one JSON file the client fetches once and searches in memory.
 export const prerender = true;
 
-function stripMarkdown(md: string): string {
-  return md
-    .replace(/```[\s\S]*?```/g, " ") // fenced code blocks
-    .replace(/~~~[\s\S]*?~~~/g, " ")
-    .replace(/`[^`]*`/g, " ") // inline code
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ") // images
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1") // links → label
-    .replace(/^\s{0,3}>+\s?/gm, " ") // blockquotes
-    .replace(/^[#>\-*+]+\s?/gm, " ") // list/heading markers
-    .replace(/[*_~#>|]/g, " ") // residual emphasis/table punctuation
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 export const GET: APIRoute = async () => {
   const [posts, projects, projectDocs] = await Promise.all([
     getSortedPosts(),
@@ -50,7 +32,9 @@ export const GET: APIRoute = async () => {
     getCollection("projectDocs"),
   ]);
 
-  const projectsById = new Map(projects.map((project) => [project.id, project]));
+  const projectsById = new Map(
+    projects.map((project) => [project.id, project]),
+  );
 
   // Static pages (Home, About) — sourced from the nav so they never drift.
   const pages: SearchDoc[] = NAV_LINKS.filter(
@@ -73,7 +57,7 @@ export const GET: APIRoute = async () => {
       section: "Projects",
       description: project.data.description,
       tags: [...(project.data.tags ?? [])],
-      text: stripMarkdown(project.body ?? "").slice(0, 1500),
+      text: stripMarkdown(project.body ?? "").slice(0, SEARCH_TEXT_MAX),
     })),
     ...projectDocs.map((doc) => {
       const project = projectsById.get(doc.data.project);
@@ -85,7 +69,7 @@ export const GET: APIRoute = async () => {
         section: "Projects",
         description: doc.data.description || project?.data.description || "",
         tags: [...(project?.data.tags ?? [])],
-        text: stripMarkdown(doc.body ?? "").slice(0, 1500),
+        text: stripMarkdown(doc.body ?? "").slice(0, SEARCH_TEXT_MAX),
       };
     }),
     ...posts.map((post) => ({
@@ -94,7 +78,7 @@ export const GET: APIRoute = async () => {
       section: "Blog",
       description: post.data.description,
       tags: [...(post.data.tags ?? [])],
-      text: stripMarkdown(post.body ?? "").slice(0, 1500),
+      text: stripMarkdown(post.body ?? "").slice(0, SEARCH_TEXT_MAX),
     })),
   ];
 

@@ -4,7 +4,7 @@ description: "A build-time content aggregator with a small edge backend."
 repository: "https://github.com/thiagomoura/nthings.dev"
 website: "https://nthings.dev"
 order: 1
-tags: [ "content federation", "edge backend" ]
+tags: [ "cloudflare", "architecture" ]
 ---
 
 nthings.dev keeps the website separate from the projects it documents. Project repositories remain the source of truth for their own pages and posts; this site assembles them into one consistent publication during the build.

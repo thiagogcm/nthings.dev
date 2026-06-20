@@ -26,8 +26,11 @@ const featuredProject = projectCards[0];
     <header class="home-hero">
       <div class="home-hero__copy">
         <p class="eyebrow">nthings.dev</p>
-        <h1>Thiago Moura | Stuff Engineer</h1>
-        <p class="lede mt-4">Experiments, thoughts, and anything in between.</p>
+        <h1>Thiago Moura</h1>
+        <p class="lede mt-4">Stuff Engineer</p>
+        <p class="home-hero__description">
+          Experiments, thoughts, and anything in between.
+        </p>
 
         <div class="home-hero__actions">
           <a class="button-link button-link--primary" href="/projects">
@@ -212,7 +215,7 @@ const featuredProject = projectCards[0];
 
   .home-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.45fr);
+    grid-template-columns: minmax(0, 1fr) minmax(28rem, 0.65fr);
     gap: clamp(1.75rem, 4vw, 3.5rem);
     align-items: stretch;
   }
@@ -220,6 +223,11 @@ const featuredProject = projectCards[0];
   .home-hero__copy {
     align-self: center;
     max-width: 44rem;
+  }
+
+  .home-hero__description {
+    margin-top: 0.35rem;
+    color: var(--color-fg-muted);
   }
 
   .home-hero__actions {

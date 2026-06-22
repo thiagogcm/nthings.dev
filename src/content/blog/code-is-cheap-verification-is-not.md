@@ -1,6 +1,6 @@
 ---
 title: "Code Is Cheap. Verification Is Not"
-description: "What I learned building a regulated Open Finance ecosystem with coding agents."
+description: "What I learned from using AI agents to build an Open Finance Authorization Server"
 pubDate: "2026-06-22"
 tags: [ "at-work", "coding-agents", "observability" ]
 ---

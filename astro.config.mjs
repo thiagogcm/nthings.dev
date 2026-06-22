@@ -1,5 +1,4 @@
 import cloudflare from "@astrojs/cloudflare";
-import { unified } from "@astrojs/markdown-remark";
 import adf4jWasm from "@nthings.dev/adf4j-wasm/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
@@ -8,11 +7,14 @@ export default defineConfig({
   site: "https://nthings.dev",
   adapter: cloudflare({
     platformProxy: { enabled: true },
+    // No images to optimize; passthrough avoids the Cloudflare IMAGES binding.
+    imageService: "passthrough",
   }),
   vite: {
     plugins: [tailwindcss(), adf4jWasm()],
   },
   markdown: {
+    // Default processor is Sätteri (GFM, SmartyPants, heading IDs applied automatically).
     syntaxHighlight: "shiki",
     // Dual themes: light colors inline, dark swapped via --shiki-dark in global.css.
     shikiConfig: {
@@ -21,11 +23,6 @@ export default defineConfig({
         dark: "github-dark",
       },
     },
-    processor: unified({
-      smartypants: {
-        dashes: "oldschool",
-      },
-    }),
   },
   prefetch: {
     prefetchAll: true,

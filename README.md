@@ -90,6 +90,10 @@ This boundary is intentional: content assembly belongs to the build, presentatio
 | Command                     | Purpose                                                   |
 | --------------------------- | --------------------------------------------------------- |
 | `npm run dev`               | Sync external content, then start the development server. |
+| `npm run dev:bg`            | Start the dev server as a managed background process. Astro 7 auto-enables this when it detects an AI agent, so coding agents can run the server without blocking. |
+| `npm run dev:status`        | Report the background dev server's status.                |
+| `npm run dev:logs`          | Print the background dev server's logs.                   |
+| `npm run dev:stop`          | Stop the background dev server.                           |
 | `npm run sync:content`      | Rebuild generated content from registered sources.        |
 | `npm run validate:sources`  | Validate sources without writing generated output.        |
 | `npm run test:content-sync` | Test content normalization and link rewriting.            |

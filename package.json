@@ -7,6 +7,10 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "dev:bg": "astro dev --background",
+    "dev:status": "astro dev status",
+    "dev:stop": "astro dev stop",
+    "dev:logs": "astro dev logs",
     "check": "astro check",
     "lint": "biome check .",
     "format": "biome format --write .",
@@ -21,9 +25,9 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "13.7.0",
+    "@astrojs/cloudflare": "14.0.0",
     "@nthings.dev/adf4j-wasm": "1.0.2",
-    "astro": "6.4.8",
+    "astro": "7.0.0",
     "chart.js": "4.5.1",
     "dompurify": "3.4.11",
     "markdown-it": "14.2.0",
@@ -34,7 +38,6 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.9",
-    "@astrojs/markdown-remark": "7.2.0",
     "@biomejs/biome": "2.5.0",
     "@tailwindcss/vite": "4.3.1",
     "@types/markdown-it": "14.1.2",

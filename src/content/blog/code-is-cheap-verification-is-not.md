@@ -1,64 +1,72 @@
 ---
 title: "Code Is Cheap. Verification Is Not"
 description: "What I learned building a regulated Open Finance ecosystem with coding agents."
-pubDate: "2026-06-20"
+pubDate: "2026-06-22"
 tags: [ "at-work", "coding-agents", "observability" ]
 ---
 
-## The Authorization Server Was Only the Beginning
-
-Last week, I presented to Sensedia's engineering team what I learned building an Authorization Server for Chile's Open Finance ecosystem with AI coding agents.
-
-The main insight was simple:
+Last week I presented to Sensedia's engineering team what I learned building a FAPI 2.0 Authorization Server with embedded consent engine for Chile's emerging Open Finance. I built it using AI coding agents. As expected, code generation wasn't the bottleneck.
 
 > Code is cheap. Verification is not.
 
-The challenge looked narrow: build an OAuth 2.0 Authorization Server and consent engine for Chile's Sistema de Finanzas Abiertas. But the Authorization Server is only one piece of the ecosystem. It must work with customers, data consumers, data holders, protected APIs, and the official participant directory.
+The real challenge was proving that the generated code actually behaved correctly inside a complex, regulated ecosystem. Correctness is not a property of one service. It is a property of the flow. It spans participant registration, consent journeys, authorization details, token issuance, protected API access, revocation, expiration, and audit.
 
-It cannot be validated in isolation. Regulated consent must remain correct through authorization, token issuance, API access, revocation, expiration, and audit.
+A locally correct Authorization Server can still be wrong once it interacts with data consumers, data holders, customers, protected resources, and the official participant directory.
 
-This was a greenfield project, and the regulator's specifications were authoritative. I did not need to preserve legacy assumptions. When runtime evidence or the regulatory corpus showed that the implementation was wrong, the code changed.
+So the real challenge became: how do you give coding agents enough access to the ecosystem that they can execute behavior, observe evidence, compare it with the regulatory corpus, and only then change the code?
 
-## Building an Ecosystem the Agents Could Test
+## Building an Executable Ecosystem
 
-Reading the Authorization Server source was not enough. A locally correct implementation could still fail when a participant registered, a customer completed a consent journey, a token reached a resource server, or a grant was revoked.
+Reading the Authorization Server source was not enough. A real ecosystem has multiple actors, trust relationships, protocol boundaries, and state transitions. So I built a simulated Open Finance ecosystem around the Authorization Server.
 
-So I built a simulated Open Finance ecosystem around the Authorization Server, with running components representing the other participants. These components exercised participant registration, consent journeys, protected resource access, and trust relationships. They were not static mocks with canned responses.
+The important detail: these simulated participants were not generic mocks. They were purpose-built for the Authorization Server harness. The ecosystem included running components representing the surrounding participants and dependencies: data consumers, data holders, protected resources, customer-facing journeys, and directory and trust relationships. Their job was not to return canned responses. Their job was to make the Authorization Server prove its behavior in realistic flows.
 
-Every component was fully instrumented and emitted telemetry, making behavior observable across service boundaries.
+That changed the role of the test environment. It was not just a place where tests ran. It became an executable model of the ecosystem around the AS.
 
-The biggest leverage was Atacama, a command-line tool that runs ecosystem flows through protocols and APIs, or through Playwright for browser interactions.
+The biggest leverage came from Atacama, an internal CLI I built as the executable interface to that ecosystem. Through Atacama, agents could run complete flows via protocols and APIs, or through Playwright when the browser journey mattered. They could register participants, start consent journeys, interrupt them before authorization, retry with modified authorization details, request tokens, call protected resources, revoke grants, vary inputs, and inspect the resulting grant state.
 
-I gave Atacama to the agents as an adversarial testing interface for the ecosystem. They could execute valid and invalid flows, vary inputs, probe boundaries, interrupt journeys, and look for behavior that contradicted the specifications. Every experiment produced evidence they could inspect.
+The simulated participants were designed to be controllable, observable, and adversarial enough for agents to use. They supported valid flows, invalid flows, boundary cases, interrupted journeys, and cross-component checks. Every component was instrumented, so each run produced runtime evidence that agents could reason about.
 
-## Closing the Loop with Atacama and Telemetry
+The agents were not asked to "read the code and decide if it looked right." They were asked to run the ecosystem, observe what happened, compare that behavior with the authoritative specifications, and report contradictions. Without a simulated ecosystem and a tool to drive it, agents would mostly reason from source code. With both, they could run the system.
 
-The workflow connected Atacama agents, monitoring agents, and coding agents with direct access to the regulatory corpus.
+## The Verification Loop
+
+The workflow became a verification loop. Each cycle ran as follows:
+
+1. **Execute.** QA agents exercised real protocol and browser journeys through Atacama.
+2. **Capture.** Telemetry from every component produced runtime evidence: metrics, traces, state transitions, request payloads, responses, and token contents.
+3. **Compare.** Monitoring agents inspected what actually happened across the ecosystem. Coding agents compared the observed behavior with the authoritative specifications.
+4. **Change.** When the evidence showed a mismatch, coding agents located the issue, changed the implementation, and ran the flow again.
+5. **Improve the harness.** At the end of each cycle, I asked the agents what was difficult, which operations were missing, what evidence they could not retrieve, and what prevented them from completing the task. Some feedback became new Atacama capabilities, some became better telemetry, some became better simulated participant behavior.
+
+Success required evidence from the complete flow, not confidence based on reading the diff.
 
 ```mermaid
-flowchart TD
-    A[Agents use Atacama to run API and UI flows] --> B[Instrumented ecosystem emits telemetry]
-    B --> C[Monitoring agents collect runtime evidence]
-    C --> D[Coding agents compare evidence with the regulatory corpus]
-    D --> E[Implement and verify relevant changes]
-    E --> A
-    E --> F[Agents report missing or difficult Atacama capabilities]
-    F --> G[Improve Atacama]
-    G --> A
+flowchart LR
+    Specs[Regulatory corpus] --> Agents[QA / Monitoring / Coding agents]
+    Agents --> Atacama[Atacama CLI]
+    Atacama --> Ecosystem[Simulated Open Finance ecosystem]
+    Ecosystem --> AS[Authorization Server + Consent Engine]
+    AS --> Telemetry[Runtime evidence]
+    Ecosystem --> Telemetry
+    Telemetry --> Agents
+    Agents --> Code[Implementation changes]
+    Code --> AS
 ```
-
-Atacama agents first exercised real protocol and browser journeys. Monitoring agents then inspected traces, state transitions, request payloads, responses, and token contents. Their job was to report what the system had actually done.
-
-Coding agents compared that evidence with the authoritative specifications. They located the mismatch, changed the implementation, and ran the flow again. Success required evidence from the complete flow, not confidence based on reading the diff.
-
-The feedback loop also improved Atacama. At the end of each cycle, I asked its agent users what was difficult, which operations were missing, what evidence they could not retrieve, and what prevented them from completing a task. I implemented the relevant feedback and started the cycle again.
 
 Each cycle improved both the product and the agents' ability to test the next version. The leverage came from expanding what agents could independently execute, observe, compare, and verify.
 
 ## Build the Verification Loop First
 
-If correctness spans multiple components, start with one critical user flow and make it executable from a single tool. Include protocol and user interface paths when both matter. Instrument every component. Give agents access to the requirements and to telemetry from their own runs. Require them to compare the two before changing code or claiming success.
+The lesson I took from this project is simple: if correctness spans multiple components, build the verification loop before trying to scale code generation.
 
-Then ask what the tool prevented them from testing or understanding. Implement the useful feedback and repeat.
+1. Start with one critical flow.
+2. Make it executable from a single tool.
+3. Include protocol and browser paths when both matter.
+4. Build simulated participants that are specific to the system under test, not generic mocks.
+5. Instrument every component.
+6. Give agents access to the requirements and to the telemetry produced by their own runs.
+7. Require evidence before accepting a fix.
+8. Ask what the harness prevented them from testing or understanding. Improve the harness. Repeat.
 
-You do not need my stack or Atacama. You need an executable interface to your system, observable runtime evidence, and an authoritative source of truth. With those three things, agents can do more than generate code. They can challenge the system and help prove that it works.
+Verification is non-negotiable. Even frontier models hallucinate, and coding agents inherit the non-determinism by design. Rather than trusting their self-reported confidence, give them an authoritative source of truth, an executable environment, and runtime evidence so they can independently challenge the system and prove it meets its requirements.

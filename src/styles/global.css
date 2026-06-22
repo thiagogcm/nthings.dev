@@ -72,7 +72,7 @@
     --header-height: 3.75rem;
     --tabs-height: 3.25rem;
     --header-stack: calc(var(--header-height) + var(--tabs-height));
-    --reading-width: 54rem;
+    --reading-width: 62rem;
     --page-max: 100rem;
     --page-pad: clamp(1.1rem, 2.5vw, 2rem);
     --color-scrim: rgb(0 0 0 / 0.5);
@@ -553,7 +553,9 @@
     min-width: 0;
     width: 100%;
     max-width: var(--reading-width);
-    justify-self: start;
+    /* Centre the reading column instead of left-pinning it in the page-max
+       band; rail layouts below re-place it into an explicit column. */
+    justify-self: center;
   }
 
   /* Sticky lives on the grid item itself so its containing block is the
@@ -750,46 +752,76 @@
     font-size: 0.82rem;
   }
 
+  /* Responsive docs layout: a rail engages only once the viewport can host it
+     beside a full reading column; below each breakpoint the page falls back to
+     the centred single column + the sticky "On this page" / "Docs" dropdown. */
+
+  /* Nav-only: take the left rail once it fits beside a full reading column. */
   @media (min-width: 64rem) {
-    .docs-layout--with-nav {
+    .docs-layout--with-nav:not(.docs-layout--with-toc) {
       grid-template-columns: 14rem minmax(0, 1fr);
       gap: var(--docs-col-gap);
     }
 
-    .docs-layout--with-nav .project-docs-nav {
+    .docs-layout--with-nav:not(.docs-layout--with-toc) .project-docs-nav {
       display: block;
     }
 
-    .docs-layout--with-toc:not(.docs-layout--with-nav) {
-      grid-template-columns: minmax(0, 1fr) 12rem;
-      gap: var(--docs-col-gap);
-    }
-
-    .docs-layout--with-toc:not(.docs-layout--with-nav) .site-toc {
-      display: block;
-    }
-
-    .docs-layout--with-nav.docs-layout--with-toc .site-toc {
-      display: none;
-    }
-
-    .mobile-doc-nav {
+    .docs-layout--with-nav:not(.docs-layout--with-toc) .mobile-doc-nav {
       display: none;
     }
   }
 
+  /* Nav + ToC: full three columns only when all three fit, else the centred
+     single column (avoids a lopsided nav-only intermediate). */
   @media (min-width: 80rem) {
     .docs-layout--with-nav.docs-layout--with-toc {
       grid-template-columns: 14rem minmax(0, 1fr) 12rem;
+      gap: var(--docs-col-gap);
     }
 
+    .docs-layout--with-nav.docs-layout--with-toc .project-docs-nav,
     .docs-layout--with-nav.docs-layout--with-toc .site-toc {
       display: block;
     }
 
-    /* Let the article fill the middle column so gaps match the nav rail. */
+    /* Fill the middle column so gaps match the rails. */
     .docs-layout--with-nav.docs-layout--with-toc .docs-content {
       max-width: none;
+    }
+
+    .docs-layout--with-nav.docs-layout--with-toc .mobile-doc-nav {
+      display: none;
+    }
+  }
+
+  /* ToC-only (blog posts): rail on wide viewports only, else the dropdown.
+     Symmetric side tracks keep the article centred; the 13rem floor keeps the
+     ToC's longest heading to ~2 lines when the rail engages at 1536px (the
+     article flexes just below 62rem to pay for it, full width again by 1600px). */
+  @media (min-width: 96rem) {
+    .docs-layout--with-toc:not(.docs-layout--with-nav) {
+      grid-template-columns:
+        minmax(13rem, 1fr)
+        minmax(0, var(--reading-width))
+        minmax(13rem, 1fr);
+      gap: var(--docs-col-gap);
+    }
+
+    /* Grid track already caps width at --reading-width (no max-width needed). */
+    .docs-layout--with-toc:not(.docs-layout--with-nav) .docs-content {
+      grid-column: 2;
+    }
+
+    .docs-layout--with-toc:not(.docs-layout--with-nav) .site-toc {
+      display: block;
+      grid-column: 3;
+      justify-self: start;
+      max-width: 15rem;
+    }
+
+    .docs-layout--with-toc:not(.docs-layout--with-nav) .mobile-doc-nav {
+      display: none;
     }
   }
 

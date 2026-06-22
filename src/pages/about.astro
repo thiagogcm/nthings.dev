@@ -1,12 +1,10 @@
 ---
 import { SITE } from "@/consts";
-import BaseLayout from "@/layouts/BaseLayout.astro";
+import DocsLayout from "@/layouts/DocsLayout.astro";
 ---
 
-<BaseLayout title="About" description={`Release notes`} contained>
-  <article
-    class="grid grid-cols-[minmax(0,1fr)] gap-10 max-w-(--reading-width)"
-  >
+<DocsLayout title="About" description={`Release notes`}>
+  <article class="grid grid-cols-[minmax(0,1fr)] gap-10">
     <header class="grid gap-[0.85rem]">
       <h1>{SITE.author}</h1>
       <p class="lede">Software <del>Stuff</del> Engineer</p>
@@ -56,4 +54,4 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
       </ul>
     </div>
   </article>
-</BaseLayout>
+</DocsLayout>
